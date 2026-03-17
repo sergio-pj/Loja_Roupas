@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Loja Virtual | Em Desenvolvimento</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="sidebar" class="sidebar">
+    <a href="javascript:void(0)" class="closebtn" onclick="toggleMenu()">×</a>
+    <div class="sidebar-content">
+        <h3>Categorias</h3>
+        <a href="#">Todas as Camisas</a>
+        <a href="#">Camisas Claras</a>
+        <a href="#">Camisas Escuras</a>
+        <hr>
+        <a href="#">Minha Conta</a>
+        <a href="#">Suporte</a>
+    </div>
+</div>
+
+    <header class="main-header">
+    <div class="menu-icon" onclick="toggleMenu()">
+        <span></span>
+        <span></span>
+        <span></span>
+    </div>
+    <div class="search-bar">
+        <input type="text" placeholder="O que está procurando?">
+        <button>🔍</button>
+    </div>
+</header>
+
+    <section class="hero-banner">
+        <img src="assets/banner.png.png" alt="ERROR">
+    </section>
+
+
+    <h2 class="section-title">DESTAQUES PARA VOCÊ CONFERIR!</h2>
+    <section class="product-grid">
+        <article class="product-card">
+    <div class="img-box" style="background-color: #E2E2E2;"> <img src="assets/camisa-preta.png" alt="Camisa Preta" style="width: 90%; mix-blend-mode: multiply;">
+    </div>
+    <h3>Camisa Off-White Preta</h3>
+    <p class="price">R$ 80,00</p>
+</article>
+
+<article class="product-card">
+    <div class="img-box" style="background-color: #EBE7DE;"> <img src="assets/camisa-bege.png" alt="Camisa Bege" style="width: 90%; mix-blend-mode: multiply;">
+    </div>
+    <h3>Camisa Off-White Bege</h3>
+    <p class="price">R$ 60,00</p>
+        </article>
+        <article class="product-card">
+            <div class="img-box" style="background-color: #F2F2F2;"> <img src="assets/camisa-branca.png" alt="Camisa Branca" style="width: 90%; mix-blend-mode: multiply;">
+            </div>
+            <h3>Camisa Off-White Branca</h3>
+            <p class="price">R$ 55,00</p>
+        </article>
+    </section>
+
+    <section class="tabela-medidas-container">
+    <h2>TABELA DE MEDIDAS</h2>
+    <table class="tabela-medidas">
+        <thead>
+            <tr>
+                <th>Tamanho</th>
+                <th>Referência</th>
+                <th>Busto</th>
+                <th>Cintura</th>
+                <th>Quadril</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>PP</td>
+                <td>34/36</td>
+                <td>85 cm</td>
+                <td>68 cm</td>
+                <td>94 cm</td>
+            </tr>
+            <tr>
+                <td>P</td>
+                <td>38/40</td>
+                <td>90 cm</td>
+                <td>73 cm</td>
+                <td>99 cm</td>
+            </tr>
+            <tr>
+                <td>M</td>
+                <td>42/44</td>
+                <td>95 cm</td>
+                <td>78 cm</td>
+                <td>104 cm</td>
+            </tr>
+            <tr>
+                <td>G</td>
+                <td>44/46</td>
+                <td>100 cm</td>
+                <td>83 cm</td>
+                <td>109 cm</td>
+            </tr>
+        </tbody>
+    </table>
+</section>
+
+    <footer class="main-footer">
+        <p>Desenvolvido por <strong>OperaTech</strong></p>
+    </footer>
+    <script src="script.js"></script>
+</body>
+</html>
