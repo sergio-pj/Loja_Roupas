@@ -7,53 +7,65 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
+    <div id="overlay" onclick="toggleMenu()"></div>
     <div id="sidebar" class="sidebar">
-    <a href="javascript:void(0)" class="closebtn" onclick="toggleMenu()">×</a>
-    <div class="sidebar-content">
-        <h3>Categorias</h3>
-        <a href="#">Todas as Camisas</a>
-        <a href="#">Camisas Claras</a>
-        <a href="#">Camisas Escuras</a>
-        <hr>
-        <a href="#">Minha Conta</a>
-        <a href="#">Suporte</a>
+                <a href="javascript:void(0)" class="closebtn" onclick="toggleMenu()">×</a>
+        <div class="sidebar-content">
+            <h3>Categorias</h3>
+            <nav class="sidebar-links">
+                <a href="#" onclick="toggleMenu()">Todas as Camisas</a>
+                <a href="#" class="link-clara" onclick="toggleMenu()">Camisas Claras</a>
+                <a href="#" class="link-escura" onclick="toggleMenu()">Camisas Escuras</a>
+                <hr>
+                <a href="#">Minha Conta</a>
+                <a href="#">Suporte</a>
+            </nav>
+        </div>
     </div>
-</div>
 
-    <header class="main-header">
-    <div class="menu-icon" onclick="toggleMenu()">
-        <span></span>
-        <span></span>
-        <span></span>
-    </div>
-    <div class="search-bar">
-        <input type="text" placeholder="O que está procurando?">
-        <button>🔍</button>
-    </div>
-</header>
+        <header class="main-header">
+            <div class="menu-icon" onclick="toggleMenu()">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+
+            <div class="search-bar">
+                <input type="text" placeholder="O que está procurando?">
+            </div>
+
+            <nav class="nav-menu">
+                <a href="pages/quemsomos/index.html">Quem somos</a>
+                <a href="pages/catalogo/index.html">Produtos</a>
+            </nav>
+    </header>
 
     <section class="hero-banner">
-        <img src="assets/banner.png.png" alt="ERROR">
+        <img src="assets/bannerp.png" alt="ERROR">
     </section>
 
 
+    <section class="highlights-section">
+    
     <h2 class="section-title">DESTAQUES PARA VOCÊ CONFERIR!</h2>
+    
     <section class="product-grid">
         <article class="product-card">
-    <div class="img-box" style="background-color: #E2E2E2;"> <img src="assets/camisa-preta.png" alt="Camisa Preta" style="width: 90%; mix-blend-mode: multiply;">
-    </div>
-    <h3>Camisa Off-White Preta</h3>
-    <p class="price">R$ 80,00</p>
-</article>
+            <div class="img-box" style="background-color: #E2E2E2;"> 
+                <img src="assets/CamisaModeloPreta.png" alt="Camisa Preta" style="width: 90%; mix-blend-mode: multiply;">
+            </div>
+            <h3>Camisa All Black</h3>
+            <p class="price">R$ 80,00</p>
+        </article>
 
 <article class="product-card">
-    <div class="img-box" style="background-color: #EBE7DE;"> <img src="assets/camisa-bege.png" alt="Camisa Bege" style="width: 90%; mix-blend-mode: multiply;">
+    <div class="img-box" style="background-color: #EBE7DE;"> <img src="assets/CamisaModeloBege.png" alt="Camisa Bege" style="width: 90%; mix-blend-mode: multiply;">
     </div>
     <h3>Camisa Off-White Bege</h3>
     <p class="price">R$ 60,00</p>
         </article>
         <article class="product-card">
-            <div class="img-box" style="background-color: #F2F2F2;"> <img src="assets/camisa-branca.png" alt="Camisa Branca" style="width: 90%; mix-blend-mode: multiply;">
+            <div class="img-box" style="background-color: #F2F2F2;"> <img src="assets/CamisaModeloBranca.png" alt="Camisa Branca" style="width: 90%; mix-blend-mode: multiply;">
             </div>
             <h3>Camisa Off-White Branca</h3>
             <p class="price">R$ 55,00</p>
@@ -106,7 +118,29 @@
 </section>
 
     <footer class="main-footer">
-        <p>Desenvolvido por <strong>OperaTech</strong></p>
+        <div class="footer-container">
+            <div class="footer-brand">
+                <h2>ARANHA</h2> <p>Sua marca de roupas off-white com qualidade e estilo.</p>
+            </div>
+            
+            <div class="footer-links">
+                <h4>PROJETO ARANHA</h4>
+                <a href="#">Coleção Off-White</a>
+                <a href="#">Guia de Estilo</a>
+                <a href="#">Catálogo Completo</a>
+            </div>
+
+            <div class="footer-social">
+                <h4>CONTATO</h4>
+                <div class="social-icons">
+                    <a href="https://www.instagram.com/yuri_mtss/?utm_source=ig_web_button_share_sheet">Instagram</a>
+                    <a href="#">LinkedIn</a>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2026 <strong>AuryxTech</strong> - Desenvolvido por AuryxTech.</p>
+        </div>
     </footer>
     <script src="script.js"></script>
 </body>

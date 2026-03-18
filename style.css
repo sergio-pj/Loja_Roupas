@@ -1,17 +1,28 @@
-/* Reset Básico */
-* { margin: 0; padding: 0; box-box: border-box; font-family: 'Inter', sans-serif; }
+/* 1. CONFIGURAÇÕES GERAIS E FONTES */
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Inter:wght@400;600&display=swap');
+
+* { 
+    margin: 0; 
+    padding: 0; 
+    box-sizing: border-box; /* Corrigido de box-box */
+}
 
 body {
     background-color: #FAF9F6; /* Off-white base */
-    font-family: sans-serif;
+    font-family: 'Inter', sans-serif;
     color: #333;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
 }
 
-/* Header Centralizado */
+/* 2. HEADER E BARRA DE BUSCA */
 .main-header {
     display: flex;
-    justify-content: center;
+    justify-content: center; /* Centraliza a barra de busca */
+    align-items: center;
     padding: 20px;
+    position: relative;
 }
 
 .search-bar {
@@ -21,7 +32,8 @@ body {
     border-radius: 25px;
     padding: 5px 15px;
     width: 100%;
-    max-width: 500px;
+    max-width: 400px;
+    background: #fff;
 }
 
 .search-bar input {
@@ -29,111 +41,122 @@ body {
     outline: none;
     width: 100%;
     padding: 8px;
+    font-family: 'Inter', sans-serif;
+    text-align: center;
 }
 
-/* Grid de Categorias (Lado a Lado) */
-.categorias-container {
-    display: flex;
-    gap: 15px;
-    padding: 20px;
-    justify-content: center;
-}
-
-.categoria-item {
-    flex: 1;
-    max-width: 450px;
-    height: 180px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-weight: bold;
-    letter-spacing: 1px;
+/* 3. MENU HAMBÚRGUER E SIDEBAR */
+.menu-icon {
     cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    padding: 10px;
+    position: absolute;
+    left: 20px;
+}
+
+.menu-icon span {
+    width: 25px;
+    height: 3px;
+    background-color: #333;
     transition: 0.3s;
 }
 
-.categoria-item.clara { background-color: #EBE7DE; color: #000; }
-.categoria-item.escura { background-color: #1A1714; color: #fff; }
-
-.categoria-item:hover { opacity: 0.8; transform: translateY(-3px); }
-
-/* Grid de Produtos */
-.section-title {
-    text-align: center;
-    margin: 40px 0 20px;
-    font-weight: 400;
-    letter-spacing: 2px;
+.sidebar {
+    height: 100%;
+    width: 0;
+    position: fixed;
+    z-index: 1000;
+    top: 0;
+    left: 0;
+    background-color: rgba(255, 255, 255, 0.98);
+    backdrop-filter: blur(10px);
+    overflow-x: hidden;
+    transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 10px 0 30px rgba(0, 0, 0, 0.05);
 }
 
-.categories-section {
+.sidebar-content {
+    padding: 80px 30px;
     display: flex;
-    justify-content: center;
-    gap: 20px;
-    padding: 40px 20px;
+    flex-direction: column;
 }
 
-.cat-card {
-    flex: 1;
-    max-width: 400px;
-    height: 150px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-weight: bold;
+.sidebar-content h3 {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 3px;
+    color: #999;
+    margin-bottom: 20px;
+}
+
+.sidebar a {
+    padding: 12px 20px;
+    text-decoration: none;
+    font-size: 18px;
+    color: #1a1a1a;
+    display: block;
+    transition: 0.3s;
+    border-radius: 8px;
+}
+
+.sidebar a:hover {
+    background-color: #f5f5f5;
+    padding-left: 30px;
+}
+
+.link-clara { border-left: 4px solid #EBE7DE; }
+.link-escura { border-left: 3px solid #1A1714; }
+
+.closebtn {
+    position: absolute;
+    top: 20px;
+    right: 25px;
+    font-size: 36px;
+    color: #333;
+    text-decoration: none;
     cursor: pointer;
 }
 
-.light { background: #e9e4d4; }
-.dark { background: #1a1510; color: white; }
-
-/* Grid de Produtos Responsivo */
-.product-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-    gap: 30px;
-    padding: 40px;
-    max-width: 1200px;
-    margin: 0 auto;
-}
-
-.product-card {
-    background: #fff;
-    padding: 15px;
-    border-radius: 12px; /* Cantos arredondados suaves */
-    transition: all 0.3s ease;
-    text-align: center;
-}
-
-.product-card h3 {
-    font-size: 15px;
-    color: #222;
-    font-weight: 500;
-    margin-bottom: 8px;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-}
-
-.price {
-    font-size: 18px;
-    color: #000;
-    font-weight: 700;
-}
-
-.product-card:hover {
-    transform: translateY(-10px);
-    box-shadow: 0 20px 40px rgba(0,0,0,0.08);
-}
-
-.img-box {
+#overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
     width: 100%;
-    aspect-ratio: 1 / 1; /* Garante que seja um quadrado perfeito */
-    background-color: #f7f7f7; /* Cinza bem clarinho igual ao Figma */
-    border-radius: 8px;
-    margin-bottom: 20px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    overflow: hidden;
+    height: 100%;
+    background: rgba(0,0,0,0.5);
+    z-index: 999;
+}
+
+/* 4. SEÇÃO DE DESTAQUES E PRODUTOS */
+.highlights-section {
+    background-color: #f9f9f9;
+    padding: 0px 0;
+    text-align: center;
+    flex: 1; /* Faz a seção ocupar o espaço necessário */
+}
+
+.highlights-section h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: 24px;
+    letter-spacing: 4px;
+    margin-bottom: 40px;
+    position: relative;
+    display: inline-block;
+    text-transform: uppercase;
+}
+
+.highlights-section h2::after {
+    content: '';
+    position: absolute;
+    width: 50px;
+    height: 2px;
+    background-color: #1a1714;
+    bottom: -10px;
+    left: 50%;
+    transform: translateX(-50%);
 }
 
 .tabela-medidas-container {
@@ -165,135 +188,141 @@ h2 {
     text-transform: uppercase;
 }
 
-/* Melhorando os Cards */
-.card-produto {
-    background-color: #f0f0f0; /* Cor de fundo suave do Figma */
-    border: none;
+.product-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 30px;
     padding: 20px;
-    transition: transform 0.3s ease;
+    max-width: 1200px;
+    margin: 0 auto;
 }
 
-.card-produto img {
-    mix-blend-mode: multiply; /* Ajuda a remover fundos brancos das fotos se o card for cinza */
-    max-width: 100%;
+.product-card {
+    background: #fff;
+    padding: 20px;
+    border-radius: 12px;
+    transition: 0.3s ease;
+    text-align: center;
 }
 
-.card-produto h3 {
+.product-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 15px 30px rgba(0,0,0,0.08);
+}
+
+.img-box {
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    background-color: #f0f0f0;
+    border-radius: 8px;
+    margin-bottom: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+
+.img-box img {
+    max-width: 90%;
+    mix-blend-mode: multiply;
+}
+
+.product-card h3 {
     font-size: 14px;
-    margin-top: 15px;
-    font-weight: 400;
-}
-
-.card-produto p {
-    font-weight: bold;
-    color: #333;
-}
-
-/* Ícone das 3 listras */
-.menu-icon {
-    cursor: pointer;
-    display: flex;
-    flex-direction: column;
-    gap: 5px;
-    padding: 10px;
-    position: absolute;
-    left: 20px;
-}
-
-.menu-icon span {
-    width: 25px;
-    height: 3px;
-    background-color: #333;
-    transition: 0.3s;
-}
-
-/* Sidebar com efeito de vidro (Glassmorphism) */
-.sidebar {
-    height: 100%;
-    width: 0;
-    position: fixed;
-    z-index: 1000;
-    top: 0;
-    left: 0;
-    background-color: rgba(255, 255, 255, 0.98); /* Fundo quase branco */
-    backdrop-filter: blur(10px); /* Leve desfoque no que está atrás */
-    overflow-x: hidden;
-    transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1); /* Transição mais suave */
-    box-shadow: 10px 0 30px rgba(0, 0, 0, 0.05);
-}
-
-.sidebar-content {
-    padding: 80px 30px;
-    display: flex;
-    flex-direction: column;
-}
-
-.sidebar-content h3 {
-    font-size: 12px;
     text-transform: uppercase;
-    letter-spacing: 3px;
-    color: #999;
-    margin-bottom: 40px;
-    font-weight: 600;
+    letter-spacing: 1px;
+    margin-bottom: 10px;
 }
 
-.sidebar a {
-    padding: 12px 0;
-    text-decoration: none;
+.price {
+    font-weight: 700;
     font-size: 18px;
-    color: #1a1a1a;
-    display: block;
-    font-weight: 400;
-    transition: 0.3s;
-    position: relative;
 }
 
-.sidebar a::after {
-    content: '';
-    position: absolute;
-    width: 0;
-    height: 1px;
-    bottom: 8px;
-    left: 0;
-    background-color: #000;
-    transition: 0.3s;
+/* 5. RODAPÉ (CONSOLIDADO AURYXTECH) */
+.main-footer {
+    background-color: #1a1714;
+    color: #fff;
+    padding: 60px 0 20px;
+    margin-top: auto;
 }
 
-.sidebar a:hover {
-    color: #000;
-    padding-left: 10px; /* Pequeno deslize para a direita */
+.footer-container {
+    display: flex;
+    justify-content: space-between;
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 0 20px;
+    gap: 0px;
+    flex-wrap: wrap;
 }
 
-.sidebar a:hover::after {
-    width: 30px;
+.footer-brand { flex: 1.5; max-width: 350px; }
+.footer-links, .footer-social { flex: 1; min-width: 150px; }
+
+.main-footer h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: 32px;
+    letter-spacing: 5px;
+    margin-bottom: 15px;
 }
 
-.closebtn {
-    position: absolute;
-    top: 25px;
-    right: 25px;
-    font-size: 28px;
-    color: #333;
+.main-footer h4 {
+    font-family: 'Playfair Display', serif;
+    font-size: 14px;
+    letter-spacing: 2px;
+    color: #888;
+    margin-bottom: 20px;
+    text-transform: uppercase;
+}
+
+.main-footer p, .main-footer a {
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    color: #bbb;
     text-decoration: none;
-    transition: 0.3s;
+    line-height: 1.6;
 }
 
-.closebtn:hover {
-    transform: rotate(90deg);
-    color: #ff4d4d;
+.footer-links a, .footer-social a {
+    display: block;
+    margin-bottom: 10px;
 }
 
-hr {
-    border: 0;
-    height: 1px;
-    background: #eee;
-    margin: 30px 0;
+.footer-links a:hover, .footer-social a:hover { color: #fff; }
+
+.footer-bottom {
+    text-align: center;
+    margin-top: 40px;
+    padding-top: 20px;
+    border-top: 1px solid #333;
+    font-size: 12px;
 }
 
-.sidebar .closebtn {
+.footer-bottom strong {
+    font-family: 'Playfair Display', serif;
+    letter-spacing: 1px;
+    color: #fff;
+}
+
+.nav-menu {
     position: absolute;
-    top: 10px;
-    right: 25px;
-    font-size: 36px;
-    border: none;
+    right: 30px; /* Distância da borda direita */
+    display: flex;
+    gap: 25px; /* Espaço entre "Quem somos" e "Produtos" */
+}
+
+.nav-menu a {
+    text-decoration: none;
+    color: #1a1714;
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    transition: 0.3s ease;
+}
+
+.nav-menu a:hover {
+    color: #888; /* Efeito visual ao passar o mouse */
 }
