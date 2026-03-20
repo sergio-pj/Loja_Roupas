@@ -1,0 +1,228 @@
+/* Base de cores da Aranha */
+body {
+    background-color: #f2f2f2; /* Cinza claro da Home */
+    font-family: 'Inter', sans-serif;
+}
+
+.titulo-sessao {
+    font-family: 'Playfair Display', serif; /* Ou a fonte serifada que você usou na Home */
+    text-align: center;
+    text-transform: uppercase;
+    letter-spacing: 4px;
+    margin-bottom: 40px;
+    color: #1a1714;
+}
+
+.sidebar-content {
+    padding: 40px 30px; /* Espaçamento interno generoso */
+}
+
+.sidebar-content h3 {
+    font-family: 'Inter', sans-serif;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: #888; /* Tom cinza suave para o título */
+    margin-bottom: 25px;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 10px;
+}
+
+.sidebar-links a {
+    display: flex;
+    align-items: center;
+    gap: 15px; /* Espaço entre o ícone e o texto */
+    padding: 12px 0;
+    color: #1a1714;
+    text-decoration: none;
+    font-size: 15px;
+    transition: 0.3s;
+}
+
+.sidebar-links a i {
+    width: 20px; /* Garante que os ícones fiquem alinhados verticalmente */
+    text-align: center;
+    font-size: 18px;
+}
+
+.sidebar-links a:hover {
+    padding-left: 8px; /* Efeito de deslocamento suave */
+    color: #555;
+}
+
+/* Sidebar elegante */
+.filtros-sidebar {
+    width: 250px;
+    background: rgba(255, 255, 255, 0.7); /* Efeito semi-transparente */
+    backdrop-filter: blur(10px);
+    padding: 25px;
+    border-radius: 2px;
+    border-left: 4px solid #1a1714;
+}
+
+.filtros-sidebar h3 {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    margin: 20px 0 10px;
+    color: #888;
+}
+
+.filtros-sidebar button {
+    display: block;
+    width: 100%;
+    text-align: left;
+    background: none;
+    border: none;
+    padding: 8px 0;
+    font-size: 14px;
+    cursor: pointer;
+    transition: 0.3s;
+    border-bottom: 1px solid transparent;
+}
+
+.filtros-sidebar button:hover {
+    padding-left: 5px;
+    border-bottom: 1px solid #1a1714;
+}
+
+/* Card de Produto Minimalista */
+.product-card {
+    background: #fff;
+    padding: 10px;
+    transition: 0.4s;
+}
+
+.product-card:hover {
+    box-shadow: 0 15px 30px rgba(0,0,0,0.08);
+}
+
+.product-image img {
+    width: 100%;
+    height: 250px; /* Altura fixa para manter o grid alinhado */
+    object-fit: contain; /* Não corta a imagem da camisa */
+    transition: transform 0.5s ease;
+}
+
+/* Efeito de zoom que sugeri antes */
+.product-card:hover .product-image img {
+    transform: scale(1.0);
+}
+
+.product-info h4 {
+    font-weight: 600;
+    font-size: 15px;
+    margin-bottom: 5px;
+    color: #1a1714;
+}
+
+.product-info .price {
+    font-size: 14px;
+    color: #666;
+}
+
+.main-header {
+    background: rgba(255,255,255,0.95);
+    border-bottom: 1px solid #eee;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    background-image: url('../../assets/Fundo_Cabeçalho.png'); /* Caminho da sua imagem de fumaça */
+    background-size: cover;
+}
+
+.catalogo-container {
+    display: flex; /* Coloca Filtros e Produtos lado a lado */
+    gap: 40px;
+    padding: 50px 5%;
+    align-items: flex-start;
+}
+
+.filtros-sidebar {
+    width: 250px;
+    position: sticky; /* Faz o filtro acompanhar a rolagem */
+    top: 100px;
+}   
+
+.search-bar input:focus {
+    outline: none;
+    border: 1px solid #1a1714; /* Cor da Aranha */
+    box-shadow: 0 0 8px rgba(0, 0, 0, 0.05);
+}
+
+
+
+.btn-detalhes {
+    width: 100%;
+    background-color: #1a1714; /* Cinza quase preto da marca */
+    color: #ffffff;
+    border: 1px solid #1a1714;
+    padding: 12px 20px;
+    font-family: 'Inter', sans-serif; /* Fonte padrão do projeto */
+    font-size: 13px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 2px; /* Espaçamento premium entre letras */
+    cursor: pointer;
+    transition: all 0.4s ease;
+    margin-top: 15px;
+    border-radius: 2px;
+}
+
+.btn-detalhes:hover {
+    background-color: transparent;
+    color: #1a1714;
+    letter-spacing: 3px; /* Efeito visual de expansão no hover */
+}
+
+.nav-menu {
+    display: flex;
+    align-items: center;
+    gap: 25px;
+}
+
+.nav-menu a {
+    display: flex;
+    align-items: center;
+    gap: 8px; /* Espaço entre o ícone e o texto */
+    text-decoration: none;
+    color: #1a1714;
+    font-size: 14px;
+    font-weight: 600;
+    transition: 0.3s;
+}
+
+.nav-menu a i {
+    font-size: 18px; /* Ícone levemente maior que o texto para destaque */
+}
+
+.nav-menu a:hover {
+    opacity: 0.7;
+}
+
+.user-link {
+    display: flex;
+    align-items: center;
+    gap: 8px; /* Espaço entre o círculo e o texto */
+}
+
+/* Garante que o Font Awesome use a fonte correta e apareça */
+.fas, .fa-solid {
+    font-family: "Font Awesome 6 Free" !important;
+    font-weight: 950 !important;
+    display: inline-block !important;
+    font-style: normal !important;
+    color: inherit; /* Segue a cor do texto do link */
+}
+
+.user-link i {
+    font-size: 22px; /* Destaque para o ícone de usuário */
+    color: #1a1714;
+}
+
+/* Se quiser esconder o texto no mobile e deixar só o ícone */
+@media (max-width: 768px) {
+    .user-link span {
+        display: none;
+    }
+}

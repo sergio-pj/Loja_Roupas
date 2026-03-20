@@ -1,14 +1,79 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-br">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
-    <link rel="stylesheet" href="../../style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">    <link rel="stylesheet" href="../../style.css">
     <link rel="stylesheet" href="catalogo.css">
 </head>
 <body>
-    <p id="titulo">Aqui vai ficar o catalogo</p>
+    <div id="overlay" onclick="toggleMenu()"></div>
+    
+    
+    <div id="sidebar" class="sidebar">
+            <a href="javascript:void(0)" class="closebtn" onclick="toggleMenu()">×</a>
+        <div class="sidebar-content">
+            <h3>Informações</h3>
+            <nav class="sidebar-links">                
+                <a href="#"><i class="fas fa-box"></i> Minhas Compras</a>
+                <a href="#"><i class="fas fa-headset"></i> Suporte Técnico</a>
+                <a href="#"><i class="fas fa-question-circle"></i> Perguntas Frequentes</a>
+                <hr>
+                <a href="../../index.html">Voltar ao Início</a>
+            </nav>
+        </div>
+    </div>
+
+    <header class="main-header">
+    <div class="menu-icon" onclick="toggleMenu()">
+        <span></span>
+        <span></span>
+        <span></span>
+    </div>
+
+    <div class="search-bar">
+        <input type="text" placeholder="O que está procurando?">
+    </div>
+
+    <nav class="nav-menu">
+        <a href="../../index.html">Início</a>
+        <a href="pages/quemsomos/index.html">Quem Somos</a>
+        <a href="#" class="user-link">
+            <i class="fas fa-user-circle"></i> 
+        </a>
+    </nav>
+</header>
+
+
+   <main class="catalogo-container">
+        <aside class="filtros-sidebar">
+            
+            <div class="sessao-filtro">
+                <h3>Filtrar por Estilo</h3>
+                <div class="grupo-filtros">
+                    <button onclick="filtrar('todos')">Todos</button>
+                    <button onclick="filtrar('camisetas')">Camisetas</button>
+                    <button onclick="filtrar('oversized')">Oversized</button>
+                </div>
+            </div>
+
+            <div class="sessao-filtro">
+                <h3>Filtrar por Cor</h3>
+                <div class="grupo-filtros">
+                    <button onclick="filtrar('clara')">Peças Claras</button>
+                    <button onclick="filtrar('escura')">Peças Escuras</button>
+                </div>
+            </div>
+
+        </aside>
+
+            <section class="conteudo-produtos">
+                <h2 class="titulo-sessao">Catálogo Aranha</h2>
+                    <div id="lista-produtos" class="product-grid">
+                    </div>
+            </section>
+    </main>
     <script src="catalogo.js"></script>
 </body>
 </html>

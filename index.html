@@ -7,57 +7,58 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div class="decor-topo">
-        <img src="assets/teia-semfundonormal.png" class="teia-img">
-    </div>
+
 
     <div id="overlay" onclick="toggleMenu()"></div>
-    
-    
-    <div id="sidebar" class="sidebar">
-                <a href="javascript:void(0)" class="closebtn" onclick="toggleMenu()">×</a>
-        <div class="sidebar-content">
-            <h3>Categorias</h3>
-            <nav class="sidebar-links">
-                <a href="#" onclick="toggleMenu()">Todas as Camisas</a>
-                <a href="#" class="link-clara" onclick="toggleMenu()">Camisas Claras</a>
-                <a href="#" class="link-escura" onclick="toggleMenu()">Camisas Escuras</a>
-                <hr>
-                <a href="#">Minha Conta</a>
-                <a href="#">Suporte</a>
-            </nav>
-        </div>
+
+<div id="sidebar" class="sidebar">
+    <a href="javascript:void(0)" class="closebtn" onclick="toggleMenu()">×</a>
+    <div class="sidebar-content">
+        <h3>Categorias</h3>
+        <nav class="sidebar-links">
+            <a href="#" onclick="filtrar('todos'); toggleMenu()">Todas as Camisas</a>
+            <a href="#" class="link-clara" onclick="filtrar('clara'); toggleMenu()">Camisas Claras</a>
+            <a href="#" class="link-escura" onclick="filtrar('escura'); toggleMenu()">Camisas Escuras</a>
+            <a href="pages/quemsomos/index.html">Quem Somos</a>
+            <a href="pages/catalogo/index.html">Catálogo</a>
+            <hr>
+            <a href="#" class="user-link-sidebar">
+                <i class="fas fa-user-circle"></i> 
+                <span>Minha Conta</span>
+            </a>
+            <a href="#"><i class="fas fa-headset"></i> Suporte</a>
+        </nav>
+    </div>
+</div>
+
+<header class="main-header">
+    <div class="menu-icon" onclick="toggleMenu()">
+        <span></span>
+        <span></span>
+        <span></span>
     </div>
 
-        <header class="main-header">
-            <div class="menu-icon" onclick="toggleMenu()">
-                <span></span>
-                <span></span>
-                <span></span>
-            </div>
+    <div class="search-bar">
+        <input type="text" placeholder="O que está procurando?">
+    </div>
 
-            <div class="search-bar">
-                <input type="text" placeholder="O que está procurando?">
-            </div>
-
-            <nav class="nav-menu">
-                <a href="pages/quemsomos/index.html">Quem somos</a>
-                <a href="pages/catalogo/index.html">Produtos</a>
-            </nav>
-    </header>
+    <nav class="nav-menu">
+        <a href="pages/quemsomos/index.html">Quem somos</a>
+        <a href="pages/catalogo/index.html">Catálogo</a>
+        <a href="#" class="user-link">
+            <i class="fas fa-user-circle"></i> 
+        </a>
+    </nav>
+</header>
 
     <section class="hero-banner">
         <div class="banner-overlay">
-            <div class="banner-text">
-                <h1>PROMOÇÃO<br>DE PRIMAVERA</h1>
-                <span class="badge-off">20% OFF</span>
-            </div>
         </div>
     </section>
 
     <section class="brand-overlap">
         <div class="overlap-box">
-            <img src="assets/AranhaLogo.png.png" alt="Logo" class="mini-logo">
+            <img src="assets/AranhaTransp82-remove.png" alt="Logo" class="mini-logo">
             <h2>ARANHA</h2>
             <p>Descubra a elegância sutil da Aranha. Qualidade excepcional, design atemporal.</p>
         </div>
@@ -86,14 +87,14 @@
     </div>
 </section>
 
-    <section><div class="newsletter-container">
+    <section class="newsletter-section"> <div class="newsletter-container">
         <div class="newsletter-form">
             <input type="email" placeholder="Email" class="newsletter-input">
             <button class="newsletter-button">INSCREVER-SE</button>
         </div>
-            <p class="newsletter-text">Assine nossa newsletter para novidades e ofertas exclusivas.</p>
-        </div>
-    </section>
+        <p class="newsletter-text">Assine nossa newsletter para novidades e ofertas exclusivas.</p>
+    </div>
+</section>
 
     <section class="tabela-medidas-container">
     <h2>TABELA DE MEDIDAS</h2>
@@ -140,9 +141,7 @@
     </table>
 </section>
 
-    <div class="decor-rodape">
-    <img src="assets/teia-semfundoinvertida.png" class="teia-baixo-img">
-</div>
+
 
 <footer class="seu-footer-aqui">
     </footer>

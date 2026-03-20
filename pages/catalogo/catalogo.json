@@ -1,0 +1,26 @@
+[
+  {
+    "id": 1,
+    "nome": "Camiseta All Black",
+    "preco": 79.90,
+    "categoria": "camisetas",
+    "cor": "escura",
+    "imagem": "../../assets/CamisaModeloPreta.png"
+  },
+  {
+    "id": 2,
+    "nome": "Oversized Smoke",
+    "preco": 79.90,
+    "categoria": "camisetas",
+    "cor": "clara",
+    "imagem": "../../assets/CamisaModeloBege.png"
+  },
+  {
+    "id": 3,
+    "nome": "Camiseta Bege",
+    "preco": 79.90,
+    "categoria": "camisetas",
+    "cor": "clara",
+    "imagem": "../../assets/CamisaModeloBege.png"
+  }
+]
