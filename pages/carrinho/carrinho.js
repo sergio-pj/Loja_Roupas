@@ -1,0 +1,572 @@
+import { supabase } from '../../json/supabase-browser.js';
+
+function toggleMenu() {
+    const sidebar = document.getElementById('sidebar');
+    const overlay = document.getElementById('overlay');
+
+    if (!sidebar || !overlay) {
+        return;
+    }
+
+    if (sidebar.style.width === '250px') {
+        sidebar.style.width = '0';
+        overlay.style.display = 'none';
+    } else {
+        sidebar.style.width = '250px';
+        overlay.style.display = 'block';
+    }
+}
+
+window.toggleMenu = toggleMenu;
+
+const firstPurchaseCoupon = 'PRIMEIRACOMPRA';
+const couponKey = 'aranha-cart-coupon';
+const orderDraftKey = 'aranha-order-draft';
+let appliedCoupon = window.localStorage.getItem(couponKey) || '';
+let currentUser = null;
+let couponEligibility = {
+    checked: false,
+    schemaReady: true,
+    canUseFirstPurchase: false,
+    reason: 'Faça login para validar cupons da conta.'
+};
+
+const cartItemsContainer = document.getElementById('cart-items');
+const cartEmpty = document.getElementById('cart-empty');
+const cartLoginRequired = document.getElementById('cart-login-required');
+const shippingZip = document.getElementById('shipping-zip');
+const shippingFeedback = document.getElementById('shipping-feedback');
+const couponForm = document.getElementById('coupon-form');
+const couponCode = document.getElementById('coupon-code');
+const couponFeedback = document.getElementById('coupon-feedback');
+const checkoutButton = document.getElementById('checkout-button');
+const checkoutFeedback = document.getElementById('checkout-feedback');
+const summarySubtotal = document.getElementById('summary-subtotal');
+const summaryDiscount = document.getElementById('summary-discount');
+const summaryShipping = document.getElementById('summary-shipping');
+const summaryTotal = document.getElementById('summary-total');
+
+async function syncAuthState() {
+    const { data, error } = await supabase.auth.getSession();
+
+    if (error || !data.session?.user) {
+        currentUser = null;
+        if (window.storefront) {
+            window.storefront.clearAuth();
+        }
+
+        return false;
+    }
+
+    currentUser = data.session.user;
+
+    if (window.storefront) {
+        window.storefront.setAuth({
+            userId: data.session.user.id,
+            email: data.session.user.email || ''
+        });
+    }
+
+    return true;
+}
+
+function isMissingSchemaError(error) {
+    const message = String(error?.message || '').toLowerCase();
+    return message.includes('does not exist') || message.includes('relation');
+}
+
+function clearAppliedCoupon() {
+    appliedCoupon = '';
+    window.localStorage.removeItem(couponKey);
+
+    if (couponCode) {
+        couponCode.value = '';
+    }
+}
+
+async function loadCouponEligibility() {
+    if (!currentUser) {
+        couponEligibility = {
+            checked: true,
+            schemaReady: true,
+            canUseFirstPurchase: false,
+            reason: 'Faça login para validar o cupom PRIMEIRACOMPRA.'
+        };
+        return;
+    }
+
+    const paidOrdersRequest = supabase
+        .from('orders')
+        .select('id', { count: 'exact', head: true })
+        .eq('user_id', currentUser.id)
+        .in('status', ['paid', 'approved']);
+
+    const couponUseRequest = supabase
+        .from('coupon_redemptions')
+        .select('id', { count: 'exact', head: true })
+        .eq('user_id', currentUser.id)
+        .eq('coupon_code', firstPurchaseCoupon)
+        .in('status', ['reserved', 'redeemed']);
+
+    const [paidOrdersResult, couponUseResult] = await Promise.all([paidOrdersRequest, couponUseRequest]);
+
+    if (paidOrdersResult.error || couponUseResult.error) {
+        const firstError = paidOrdersResult.error || couponUseResult.error;
+
+        if (isMissingSchemaError(firstError)) {
+            couponEligibility = {
+                checked: true,
+                schemaReady: false,
+                canUseFirstPurchase: false,
+                reason: 'Execute o SQL supabase/003_orders_coupons.sql no Supabase para validar cupons e pedidos.'
+            };
+            clearAppliedCoupon();
+            return;
+        }
+
+        couponEligibility = {
+            checked: true,
+            schemaReady: false,
+            canUseFirstPurchase: false,
+            reason: 'Nao foi possivel validar a elegibilidade do cupom agora.'
+        };
+        clearAppliedCoupon();
+        return;
+    }
+
+    const paidOrdersCount = Number(paidOrdersResult.count || 0);
+    const couponUsageCount = Number(couponUseResult.count || 0);
+    const canUseFirstPurchase = paidOrdersCount === 0 && couponUsageCount === 0;
+
+    couponEligibility = {
+        checked: true,
+        schemaReady: true,
+        canUseFirstPurchase,
+        reason: canUseFirstPurchase
+            ? 'Cupom PRIMEIRACOMPRA disponivel para a primeira compra aprovada desta conta.'
+            : 'Este cliente ja possui compra aprovada ou ja utilizou o cupom PRIMEIRACOMPRA.'
+    };
+
+    if (!canUseFirstPurchase && appliedCoupon === firstPurchaseCoupon) {
+        clearAppliedCoupon();
+    }
+}
+
+function formatPrice(value) {
+    return value.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+}
+
+function formatZipCode(value) {
+    const digits = value.replace(/\D/g, '').slice(0, 8);
+
+    if (digits.length <= 5) {
+        return digits;
+    }
+
+    return `${digits.slice(0, 5)}-${digits.slice(5)}`;
+}
+
+function getDiscount(subtotal) {
+    if (appliedCoupon === firstPurchaseCoupon && couponEligibility.canUseFirstPurchase) {
+        return subtotal * 0.1;
+    }
+
+    return 0;
+}
+
+function buildCouponSnapshot(discount) {
+    if (!appliedCoupon) {
+        return {};
+    }
+
+    return {
+        code: appliedCoupon,
+        type: 'first_purchase',
+        discount_percentage: appliedCoupon === firstPurchaseCoupon ? 10 : 0,
+        discount_amount: Number(discount.toFixed(2)),
+        eligibility: couponEligibility.canUseFirstPurchase ? 'validated' : 'rejected'
+    };
+}
+
+async function persistOrderDraft() {
+    if (!currentUser) {
+        return { ok: false, message: 'Faça login para continuar a compra.' };
+    }
+
+    if (!couponEligibility.schemaReady) {
+        return { ok: false, message: 'Ative primeiro o SQL supabase/003_orders_coupons.sql no Supabase.' };
+    }
+
+    const cart = window.storefront.getCart();
+
+    if (!cart.length) {
+        return { ok: false, message: 'Seu carrinho está vazio.' };
+    }
+
+    const subtotal = cart.reduce((total, item) => total + item.preco * item.quantity, 0);
+    const discount = getDiscount(subtotal);
+    const total = subtotal - discount;
+
+    const orderPayload = {
+        user_id: currentUser.id,
+        status: 'checkout_started',
+        payment_status: 'pending',
+        shipping_zip_code: shippingZip?.value.trim() || null,
+        shipping_amount: 0,
+        subtotal_amount: Number(subtotal.toFixed(2)),
+        discount_amount: Number(discount.toFixed(2)),
+        total_amount: Number(total.toFixed(2)),
+        coupon_code: appliedCoupon || null,
+        coupon_snapshot: buildCouponSnapshot(discount)
+    };
+
+    let draftId = window.localStorage.getItem(orderDraftKey) || '';
+
+    if (draftId) {
+        const { data: updatedOrder, error: updateError } = await supabase
+            .from('orders')
+            .update(orderPayload)
+            .eq('id', draftId)
+            .eq('user_id', currentUser.id)
+            .select('id')
+            .maybeSingle();
+
+        if (updateError && !isMissingSchemaError(updateError)) {
+            return { ok: false, message: updateError.message };
+        }
+
+        if (!updatedOrder?.id) {
+            draftId = '';
+        }
+    }
+
+    if (!draftId) {
+        const { data: insertedOrder, error: insertError } = await supabase
+            .from('orders')
+            .insert(orderPayload)
+            .select('id')
+            .single();
+
+        if (insertError) {
+            return {
+                ok: false,
+                message: isMissingSchemaError(insertError)
+                    ? 'Execute o SQL supabase/003_orders_coupons.sql antes de iniciar o checkout.'
+                    : insertError.message
+            };
+        }
+
+        draftId = insertedOrder.id;
+    }
+
+    const { error: deleteItemsError } = await supabase
+        .from('order_items')
+        .delete()
+        .eq('order_id', draftId)
+        .eq('user_id', currentUser.id);
+
+    if (deleteItemsError && !isMissingSchemaError(deleteItemsError)) {
+        return { ok: false, message: deleteItemsError.message };
+    }
+
+    const itemsPayload = cart.map(item => ({
+        order_id: draftId,
+        user_id: currentUser.id,
+        product_id: Number(item.id),
+        product_name: item.nome,
+        product_image: item.imagem,
+        category: item.categoria || null,
+        color: item.cor || null,
+        unit_price: Number(item.preco.toFixed(2)),
+        quantity: Number(item.quantity),
+        line_total: Number((item.preco * item.quantity).toFixed(2))
+    }));
+
+    const { error: insertItemsError } = await supabase
+        .from('order_items')
+        .insert(itemsPayload);
+
+    if (insertItemsError) {
+        return {
+            ok: false,
+            message: isMissingSchemaError(insertItemsError)
+                ? 'A tabela de itens do pedido ainda nao foi criada no Supabase.'
+                : insertItemsError.message
+        };
+    }
+
+    window.localStorage.setItem(orderDraftKey, draftId);
+
+    return {
+        ok: true,
+        draftId,
+        total: formatPrice(total)
+    };
+}
+
+async function createMercadoPagoPreference(orderId) {
+    const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
+
+    if (sessionError || !sessionData.session?.refresh_token) {
+        return { ok: false, message: 'Sua sessao expirou. Entre novamente para iniciar o pagamento.' };
+    }
+
+    const { data: refreshedSession, error: refreshError } = await supabase.auth.refreshSession({
+        refresh_token: sessionData.session.refresh_token
+    });
+
+    const accessToken = refreshedSession.session?.access_token || sessionData.session.access_token || '';
+
+    if (refreshError || !accessToken) {
+        return { ok: false, message: 'Nao foi possivel renovar sua sessao. Entre novamente para iniciar o pagamento.' };
+    }
+
+    const { data, error } = await supabase.functions.invoke('create-mercadopago-preference', {
+        headers: {
+            Authorization: `Bearer ${accessToken}`
+        },
+        body: {
+            orderId,
+            accessToken
+        }
+    });
+
+    if (error) {
+        return { ok: false, message: error.message || 'Nao foi possivel iniciar o checkout.' };
+    }
+
+    if (!data?.checkoutUrl) {
+        return { ok: false, message: 'A funcao de checkout nao retornou uma URL valida.' };
+    }
+
+    return {
+        ok: true,
+        checkoutUrl: data.checkoutUrl,
+        sandboxCheckoutUrl: data.sandboxCheckoutUrl || '',
+        preferenceId: data.preferenceId || ''
+    };
+}
+
+function renderSummary(cart) {
+    const subtotal = cart.reduce((total, item) => total + item.preco * item.quantity, 0);
+    const discount = getDiscount(subtotal);
+    const total = subtotal - discount;
+
+    summarySubtotal.textContent = formatPrice(subtotal);
+    summaryDiscount.textContent = `- ${formatPrice(discount)}`;
+    summaryShipping.textContent = shippingZip && shippingZip.value.length === 9 ? 'Calculo em breve' : 'Informe o CEP';
+    summaryTotal.textContent = formatPrice(total);
+}
+
+function renderCart() {
+    const isLoggedIn = window.storefront.isLoggedIn();
+    const cart = window.storefront.getCart();
+
+    cartItemsContainer.innerHTML = '';
+    cartLoginRequired.hidden = isLoggedIn;
+    cartEmpty.hidden = !isLoggedIn || cart.length > 0;
+    checkoutButton.disabled = !isLoggedIn || cart.length === 0;
+
+    if (!isLoggedIn || !cart.length) {
+        renderSummary([]);
+        return;
+    }
+
+    cart.forEach(item => {
+        const article = document.createElement('article');
+        article.className = 'cart-item';
+        article.innerHTML = `
+            <div class="cart-item-image">
+                <img src="${item.imagem}" alt="${item.nome}">
+            </div>
+            <div class="cart-item-content">
+                <div class="cart-item-header">
+                    <div>
+                        <h3 class="cart-item-title">${item.nome}</h3>
+                        <p class="cart-item-meta">Categoria: ${item.categoria || 'Colecao Aranha'}</p>
+                    </div>
+                    <strong class="cart-item-price">${formatPrice(item.preco)}</strong>
+                </div>
+                <div class="cart-item-actions">
+                    <div class="quantity-control">
+                        <button type="button" data-action="decrease" data-id="${item.id}" aria-label="Diminuir quantidade">-</button>
+                        <span>${item.quantity}</span>
+                        <button type="button" data-action="increase" data-id="${item.id}" aria-label="Aumentar quantidade">+</button>
+                    </div>
+                    <button type="button" class="remove-button" data-action="remove" data-id="${item.id}">Remover</button>
+                </div>
+            </div>
+        `;
+
+        cartItemsContainer.appendChild(article);
+    });
+
+    renderSummary(cart);
+}
+
+cartItemsContainer.addEventListener('click', event => {
+    const target = event.target;
+
+    if (!(target instanceof HTMLElement)) {
+        return;
+    }
+
+    const action = target.getAttribute('data-action');
+    const id = Number(target.getAttribute('data-id'));
+
+    if (!action || !id) {
+        return;
+    }
+
+    const cart = window.storefront.getCart();
+    const item = cart.find(entry => Number(entry.id) === id);
+
+    if (!item) {
+        return;
+    }
+
+    if (action === 'increase') {
+        window.storefront.updateCartItemQuantity(id, item.quantity + 1);
+    }
+
+    if (action === 'decrease') {
+        window.storefront.updateCartItemQuantity(id, item.quantity - 1);
+    }
+
+    if (action === 'remove') {
+        window.storefront.removeCartItem(id);
+    }
+
+    renderCart();
+});
+
+if (shippingZip) {
+    shippingZip.addEventListener('input', () => {
+        shippingZip.value = formatZipCode(shippingZip.value);
+
+        if (shippingZip.value.length === 9) {
+            shippingFeedback.textContent = `CEP ${shippingZip.value} recebido. O calculo automatico de frete sera conectado na proxima etapa.`;
+        } else {
+            shippingFeedback.textContent = 'Frete automático será conectado em seguida.';
+        }
+
+        renderSummary(window.storefront.getCart());
+    });
+}
+
+if (couponForm) {
+    couponForm.addEventListener('submit', async event => {
+        event.preventDefault();
+
+        const code = String(couponCode.value || '').trim().toUpperCase();
+
+        if (!window.storefront.ensureLoggedIn('aplicar cupom')) {
+            return;
+        }
+
+        await loadCouponEligibility();
+
+        if (!window.storefront.getCart().length) {
+            couponFeedback.textContent = 'Adicione itens ao carrinho antes de aplicar um cupom.';
+            return;
+        }
+
+        if (!couponEligibility.schemaReady) {
+            couponFeedback.textContent = couponEligibility.reason;
+            return;
+        }
+
+        if (code !== firstPurchaseCoupon) {
+            couponFeedback.textContent = 'Cupom inválido. Use PRIMEIRACOMPRA para esta primeira fase.';
+            return;
+        }
+
+        if (!couponEligibility.canUseFirstPurchase) {
+            clearAppliedCoupon();
+            couponFeedback.textContent = couponEligibility.reason;
+            return;
+        }
+
+        appliedCoupon = code;
+        window.localStorage.setItem(couponKey, appliedCoupon);
+        couponFeedback.textContent = 'Cupom aplicado: 10% de desconto liberado para a primeira compra aprovada.';
+        renderCart();
+    });
+}
+
+if (checkoutButton) {
+    checkoutButton.addEventListener('click', async () => {
+        if (!window.storefront.ensureLoggedIn('continuar a compra')) {
+            return;
+        }
+
+        if (!window.storefront.getCart().length) {
+            checkoutFeedback.textContent = 'Seu carrinho está vazio.';
+            return;
+        }
+
+        await loadCouponEligibility();
+
+        if (appliedCoupon === firstPurchaseCoupon && !couponEligibility.canUseFirstPurchase) {
+            clearAppliedCoupon();
+            couponFeedback.textContent = couponEligibility.reason;
+            renderCart();
+            return;
+        }
+
+        checkoutFeedback.textContent = 'Preparando pedido...';
+
+        const result = await persistOrderDraft();
+
+        if (!result.ok) {
+            checkoutFeedback.textContent = result.message;
+            return;
+        }
+
+        checkoutFeedback.textContent = 'Conectando checkout Mercado Pago...';
+
+        const checkoutResult = await createMercadoPagoPreference(result.draftId);
+
+        if (!checkoutResult.ok) {
+            checkoutFeedback.textContent = `${result.total} preparado no pedido ${result.draftId.slice(0, 8).toUpperCase()}, mas a integracao de pagamento ainda nao respondeu. Verifique as Edge Functions e as variaveis do Mercado Pago.`;
+            return;
+        }
+
+        checkoutFeedback.textContent = 'Redirecionando para o Mercado Pago...';
+        window.location.href = checkoutResult.checkoutUrl;
+    });
+}
+
+supabase.auth.onAuthStateChange((_event, session) => {
+    if (session?.user) {
+        currentUser = session.user;
+        window.storefront.setAuth({
+            userId: session.user.id,
+            email: session.user.email || ''
+        });
+    } else {
+        currentUser = null;
+        clearAppliedCoupon();
+        window.localStorage.removeItem(orderDraftKey);
+        window.storefront.clearAuth();
+    }
+
+    renderCart();
+});
+
+document.addEventListener('DOMContentLoaded', async () => {
+    await syncAuthState();
+    await loadCouponEligibility();
+
+    if (couponCode && appliedCoupon) {
+        couponCode.value = appliedCoupon;
+    }
+
+    if (couponFeedback) {
+        couponFeedback.textContent = appliedCoupon === firstPurchaseCoupon && couponEligibility.canUseFirstPurchase
+            ? 'Cupom aplicado: 10% de desconto liberado para a primeira compra aprovada.'
+            : couponEligibility.reason;
+    }
+
+    renderCart();
+});

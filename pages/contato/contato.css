@@ -1,0 +1,254 @@
+body {
+	background: linear-gradient(180deg, #f7f4ee 0%, #fbfaf8 52%, #f0ebe3 100%);
+}
+
+.contato-header {
+	background-image: url('../../assets/Fundo_Cabeçalho.png');
+}
+
+.search-bar-static input {
+	cursor: default;
+}
+
+.contato-page {
+	flex: 1;
+}
+
+.contato-hero {
+	padding: 96px 24px 56px;
+	background:
+		linear-gradient(135deg, rgba(255,255,255,0.88), rgba(255,255,255,0.64)),
+		url('../../assets/fundo_fumaça.png') center/cover no-repeat;
+}
+
+.contato-hero-content,
+.contato-grid,
+.faq-content {
+	width: min(1120px, calc(100% - 32px));
+	margin: 0 auto;
+}
+
+.contato-kicker {
+	font-size: 12px;
+	text-transform: uppercase;
+	letter-spacing: 4px;
+	color: #6d665e;
+	margin-bottom: 18px;
+}
+
+.contato-hero h1,
+.section-head h2,
+.contact-note h3 {
+	font-family: 'Playfair Display', serif;
+	color: #1a1714;
+}
+
+.contato-hero h1 {
+	font-size: clamp(2.6rem, 5vw, 4.8rem);
+	line-height: 1.03;
+	max-width: 780px;
+	margin-bottom: 22px;
+}
+
+.contato-hero p,
+.section-head p,
+.contact-note p,
+.form-feedback {
+	color: #4e4842;
+	line-height: 1.8;
+}
+
+.contato-grid {
+	display: grid;
+	grid-template-columns: minmax(0, 1.2fr) minmax(300px, 0.8fr);
+	gap: 24px;
+	padding: 24px 0 88px;
+}
+
+.contato-card {
+	background: rgba(255,255,255,0.82);
+	border: 1px solid rgba(26, 23, 20, 0.08);
+	box-shadow: 0 18px 50px rgba(84, 74, 64, 0.08);
+	border-radius: 28px;
+	padding: 28px;
+}
+
+.section-head {
+	margin-bottom: 24px;
+}
+
+.contact-form {
+	display: grid;
+	gap: 18px;
+}
+
+.field-grid {
+	display: grid;
+	grid-template-columns: repeat(2, minmax(0, 1fr));
+	gap: 16px;
+}
+
+.contact-form label {
+	display: grid;
+	gap: 8px;
+}
+
+.contact-form span {
+	font-size: 12px;
+	text-transform: uppercase;
+	letter-spacing: 1.5px;
+	color: #5f5750;
+}
+
+.contact-form input,
+.contact-form textarea {
+	width: 100%;
+	border: 1px solid #ddd6cf;
+	border-radius: 16px;
+	padding: 15px 16px;
+	font: inherit;
+	color: #1a1714;
+	background: #fff;
+	outline: none;
+	transition: border-color 0.25s ease, box-shadow 0.25s ease;
+}
+
+.contact-form input:focus,
+.contact-form textarea:focus {
+	border-color: #1a1714;
+	box-shadow: 0 0 0 4px rgba(26, 23, 20, 0.06);
+}
+
+.contact-form textarea {
+	resize: vertical;
+	min-height: 170px;
+}
+
+.form-actions {
+	display: grid;
+	gap: 12px;
+}
+
+.form-feedback {
+	min-height: 28px;
+	font-size: 14px;
+}
+
+.contact-links {
+	display: grid;
+	gap: 14px;
+}
+
+.contact-link-card {
+	display: flex;
+	align-items: center;
+	gap: 16px;
+	text-decoration: none;
+	color: #1a1714;
+	padding: 18px;
+	border-radius: 20px;
+	background: #fff;
+	border: 1px solid #ece6de;
+	transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+}
+
+.contact-link-card:hover {
+	transform: translateY(-2px);
+	box-shadow: 0 12px 28px rgba(26, 23, 20, 0.08);
+	border-color: #d1c7bc;
+}
+
+.contact-link-card i {
+	font-size: 1.3rem;
+	width: 24px;
+	text-align: center;
+}
+
+.contact-link-card strong,
+.contact-link-card span {
+	display: block;
+}
+
+.contact-link-card span {
+	color: #5e5851;
+	margin-top: 4px;
+}
+
+.contact-note {
+	margin-top: 22px;
+	padding-top: 22px;
+	border-top: 1px solid #ece6de;
+}
+
+.faq-section {
+	padding: 0 0 88px;
+}
+
+.faq-grid {
+	display: grid;
+	grid-template-columns: repeat(2, minmax(0, 1fr));
+	gap: 18px;
+}
+
+.faq-item {
+	background: rgba(255,255,255,0.82);
+	border: 1px solid rgba(26, 23, 20, 0.08);
+	box-shadow: 0 18px 50px rgba(84, 74, 64, 0.08);
+	border-radius: 24px;
+	padding: 24px;
+}
+
+.faq-item h3 {
+	font-family: 'Playfair Display', serif;
+	font-size: 1.35rem;
+	color: #1a1714;
+	margin-bottom: 10px;
+}
+
+.faq-item p {
+	color: #4e4842;
+	line-height: 1.75;
+}
+
+@media (max-width: 900px) {
+	.contato-grid {
+		grid-template-columns: 1fr;
+	}
+
+	.faq-grid {
+		grid-template-columns: 1fr;
+	}
+}
+
+@media (max-width: 600px) {
+	.contato-hero {
+		padding: 74px 20px 40px;
+	}
+
+	.contato-hero-content,
+	.contato-grid,
+	.faq-content {
+		width: min(1120px, calc(100% - 24px));
+	}
+
+	.contato-hero h1 {
+		font-size: 2.15rem;
+	}
+
+	.contato-kicker {
+		letter-spacing: 3px;
+	}
+
+	.contato-card {
+		padding: 22px 18px;
+		border-radius: 22px;
+	}
+
+	.field-grid {
+		grid-template-columns: 1fr;
+	}
+
+	.contact-link-card {
+		align-items: flex-start;
+	}
+}

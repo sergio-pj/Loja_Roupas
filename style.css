@@ -49,6 +49,7 @@ body {
     max-width: 500px;
     background: #fff;
     z-index: 1;
+    min-width: 0;
 }
 
 .search-bar input {
@@ -62,9 +63,59 @@ body {
 
 .nav-menu {
     position: absolute;
+    right: 148px;
+    display: flex;
+    gap: 22px;
+    align-items: center;
+    z-index: 2;
+}
+
+.header-actions {
+    position: absolute;
     right: 40px;
     display: flex;
-    gap: 25px;
+    align-items: center;
+    gap: 10px;
+    z-index: 2;
+}
+
+.header-icon-link {
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: #1a1714;
+    text-decoration: none;
+    position: relative;
+    transition: background-color 0.25s ease, transform 0.25s ease;
+}
+
+.header-icon-link:hover,
+.header-icon-link.active {
+    background-color: rgba(26, 23, 20, 0.08);
+    transform: translateY(-1px);
+}
+
+.header-icon-link i {
+    font-size: 1.15rem;
+}
+
+.cart-badge {
+    min-width: 18px;
+    height: 18px;
+    padding: 0 5px;
+    border-radius: 999px;
+    background: #1a1714;
+    color: #fff;
+    font-size: 10px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    position: absolute;
+    top: -2px;
+    right: -2px;
 }
 
 .nav-menu a {
@@ -161,11 +212,15 @@ body {
     padding: 15px 0;
 }
 
+.user-link-sidebar i {
+    font-size: 22px;
+}
+
 /* 4. BANNER E DESTAQUES */
 .hero-banner {
     width: 100%;
     height: 650px !important; /* O !important força a altura se houver conflito */
-    background-image: url('assets/BannerP.png');
+    background-image: url('assets/bannerp.png');
     background-size: cover;
     background-position: center;
     display: flex;
@@ -211,6 +266,27 @@ body {
     overflow: hidden; /* Garante que a fumaça não saia da caixa */
 }
 
+.mini-logo {
+    width: 78px;
+    max-width: 100%;
+    margin-bottom: 16px;
+}
+
+.overlap-box h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(2rem, 4vw, 3rem);
+    letter-spacing: 3px;
+    margin-bottom: 12px;
+    color: #1a1714;
+}
+
+.overlap-box p {
+    max-width: 620px;
+    margin: 0 auto;
+    line-height: 1.7;
+    color: #3f3b37;
+}
+
 .highlights-section {
     background-color: #f9f9f9;
     padding: 60px 0;
@@ -230,7 +306,7 @@ body {
 
 .product-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(min(250px, 100%), 1fr));
     gap: 30px; padding: 20px;
     max-width: 1200px; margin: 0 auto;
 }
@@ -385,6 +461,16 @@ body {
     display: block; margin-bottom: 10px;
 }
 
+.footer-col p a {
+    color: #ccc;
+    text-decoration: none;
+}
+
+.footer-col p a:hover,
+.footer-col a:hover {
+    color: #fff;
+}
+
 .footer-bottom {
     text-align: center; margin-top: 50px; padding-top: 20px;
     border-top: 1px solid rgba(255,255,255,0.1); font-size: 11px; color: #888;
@@ -394,16 +480,74 @@ body {
    7. RESPONSIVIDADE
    ========================================================================== */
 
+@media (max-width: 1080px) {
+    .main-header {
+        padding: 18px 24px;
+    }
+
+    .menu-icon {
+        left: 24px;
+    }
+
+    .search-bar {
+        max-width: 360px;
+    }
+
+    .nav-menu {
+        right: 124px;
+        gap: 14px;
+    }
+
+    .nav-menu a {
+        font-size: 12px;
+        letter-spacing: 0.8px;
+    }
+
+    .header-actions {
+        right: 24px;
+        gap: 6px;
+    }
+}
+
+@media (max-width: 920px) {
+    .nav-menu {
+        display: none;
+    }
+
+    .search-bar {
+        max-width: 420px;
+    }
+}
+
 @media (max-width: 768px) {
-    .nav-menu { display: none; }
+    .main-header {
+        padding: 18px 24px;
+    }
+
+    .menu-icon {
+        left: 24px;
+    }
+
+    .nav-menu {
+        display: none;
+    }
+
+    .header-actions {
+        right: 24px;
+    }
+
+    .search-bar {
+        max-width: 360px;
+    }
+
     .footer-container { grid-template-columns: 1fr 1fr; }
     .product-grid { grid-template-columns: 1fr 1fr; }
 
     /* Estas regras devem estar AQUI DENTRO */
     .hero-banner {
-        height: 450px; /* Um pouco mais alto para mostrar bem a arte do consumidor */
+        height: 500px; /* Um pouco mais alto para mostrar bem a arte do consumidor */
         background-size: cover;
-        background-position: 60% center; /* Ajusta para não cortar as camisetas no mobile */
+        background-position: 62% center; /* Ajusta para não cortar as camisetas no mobile */
     }
     
     .banner-text h1 {
@@ -414,16 +558,28 @@ body {
     .brand-overlap {
         margin-top: -60px; /* Sobe menos a caixa para não tapar o cupom na arte */
     }
+
+    .overlap-box {
+        width: 92%;
+        padding: 32px 24px;
+    }
 }
 
 @media (max-width: 480px) {
     .hero-banner {
-    padding: 0;
-    margin: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
+        height: auto !important;
+        aspect-ratio: 12 / 5;
+        min-height: 0;
+        padding: 0;
+        margin: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background-position: center top;
+        background-size: contain;
+        background-repeat: no-repeat;
+        background-color: #d8d5cf;
+    }
 
     /* Como a imagem já tem texto, vamos esconder o texto do HTML para não encavalar */
     .banner-text {
@@ -431,7 +587,7 @@ body {
     }
 
     .brand-overlap {
-        margin-top: -30px; /* Sobe bem pouquinho para dar respiro ao cupom da arte */
+        margin-top: 18px;
         display: flex;
         justify-content: center;
     }
@@ -457,6 +613,11 @@ body {
         position: static; /* Remove o 'left: 15px' que pode estar quebrando o flex */
         margin-right: 5px;
     }
+
+    .header-actions {
+        position: static;
+        gap: 6px;
+    }
     
     .search-bar { 
         flex: 1; /* Faz a barra ocupar o espaço restante disponível */
@@ -477,21 +638,81 @@ body {
         display: none;
     }
 
-    .brand-overlap {
-        margin-top: -60px; /* Sobe menos a caixa no mobile para não cobrir o texto */
+    .header-icon-link {
+        width: 38px;
+        height: 38px;
     }
-    .overlap-box { padding: 20px 15px; }
+
+    .overlap-box {
+        width: calc(100% - 24px);
+        padding: 20px 15px;
+    }
+
+    .overlap-box h2 {
+        font-size: 1.8rem;
+    }
+
+    .overlap-box p {
+        font-size: 0.95rem;
+    }
 
     .tabela-medidas-container { 
         width: 100%;
-        overflow-x: auto; /* Ativa a rolagem lateral */
-        -webkit-overflow-scrolling: touch; /* Deixa a rolagem suave no iPhone/Android */
+        overflow-x: visible;
         margin-bottom: 20px;
+        margin-top: 56px;
+        padding: 0 12px;
     }
 
     .tabela-medidas {
-        min-width: 500px; /* FORÇA a tabela a ser maior que a tela do celular */
-        display: block; /* Necessário para o overflow funcionar bem em alguns navegadores */
+        display: block;
+        min-width: 0;
+        margin-top: 20px;
+        background-color: transparent;
+    }
+
+    .tabela-medidas thead {
+        display: none;
+    }
+
+    .tabela-medidas tbody {
+        display: grid;
+        gap: 14px;
+    }
+
+    .tabela-medidas tr {
+        display: block;
+        background-color: #fff;
+        border: 1px solid #ece7df;
+        border-radius: 16px;
+        box-shadow: 0 10px 24px rgba(26, 23, 20, 0.06);
+        padding: 10px 14px;
+    }
+
+    .tabela-medidas td {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+        width: 100%;
+        padding: 12px 0;
+        font-size: 14px;
+        text-align: right;
+        border-bottom: 1px solid #f0ece5;
+    }
+
+    .tabela-medidas tr td:last-child {
+        border-bottom: none;
+    }
+
+    .tabela-medidas td::before {
+        content: attr(data-label);
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        color: #1a1714;
+        text-align: left;
     }
 
     .newsletter-form { flex-direction: column; }
@@ -509,5 +730,21 @@ body {
         justify-self: center;
         width: 100%;
         max-width: 250px;
+    }
+}
+
+@media (max-width: 380px) {
+    .search-bar {
+        max-width: 190px;
+    }
+
+    .product-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .product-card:last-child:nth-child(odd) {
+        grid-column: auto;
+        justify-self: stretch;
+        max-width: none;
     }
 }

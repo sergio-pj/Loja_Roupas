@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Carrinho | Aranha</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="../../style.css">
+    <link rel="stylesheet" href="carrinho.css">
+</head>
+<body>
+    <div id="overlay" onclick="toggleMenu()"></div>
+
+    <div id="sidebar" class="sidebar">
+        <a href="javascript:void(0)" class="closebtn" onclick="toggleMenu()">×</a>
+        <div class="sidebar-content">
+            <h3>Carrinho</h3>
+            <nav class="sidebar-links">
+                <a href="../../index.html">Início</a>
+                <a href="../catalogo/index.html">Catálogo</a>
+                <a href="../contato/index.html">Contato</a>
+                <a href="../login/index.html" data-auth-link>Minha Conta</a>
+            </nav>
+        </div>
+    </div>
+
+    <header class="main-header carrinho-header">
+        <div class="menu-icon" onclick="toggleMenu()">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
+
+        <div class="search-bar search-bar-static">
+            <input type="text" placeholder="Seu carrinho Aranha" readonly>
+        </div>
+
+        <nav class="nav-menu">
+            <a href="../../index.html">Início</a>
+            <a href="../catalogo/index.html">Catálogo</a>
+            <a href="../contato/index.html">Contato</a>
+        </nav>
+
+        <div class="header-actions">
+            <a href="index.html" class="header-icon-link active" aria-label="Abrir carrinho">
+                <i class="fas fa-bag-shopping"></i>
+                <span class="cart-badge" data-cart-count hidden>0</span>
+            </a>
+            <a href="../login/index.html" class="header-icon-link" data-auth-link aria-label="Abrir area do cliente">
+                <i class="fas fa-user-circle"></i>
+            </a>
+        </div>
+    </header>
+
+    <main class="cart-page">
+        <section class="cart-hero">
+            <div class="cart-hero-content">
+                <p class="cart-kicker">Carrinho de compras</p>
+                <h1>Revise os itens, informe seu CEP e aplique seu cupom.</h1>
+                <p>
+                    O frete automático entra na próxima etapa. Por enquanto, o carrinho já recebe o CEP e deixa o fluxo pronto para integrar a regra de entrega própria.
+                </p>
+            </div>
+        </section>
+
+        <section class="cart-grid">
+            <section class="cart-card items-card">
+                <div class="section-head">
+                    <p class="cart-kicker">Itens</p>
+                    <h2>Seu carrinho</h2>
+                </div>
+
+                <div id="cart-login-required" class="empty-state" hidden>
+                    <h3>Faça login para usar o carrinho</h3>
+                    <p>Adicionar itens e finalizar compra exige cadastro ativo no site.</p>
+                    <a href="../login/index.html" class="secondary-button">Entrar ou criar conta</a>
+                </div>
+
+                <div id="cart-empty" class="empty-state" hidden>
+                    <h3>Seu carrinho está vazio</h3>
+                    <p>Adicione peças pelo catálogo para começar a compra.</p>
+                    <a href="../catalogo/index.html" class="secondary-button">Ir para o catálogo</a>
+                </div>
+
+                <div id="cart-items" class="cart-items"></div>
+            </section>
+
+            <aside class="cart-card summary-card">
+                <div class="section-head">
+                    <p class="cart-kicker">Resumo</p>
+                    <h2>Resumo da compra</h2>
+                </div>
+
+                <form id="shipping-form" class="auth-form">
+                    <label>
+                        <span>CEP para frete</span>
+                        <input type="text" id="shipping-zip" name="zip_code" placeholder="00000-000">
+                    </label>
+                    <p id="shipping-feedback" class="auth-feedback">Frete automático será conectado em seguida.</p>
+                </form>
+
+                <form id="coupon-form" class="auth-form coupon-form">
+                    <label>
+                        <span>Cupom</span>
+                        <input type="text" id="coupon-code" name="coupon_code" placeholder="PRIMEIRACOMPRA">
+                    </label>
+                    <button type="submit" class="secondary-button">Aplicar cupom</button>
+                    <p id="coupon-feedback" class="auth-feedback">Cupom inicial disponível: PRIMEIRACOMPRA.</p>
+                </form>
+
+                <div class="summary-lines">
+                    <div class="summary-line">
+                        <span>Subtotal</span>
+                        <strong id="summary-subtotal">R$ 0,00</strong>
+                    </div>
+                    <div class="summary-line">
+                        <span>Desconto</span>
+                        <strong id="summary-discount">R$ 0,00</strong>
+                    </div>
+                    <div class="summary-line">
+                        <span>Frete</span>
+                        <strong id="summary-shipping">Em breve</strong>
+                    </div>
+                    <div class="summary-line total-line">
+                        <span>Total</span>
+                        <strong id="summary-total">R$ 0,00</strong>
+                    </div>
+                </div>
+
+                <button id="checkout-button" class="newsletter-button" type="button">Continuar compra</button>
+                <p id="checkout-feedback" class="auth-feedback"></p>
+            </aside>
+        </section>
+    </main>
+
+    <footer class="main-footer">
+        <div class="footer-bottom">
+            <p>&copy; 2026 AuryxTech - Transformando ideias em código.</p>
+        </div>
+    </footer>
+
+    <script src="../../json/storefront.js"></script>
+    <script type="module" src="carrinho.js"></script>
+</body>
+</html>

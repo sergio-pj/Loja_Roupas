@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Loja Virtual | Em Desenvolvimento</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -21,12 +22,14 @@
             <a href="#" class="link-escura" onclick="filtrar('escura'); toggleMenu()">Camisas Escuras</a>
             <a href="pages/quemsomos/index.html">Quem Somos</a>
             <a href="pages/catalogo/index.html">Catálogo</a>
+            <a href="pages/contato/index.html">Contato</a>
+            <a href="pages/carrinho/index.html">Carrinho</a>
             <hr>
-            <a href="#" class="user-link-sidebar">
+            <a href="pages/login/index.html" class="user-link-sidebar">
                 <i class="fas fa-user-circle"></i> 
                 <span>Minha Conta</span>
             </a>
-            <a href="#"><i class="fas fa-headset"></i> Suporte</a>
+            <a href="pages/contato/index.html"><i class="fas fa-headset"></i> Suporte</a>
         </nav>
     </div>
 </div>
@@ -45,14 +48,23 @@
     <nav class="nav-menu">
         <a href="pages/quemsomos/index.html">Quem somos</a>
         <a href="pages/catalogo/index.html">Catálogo</a>
-        <a href="#" class="user-link">
-            <i class="fas fa-user-circle"></i> 
-        </a>
+        <a href="pages/contato/index.html">Contato</a>
     </nav>
+
+    <div class="header-actions">
+        <a href="pages/carrinho/index.html" class="header-icon-link" aria-label="Abrir carrinho">
+            <i class="fas fa-bag-shopping"></i>
+            <span class="cart-badge" data-cart-count hidden>0</span>
+        </a>
+        <a href="pages/login/index.html" class="header-icon-link" data-auth-link aria-label="Abrir area do cliente">
+            <i class="fas fa-user-circle"></i>
+        </a>
+    </div>
 </header>
 
     <section class="hero-banner">
         <div class="banner-overlay">
+            
         </div>
     </section>
 
@@ -110,32 +122,32 @@
         </thead>
         <tbody>
             <tr>
-                <td>PP</td>
-                <td>34/36</td>
-                <td>85 cm</td>
-                <td>68 cm</td>
-                <td>94 cm</td>
+                <td data-label="Tamanho">PP</td>
+                <td data-label="Referência">34/36</td>
+                <td data-label="Busto">85 cm</td>
+                <td data-label="Cintura">68 cm</td>
+                <td data-label="Quadril">94 cm</td>
             </tr>
             <tr>
-                <td>P</td>
-                <td>38/40</td>
-                <td>90 cm</td>
-                <td>73 cm</td>
-                <td>99 cm</td>
+                <td data-label="Tamanho">P</td>
+                <td data-label="Referência">38/40</td>
+                <td data-label="Busto">90 cm</td>
+                <td data-label="Cintura">73 cm</td>
+                <td data-label="Quadril">99 cm</td>
             </tr>
             <tr>
-                <td>M</td>
-                <td>42/44</td>
-                <td>95 cm</td>
-                <td>78 cm</td>
-                <td>104 cm</td>
+                <td data-label="Tamanho">M</td>
+                <td data-label="Referência">42/44</td>
+                <td data-label="Busto">95 cm</td>
+                <td data-label="Cintura">78 cm</td>
+                <td data-label="Quadril">104 cm</td>
             </tr>
             <tr>
-                <td>G</td>
-                <td>44/46</td>
-                <td>100 cm</td>
-                <td>83 cm</td>
-                <td>109 cm</td>
+                <td data-label="Tamanho">G</td>
+                <td data-label="Referência">44/46</td>
+                <td data-label="Busto">100 cm</td>
+                <td data-label="Cintura">83 cm</td>
+                <td data-label="Quadril">109 cm</td>
             </tr>
         </tbody>
     </table>
@@ -166,8 +178,9 @@
             <div class="footer-col">
                 <h4>CONTATO</h4>
                 <p>Suporte ao Cliente</p>
-                <p>Email: contato@aranha.com</p>
-                <p>WhatsApp: (11) 99999-9999</p>
+                <p><a href="pages/contato/index.html">Página de Contato</a></p>
+                <p><a href="mailto:contato@aranharoupas.com.br">contato@aranharoupas.com.br</a></p>
+                <p><a href="tel:+5511999999999">(11) 99999-9999</a></p>
             </div>
 
             <div class="footer-col">
@@ -188,5 +201,6 @@
         </div>
     </footer>
 
+    <script src="json/storefront.js"></script>
     <script src="script.js"></script>
 </body>

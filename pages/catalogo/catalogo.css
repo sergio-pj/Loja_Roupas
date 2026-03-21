@@ -138,6 +138,11 @@ body {
     align-items: flex-start;
 }
 
+.conteudo-produtos {
+    flex: 1;
+    min-width: 0;
+}
+
 .filtros-sidebar {
     width: 250px;
     position: sticky; /* Faz o filtro acompanhar a rolagem */
@@ -216,13 +221,103 @@ body {
 }
 
 .user-link i {
-    font-size: 22px; /* Destaque para o ícone de usuário */
+    font-size: 28px; /* Destaque para o ícone de usuário */
     color: #1a1714;
 }
 
+.catalogo-footer {
+    margin-top: 24px;
+}
+
 /* Se quiser esconder o texto no mobile e deixar só o ícone */
+@media (max-width: 1024px) {
+    .catalogo-container {
+        gap: 24px;
+        padding: 40px 24px 48px;
+    }
+
+    .filtros-sidebar {
+        width: 220px;
+    }
+
+    .product-image img {
+        height: 220px;
+    }
+}
+
 @media (max-width: 768px) {
+    .catalogo-container {
+        flex-direction: column;
+        gap: 24px;
+        padding: 28px 16px 40px;
+    }
+
+    .filtros-sidebar {
+        width: 100%;
+        position: static;
+        top: auto;
+        padding: 20px;
+    }
+
+    .grupo-filtros {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 12px;
+    }
+
+    .filtros-sidebar button {
+        padding: 12px 10px;
+        text-align: center;
+        border: 1px solid #ddd;
+        border-radius: 999px;
+        background-color: #fff;
+    }
+
+    .filtros-sidebar button:hover {
+        padding-left: 10px;
+        border-bottom: 1px solid #ddd;
+    }
+
+    .conteudo-produtos {
+        width: 100%;
+    }
+
+    .titulo-sessao {
+        margin-bottom: 24px;
+        font-size: 22px;
+        letter-spacing: 3px;
+    }
+
+    .product-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 16px;
+        padding: 0;
+    }
+
     .user-link span {
         display: none;
+    }
+}
+
+@media (max-width: 480px) {
+    .catalogo-container {
+        padding: 22px 14px 32px;
+    }
+
+    .grupo-filtros {
+        grid-template-columns: 1fr;
+    }
+
+    .product-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .product-image img {
+        height: 200px;
+    }
+
+    .btn-detalhes {
+        padding: 11px 16px;
+        letter-spacing: 1px;
     }
 }

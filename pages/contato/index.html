@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Contato | Aranha</title>
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+	<link rel="stylesheet" href="../../style.css">
+	<link rel="stylesheet" href="contato.css">
+</head>
+<body>
+	<div id="overlay" onclick="toggleMenu()"></div>
+
+	<div id="sidebar" class="sidebar">
+		<a href="javascript:void(0)" class="closebtn" onclick="toggleMenu()">×</a>
+		<div class="sidebar-content">
+			<h3>Contato</h3>
+			<nav class="sidebar-links">
+				<a href="../../index.html">Início</a>
+				<a href="../catalogo/index.html">Catálogo</a>
+				<a href="../quemsomos/index.html">Quem Somos</a>
+				<a href="#formulario">Enviar mensagem</a>
+				<a href="mailto:contato@aranharoupas.com.br">contato@aranharoupas.com.br</a>
+				<a href="tel:+5511999999999">(11) 99999-9999</a>
+				<a href="../carrinho/index.html">Carrinho</a>
+			</nav>
+		</div>
+	</div>
+
+	<header class="main-header contato-header">
+		<div class="menu-icon" onclick="toggleMenu()">
+			<span></span>
+			<span></span>
+			<span></span>
+		</div>
+
+		<div class="search-bar search-bar-static">
+			<input type="text" placeholder="Fale com a equipe Aranha" readonly>
+		</div>
+
+		<nav class="nav-menu">
+			<a href="../../index.html">Início</a>
+			<a href="../catalogo/index.html">Catálogo</a>
+			<a href="../quemsomos/index.html">Quem Somos</a>
+		</nav>
+
+		<div class="header-actions">
+			<a href="../carrinho/index.html" class="header-icon-link" aria-label="Abrir carrinho">
+				<i class="fas fa-bag-shopping"></i>
+				<span class="cart-badge" data-cart-count hidden>0</span>
+			</a>
+			<a href="../login/index.html" class="header-icon-link" data-auth-link aria-label="Abrir area do cliente">
+				<i class="fas fa-user-circle"></i>
+			</a>
+		</div>
+	</header>
+
+	<main class="contato-page">
+		<section class="contato-hero">
+			<div class="contato-hero-content">
+				<p class="contato-kicker">Fale com a Aranha</p>
+				<h1>Atendimento direto para dúvidas, pedidos e parcerias.</h1>
+				<p>
+					Use o formulário para montar seu contato por e-mail ou escolha um dos canais rápidos abaixo.
+					Os links já abrem direto o aplicativo correspondente quando disponíveis no seu dispositivo.
+				</p>
+			</div>
+		</section>
+
+		<section class="contato-grid">
+			<section id="formulario" class="contato-card formulario-card">
+				<div class="section-head">
+					<p class="contato-kicker">Formulário</p>
+					<h2>Envie sua mensagem</h2>
+					<p>Ao enviar, o site abre seu aplicativo de e-mail com o assunto e a mensagem prontos.</p>
+				</div>
+
+				<form id="contact-form" class="contact-form">
+					<div class="field-grid">
+						<label>
+							<span>Nome</span>
+							<input type="text" name="nome" placeholder="Seu nome" required>
+						</label>
+						<label>
+							<span>E-mail</span>
+							<input type="email" name="email" placeholder="voce@email.com" required>
+						</label>
+					</div>
+
+					<div class="field-grid">
+						<label>
+							<span>Celular</span>
+							<input type="tel" name="telefone" placeholder="(11) 99999-9999">
+						</label>
+						<label>
+							<span>Assunto</span>
+							<input type="text" name="assunto" placeholder="Como podemos ajudar?" required>
+						</label>
+					</div>
+
+					<label>
+						<span>Mensagem</span>
+						<textarea name="mensagem" rows="7" placeholder="Conte sua dúvida, pedido ou proposta." required></textarea>
+					</label>
+
+					<div class="form-actions">
+						<button type="submit" class="newsletter-button">Enviar por e-mail</button>
+						<p id="form-feedback" class="form-feedback" aria-live="polite"></p>
+					</div>
+				</form>
+			</section>
+
+			<aside class="contato-card canais-card">
+				<div class="section-head">
+					<p class="contato-kicker">Canais rápidos</p>
+					<h2>Escolha como falar com a equipe</h2>
+				</div>
+
+				<div class="contact-links">
+					<a class="contact-link-card" href="mailto:contato@aranharoupas.com.br">
+						<i class="fas fa-envelope"></i>
+						<div>
+							<strong>E-mail</strong>
+							<span>contato@aranharoupas.com.br</span>
+						</div>
+					</a>
+
+					<a class="contact-link-card" href="tel:+5511999999999">
+						<i class="fas fa-phone"></i>
+						<div>
+							<strong>Celular</strong>
+							<span>(11) 99999-9999</span>
+						</div>
+					</a>
+
+					<a class="contact-link-card" href="https://wa.me/5511999999999?text=Ol%C3%A1%2C%20vim%20pelo%20site%20da%20Aranha%20e%20quero%20mais%20informa%C3%A7%C3%B5es." target="_blank" rel="noreferrer">
+						<i class="fab fa-whatsapp"></i>
+						<div>
+							<strong>WhatsApp</strong>
+							<span>Atendimento direto no aplicativo</span>
+						</div>
+					</a>
+				</div>
+
+				<div class="contact-note">
+					<h3>Horário de atendimento</h3>
+					<p>Segunda a sexta, das 9h às 18h.</p>
+				</div>
+			</aside>
+		</section>
+
+		<section id="faq" class="faq-section">
+			<div class="faq-content">
+				<div class="section-head">
+					<p class="contato-kicker">Perguntas frequentes</p>
+					<h2>Atalhos rápidos para dúvidas comuns</h2>
+					<p>Essas respostas cobrem as dúvidas iniciais mais recorrentes desta primeira fase da loja.</p>
+				</div>
+
+				<div class="faq-grid">
+					<article class="faq-item">
+						<h3>Como acompanho minhas compras?</h3>
+						<p>Entre na área do cliente. A seção Minhas Compras já aponta para sua conta e vai evoluir para o histórico completo de pedidos.</p>
+					</article>
+					<article class="faq-item">
+						<h3>Como peço suporte?</h3>
+						<p>Use o formulário desta página ou clique em Suporte Técnico no catálogo para abrir o atendimento com assunto preenchido.</p>
+					</article>
+					<article class="faq-item">
+						<h3>O frete já está calculando?</h3>
+						<p>O campo de CEP já está pronto no carrinho. O cálculo automático de frete entra na próxima etapa do projeto.</p>
+					</article>
+					<article class="faq-item">
+						<h3>Preciso estar logado para comprar?</h3>
+						<p>Sim. O cliente precisa ter cadastro ativo para adicionar itens ao carrinho e seguir para a compra.</p>
+					</article>
+				</div>
+			</div>
+		</section>
+	</main>
+
+	<footer class="main-footer">
+		<div class="footer-container">
+			<div class="footer-col">
+				<h4>ARANHA</h4>
+				<p>Estética urbana, comunicação limpa e atendimento direto para acelerar a conversão.</p>
+			</div>
+
+			<div class="footer-col">
+				<h4>NAVEGAÇÃO</h4>
+				<nav>
+					<a href="../../index.html">Página Inicial</a>
+					<a href="../catalogo/index.html">Catálogo</a>
+					<a href="../quemsomos/index.html">Quem Somos</a>
+				</nav>
+			</div>
+
+			<div class="footer-col">
+				<h4>CONTATO</h4>
+				<a href="mailto:contato@aranharoupas.com.br">contato@aranharoupas.com.br</a>
+				<a href="tel:+5511999999999">(11) 99999-9999</a>
+				<a href="https://wa.me/5511999999999" target="_blank" rel="noreferrer">WhatsApp</a>
+			</div>
+
+			<div class="footer-col">
+				<h4>ATENDIMENTO</h4>
+				<p>Segunda a sexta</p>
+				<p>9h às 18h</p>
+			</div>
+		</div>
+		<div class="footer-bottom">
+			<p>&copy; 2026 AuryxTech - Transformando ideias em código.</p>
+		</div>
+	</footer>
+
+	<script src="../../json/storefront.js"></script>
+	<script src="contato.js"></script>
+</body>
+</html>

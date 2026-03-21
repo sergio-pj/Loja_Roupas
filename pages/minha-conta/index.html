@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Minha Conta | Aranha</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="../../style.css">
+    <link rel="stylesheet" href="../login/login.css">
+</head>
+<body>
+    <div id="overlay" onclick="toggleMenu()"></div>
+
+    <div id="sidebar" class="sidebar">
+        <a href="javascript:void(0)" class="closebtn" onclick="toggleMenu()">×</a>
+        <div class="sidebar-content">
+            <h3>Minha Conta</h3>
+            <nav class="sidebar-links">
+                <a href="../../index.html">Início</a>
+                <a href="../catalogo/index.html">Catálogo</a>
+                <a href="../contato/index.html">Contato</a>
+                <a href="../carrinho/index.html">Carrinho</a>
+                <a href="#profile-card">Meus dados</a>
+            </nav>
+        </div>
+    </div>
+
+    <header class="main-header login-header">
+        <div class="menu-icon" onclick="toggleMenu()">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
+
+        <div class="search-bar search-bar-static">
+            <input type="text" placeholder="Área reservada do cliente" readonly>
+        </div>
+
+        <nav class="nav-menu">
+            <a href="../../index.html">Início</a>
+            <a href="../catalogo/index.html">Catálogo</a>
+            <a href="../contato/index.html">Contato</a>
+        </nav>
+
+        <div class="header-actions">
+            <a href="../carrinho/index.html" class="header-icon-link" aria-label="Abrir carrinho">
+                <i class="fas fa-bag-shopping"></i>
+                <span class="cart-badge" data-cart-count hidden>0</span>
+            </a>
+            <a href="../minha-conta/index.html" class="header-icon-link active" data-auth-link aria-label="Abrir area do cliente">
+                <i class="fas fa-user-circle"></i>
+            </a>
+        </div>
+    </header>
+
+    <main class="auth-page">
+        <section class="auth-hero">
+            <div class="auth-hero-content">
+                <p class="auth-kicker">Minha conta</p>
+                <h1>Seus dados do cadastro ficam centralizados aqui.</h1>
+                <p>
+                    Nesta primeira fase, a conta mostra os dados básicos vindos do cadastro.
+                    Na próxima etapa, podemos evoluir isso para perfil completo, endereços, pedidos e favoritos.
+                </p>
+            </div>
+        </section>
+
+        <section class="auth-grid">
+            <section id="profile-card" class="profile-card">
+                <div class="section-head">
+                    <p class="auth-kicker">Dados do cliente</p>
+                    <h2>Seu perfil</h2>
+                </div>
+
+                <div class="profile-grid">
+                    <div class="profile-item">
+                        <span>Nome</span>
+                        <strong id="profile-name">Carregando...</strong>
+                    </div>
+                    <div class="profile-item">
+                        <span>E-mail</span>
+                        <strong id="profile-email">Carregando...</strong>
+                    </div>
+                    <div class="profile-item">
+                        <span>Celular</span>
+                        <strong id="profile-phone">Carregando...</strong>
+                    </div>
+                </div>
+
+                <div class="profile-actions">
+                    <a href="../contato/index.html" class="secondary-button">Falar com suporte</a>
+                    <button id="logout-button" class="newsletter-button" type="button">Sair</button>
+                </div>
+                <p id="account-feedback" class="auth-feedback" aria-live="polite"></p>
+            </section>
+
+            <section class="profile-card">
+                <div class="section-head">
+                    <p class="auth-kicker">Enderecos</p>
+                    <h2>Endereco principal</h2>
+                </div>
+
+                <div id="address-empty" class="profile-item">
+                    <span>Status</span>
+                    <strong>Nenhum endereco cadastrado ainda.</strong>
+                </div>
+
+                <div id="address-card" class="profile-item" hidden>
+                    <span id="address-label">Principal</span>
+                    <strong id="address-recipient">Carregando...</strong>
+                    <p id="address-lines">Carregando...</p>
+                </div>
+
+                <form id="address-form" class="auth-form address-form">
+                    <div class="address-grid">
+                        <label>
+                            <span>Identificacao</span>
+                            <input type="text" name="label" placeholder="Ex.: Casa" value="Principal" required>
+                        </label>
+                        <label>
+                            <span>Destinatario</span>
+                            <input type="text" name="recipient_name" placeholder="Quem recebe neste endereco" required>
+                        </label>
+                    </div>
+
+                    <div class="address-grid">
+                        <label>
+                            <span>Celular</span>
+                            <input type="tel" name="phone" placeholder="(11) 99999-9999">
+                        </label>
+                        <label>
+                            <span>CEP</span>
+                            <input type="text" name="zip_code" placeholder="00000-000">
+                        </label>
+                    </div>
+
+                    <div class="address-grid address-grid-wide">
+                        <label>
+                            <span>Rua</span>
+                            <input type="text" name="street" placeholder="Rua, avenida, travessa..." required>
+                        </label>
+                        <label>
+                            <span>Numero</span>
+                            <input type="text" name="number" placeholder="123">
+                        </label>
+                    </div>
+
+                    <div class="address-grid address-grid-wide">
+                        <label>
+                            <span>Complemento</span>
+                            <input type="text" name="complement" placeholder="Apartamento, bloco, referencia">
+                        </label>
+                        <label>
+                            <span>Bairro</span>
+                            <input type="text" name="neighborhood" placeholder="Seu bairro">
+                        </label>
+                    </div>
+
+                    <div class="address-grid">
+                        <label>
+                            <span>Cidade</span>
+                            <input type="text" name="city" placeholder="Sua cidade" required>
+                        </label>
+                        <label>
+                            <span>Estado</span>
+                            <input type="text" name="state" placeholder="UF" maxlength="2" required>
+                        </label>
+                    </div>
+
+                    <label class="checkbox-field">
+                        <input type="checkbox" name="is_default" checked>
+                        <span>Definir como endereco principal</span>
+                    </label>
+
+                    <div class="profile-actions">
+                        <button id="save-address-button" class="newsletter-button" type="submit">Salvar endereco</button>
+                    </div>
+                    <p id="address-feedback" class="auth-feedback" aria-live="polite"></p>
+                </form>
+            </section>
+
+            <section id="pedidos-card" class="profile-card orders-card">
+                <div class="section-head">
+                    <p class="auth-kicker">Minhas compras</p>
+                    <h2>Pedidos e acompanhamento</h2>
+                    <p>Os pedidos iniciados no carrinho aparecem aqui com status, resumo e próximos passos.</p>
+                </div>
+
+                <div id="orders-empty" class="profile-item">
+                    <span>Status</span>
+                    <strong>Nenhum pedido listado ainda.</strong>
+                    <p>Se você já concluiu uma compra e precisa de ajuda, use o suporte técnico para receber atendimento direto.</p>
+                </div>
+
+                <div id="orders-list" class="orders-list" hidden></div>
+                <p id="orders-feedback" class="auth-feedback" aria-live="polite"></p>
+
+                <div class="profile-actions">
+                    <a href="../contato/index.html?assunto=Suporte%20Tecnico&mensagem=Ola%2C%20preciso%20de%20ajuda%20com%20um%20pedido.#formulario" class="secondary-button">Abrir suporte</a>
+                    <a href="../catalogo/index.html" class="secondary-button">Continuar comprando</a>
+                </div>
+            </section>
+        </section>
+    </main>
+
+    <footer class="main-footer">
+        <div class="footer-bottom">
+            <p>&copy; 2026 AuryxTech - Transformando ideias em código.</p>
+        </div>
+    </footer>
+
+    <script src="../../json/storefront.js"></script>
+    <script type="module" src="conta.js"></script>
+</body>
+</html>

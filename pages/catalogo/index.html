@@ -3,8 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">    <link rel="stylesheet" href="../../style.css">
+    <title>Catálogo | Aranha</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="../../style.css">
     <link rel="stylesheet" href="catalogo.css">
 </head>
 <body>
@@ -16,9 +17,12 @@
         <div class="sidebar-content">
             <h3>Informações</h3>
             <nav class="sidebar-links">                
-                <a href="#"><i class="fas fa-box"></i> Minhas Compras</a>
-                <a href="#"><i class="fas fa-headset"></i> Suporte Técnico</a>
-                <a href="#"><i class="fas fa-question-circle"></i> Perguntas Frequentes</a>
+                <a href="../login/index.html?redirect=%2Fpages%2Fminha-conta%2Findex.html%23pedidos-card"><i class="fas fa-box"></i> Minhas Compras</a>
+                <a href="../contato/index.html?assunto=Suporte%20Tecnico&mensagem=Ola%2C%20preciso%20de%20ajuda%20com%20meu%20pedido%20ou%20cadastro.#formulario"><i class="fas fa-headset"></i> Suporte Técnico</a>
+                <a href="../contato/index.html#faq"><i class="fas fa-question-circle"></i> Perguntas Frequentes</a>
+                <a href="../contato/index.html"><i class="fas fa-envelope"></i> Contato</a>
+                <a href="../login/index.html"><i class="fas fa-user-circle"></i> Minha Conta</a>
+                <a href="../carrinho/index.html"><i class="fas fa-bag-shopping"></i> Carrinho</a>
                 <hr>
                 <a href="../../index.html">Voltar ao Início</a>
             </nav>
@@ -38,11 +42,19 @@
 
     <nav class="nav-menu">
         <a href="../../index.html">Início</a>
-        <a href="pages/quemsomos/index.html">Quem Somos</a>
-        <a href="#" class="user-link">
-            <i class="fas fa-user-circle"></i> 
-        </a>
+        <a href="../quemsomos/index.html">Quem Somos</a>
+        <a href="../contato/index.html">Contato</a>
     </nav>
+
+    <div class="header-actions">
+        <a href="../carrinho/index.html" class="header-icon-link" aria-label="Abrir carrinho">
+            <i class="fas fa-bag-shopping"></i>
+            <span class="cart-badge" data-cart-count hidden>0</span>
+        </a>
+        <a href="../login/index.html" class="header-icon-link" data-auth-link aria-label="Abrir area do cliente">
+            <i class="fas fa-user-circle"></i>
+        </a>
+    </div>
 </header>
 
 
@@ -74,6 +86,40 @@
                     </div>
             </section>
     </main>
+    <footer class="main-footer catalogo-footer">
+        <div class="footer-container">
+            <div class="footer-col">
+                <h4>ARANHA</h4>
+                <p>Peças com identidade visual forte, navegação limpa e foco em experiência premium.</p>
+            </div>
+
+            <div class="footer-col">
+                <h4>NAVEGAÇÃO</h4>
+                <nav>
+                    <a href="../../index.html">Página Inicial</a>
+                    <a href="../quemsomos/index.html">Quem Somos</a>
+                    <a href="../contato/index.html">Contato</a>
+                </nav>
+            </div>
+
+            <div class="footer-col">
+                <h4>CONTATO</h4>
+                <a href="../contato/index.html">Página de Contato</a>
+                <a href="mailto:contato@aranharoupas.com.br">contato@aranharoupas.com.br</a>
+                <a href="tel:+5511999999999">(11) 99999-9999</a>
+            </div>
+
+            <div class="footer-col">
+                <h4>ÁREA DO CLIENTE</h4>
+                <a href="../login/index.html">Entrar ou criar conta</a>
+                <a href="../minha-conta/index.html">Minha Conta</a>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2026 AuryxTech - Transformando ideias em código.</p>
+        </div>
+    </footer>
+    <script src="../../json/storefront.js"></script>
     <script src="catalogo.js"></script>
 </body>
 </html>

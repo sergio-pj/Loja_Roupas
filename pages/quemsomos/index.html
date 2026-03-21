@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Quem Somos | Aranha</title>
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+	<link rel="stylesheet" href="../../style.css">
+	<link rel="stylesheet" href="quemsomos.css">
+</head>
+<body>
+	<div id="overlay" onclick="toggleMenu()"></div>
+
+	<div id="sidebar" class="sidebar">
+		<a href="javascript:void(0)" class="closebtn" onclick="toggleMenu()">×</a>
+		<div class="sidebar-content">
+			<h3>Navegação</h3>
+			<nav class="sidebar-links">
+				<a href="../../index.html">Início</a>
+				<a href="../catalogo/index.html">Catálogo</a>
+				<a href="#manifesto">Manifesto</a>
+				<a href="#diferenciais">Diferenciais</a>
+				<a href="../contato/index.html">Contato</a>
+				<a href="../carrinho/index.html">Carrinho</a>
+			</nav>
+		</div>
+	</div>
+
+	<header class="main-header quemsomos-header">
+		<div class="menu-icon" onclick="toggleMenu()">
+			<span></span>
+			<span></span>
+			<span></span>
+		</div>
+
+		<div class="search-bar search-bar-static">
+			<input type="text" placeholder="Conheça a essência da Aranha" readonly>
+		</div>
+
+		<nav class="nav-menu">
+			<a href="../../index.html">Início</a>
+			<a href="../catalogo/index.html">Catálogo</a>
+			<a href="../contato/index.html">Contato</a>
+		</nav>
+
+		<div class="header-actions">
+			<a href="../carrinho/index.html" class="header-icon-link" aria-label="Abrir carrinho">
+				<i class="fas fa-bag-shopping"></i>
+				<span class="cart-badge" data-cart-count hidden>0</span>
+			</a>
+			<a href="../login/index.html" class="header-icon-link" data-auth-link aria-label="Abrir area do cliente">
+				<i class="fas fa-user-circle"></i>
+			</a>
+		</div>
+	</header>
+
+	<main class="about-page">
+		<section class="about-hero">
+			<div class="about-hero-content">
+				<p class="eyebrow">Projeto Aranha</p>
+				<h1>Moda com presença, contraste e identidade.</h1>
+				<p class="about-lead">
+					A Aranha nasceu para unir estética urbana, peças versáteis e uma comunicação visual marcante.
+					O foco é entregar uma experiência elegante, atual e fácil de navegar.
+				</p>
+				<div class="about-hero-actions">
+					<a href="../catalogo/index.html" class="primary-link">Ver catálogo</a>
+					<a href="#manifesto" class="secondary-link">Ler manifesto</a>
+				</div>
+			</div>
+		</section>
+
+		<section id="manifesto" class="about-section about-grid">
+			<article>
+				<p class="section-kicker">Manifesto</p>
+				<h2>Menos excesso. Mais assinatura visual.</h2>
+				<p>
+					Cada detalhe da marca foi pensado para transmitir minimalismo com personalidade. A Aranha trabalha
+					com tons neutros, composição limpa e destaque total para a peça e para a mensagem.
+				</p>
+			</article>
+			<article class="about-card">
+				<h3>O que guia a marca</h3>
+				<ul class="about-list">
+					<li>Peças com linguagem contemporânea</li>
+					<li>Visual premium e navegação objetiva</li>
+					<li>Comunicação forte, sem poluição</li>
+				</ul>
+			</article>
+		</section>
+
+		<section id="diferenciais" class="about-section values-section">
+			<p class="section-kicker">Diferenciais</p>
+			<h2>Uma base visual consistente para crescer a marca.</h2>
+			<div class="values-grid">
+				<article class="value-card">
+					<i class="fas fa-shirt"></i>
+					<h3>Curadoria</h3>
+					<p>Seleção de peças com leitura limpa e apelo urbano.</p>
+				</article>
+				<article class="value-card">
+					<i class="fas fa-spider"></i>
+					<h3>Identidade</h3>
+					<p>Elementos visuais reconhecíveis e coerentes em toda a jornada.</p>
+				</article>
+				<article class="value-card">
+					<i class="fas fa-truck-fast"></i>
+					<h3>Experiência</h3>
+					<p>Navegação direta para destacar campanha, catálogo e conversão.</p>
+				</article>
+			</div>
+		</section>
+
+		<section id="contato" class="about-section contact-section">
+			<div>
+				<p class="section-kicker">Contato</p>
+				<h2>Vamos construir a presença da marca.</h2>
+				<p>
+					Para parcerias, dúvidas ou acompanhamento do projeto, use os canais abaixo.
+				</p>
+			</div>
+			<div class="contact-card">
+				<p><strong>Email:</strong> contato@aranharoupas.com.br</p>
+				<p><strong>WhatsApp:</strong> (11) 99999-9999</p>
+				<p><strong>Instagram:</strong> @aranharoupas</p>
+			</div>
+		</section>
+	</main>
+
+	<footer class="main-footer">
+		<div class="footer-container">
+			<div class="footer-col">
+				<h4>ARANHA</h4>
+				<p>Moda autoral com direção visual limpa e contemporânea.</p>
+			</div>
+
+			<div class="footer-col">
+				<h4>NAVEGAÇÃO</h4>
+				<nav>
+					<a href="../../index.html">Página Inicial</a>
+					<a href="../catalogo/index.html">Catálogo</a>
+					<a href="#manifesto">Manifesto</a>
+				</nav>
+			</div>
+
+			<div class="footer-col">
+				<h4>CONTATO</h4>
+				<a href="../contato/index.html">Página de Contato</a>
+				<a href="mailto:contato@aranharoupas.com.br">contato@aranharoupas.com.br</a>
+				<a href="tel:+5511999999999">(11) 99999-9999</a>
+			</div>
+
+			<div class="footer-col">
+				<h4>REDES</h4>
+				<a href="#">Instagram</a>
+				<a href="#">LinkedIn</a>
+			</div>
+		</div>
+		<div class="footer-bottom">
+			<p>&copy; 2026 AuryxTech - Transformando ideias em código.</p>
+		</div>
+	</footer>
+
+	<script src="../../json/storefront.js"></script>
+	<script src="quemsomos.js"></script>
+</body>
+</html>

@@ -1,14 +1,5 @@
 function toggleMenu() {
     const sidebar = document.getElementById("sidebar");
-    if (sidebar.style.width === "250px") {
-        sidebar.style.width = "0";
-    } else {
-        sidebar.style.width = "250px";
-    }
-}
-
-function toggleMenu() {
-    const sidebar = document.getElementById("sidebar");
     const overlay = document.getElementById("overlay");
     
     if (sidebar.style.width === "250px") {
@@ -20,10 +11,26 @@ function toggleMenu() {
     }
 }
 
+function filtrar(criterio) {
+    const params = new URLSearchParams();
+
+    if (criterio && criterio !== 'todos') {
+        params.set('filtro', criterio);
+    }
+
+    const destino = `pages/catalogo/index.html${params.toString() ? `?${params.toString()}` : ''}`;
+    window.location.href = destino;
+}
+
 async function carregarProdutos() {
+    const container = document.getElementById('lista-produtos');
+
+    if (!container) {
+        return;
+    }
+
     const response = await fetch('produtos.json');
     const produtos = await response.json();
-    const container = document.getElementById('lista-produtos');
 
     container.innerHTML = produtos.map(prod => `
         <div class="product-card">

@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login | Aranha</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="../../style.css">
+    <link rel="stylesheet" href="login.css">
+</head>
+<body>
+    <div id="overlay" onclick="toggleMenu()"></div>
+
+    <div id="sidebar" class="sidebar">
+        <a href="javascript:void(0)" class="closebtn" onclick="toggleMenu()">×</a>
+        <div class="sidebar-content">
+            <h3>Área do Cliente</h3>
+            <nav class="sidebar-links">
+                <a href="../../index.html">Início</a>
+                <a href="../catalogo/index.html">Catálogo</a>
+                <a href="../contato/index.html">Contato</a>
+                <a href="../carrinho/index.html">Carrinho</a>
+                <a href="#login-card">Entrar</a>
+                <a href="#cadastro-card">Criar cadastro</a>
+            </nav>
+        </div>
+    </div>
+
+    <header class="main-header login-header">
+        <div class="menu-icon" onclick="toggleMenu()">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
+
+        <div class="search-bar search-bar-static">
+            <input type="text" placeholder="Acesse sua conta Aranha" readonly>
+        </div>
+
+        <nav class="nav-menu">
+            <a href="../../index.html">Início</a>
+            <a href="../catalogo/index.html">Catálogo</a>
+            <a href="../contato/index.html">Contato</a>
+        </nav>
+
+        <div class="header-actions">
+            <a href="../carrinho/index.html" class="header-icon-link" aria-label="Abrir carrinho">
+                <i class="fas fa-bag-shopping"></i>
+                <span class="cart-badge" data-cart-count hidden>0</span>
+            </a>
+            <a href="../login/index.html" class="header-icon-link" data-auth-link aria-label="Abrir area do cliente">
+                <i class="fas fa-user-circle"></i>
+            </a>
+        </div>
+    </header>
+
+    <main class="auth-page">
+        <section class="auth-hero">
+            <div class="auth-hero-content">
+                <p class="auth-kicker">Área do cliente</p>
+                <h1>Entre na sua conta ou crie um cadastro novo.</h1>
+                <p>
+                    Esta é a primeira etapa da área autenticada. O cliente acessa só se quiser entrar
+                    ou criar conta, sem interferir na página inicial do site.
+                </p>
+            </div>
+        </section>
+
+        <section class="auth-grid">
+            <section id="login-card" class="auth-card">
+                <div class="section-head">
+                    <p class="auth-kicker">Login</p>
+                    <h2>Entrar</h2>
+                </div>
+
+                <form id="login-form" class="auth-form">
+                    <label>
+                        <span>E-mail</span>
+                        <input type="email" name="email" placeholder="voce@email.com" required>
+                    </label>
+
+                    <label>
+                        <span>Senha</span>
+                        <input type="password" name="password" placeholder="Sua senha" required>
+                    </label>
+
+                    <button type="submit" class="newsletter-button">Entrar</button>
+                    <p id="login-feedback" class="auth-feedback" aria-live="polite"></p>
+                    <p class="auth-tip">Se voce acabou de criar a conta, confirme o e-mail recebido antes de tentar entrar.</p>
+                </form>
+            </section>
+
+            <section id="cadastro-card" class="auth-card">
+                <div class="section-head">
+                    <p class="auth-kicker">Cadastro</p>
+                    <h2>Criar conta</h2>
+                </div>
+
+                <form id="register-form" class="auth-form">
+                    <label>
+                        <span>Nome completo</span>
+                        <input type="text" name="fullName" placeholder="Seu nome completo" required>
+                    </label>
+
+                    <label>
+                        <span>Celular</span>
+                        <input type="tel" name="phone" placeholder="(11) 99999-9999" required>
+                    </label>
+
+                    <label>
+                        <span>E-mail</span>
+                        <input type="email" name="email" placeholder="voce@email.com" required>
+                    </label>
+
+                    <label>
+                        <span>Senha</span>
+                        <input type="password" name="password" placeholder="Crie uma senha" minlength="6" required>
+                    </label>
+
+                    <button type="submit" class="newsletter-button">Criar cadastro</button>
+                    <p id="register-feedback" class="auth-feedback" aria-live="polite"></p>
+                    <p class="auth-tip">O projeto pode exigir confirmacao por e-mail antes do primeiro login.</p>
+                </form>
+            </section>
+        </section>
+    </main>
+
+    <footer class="main-footer">
+        <div class="footer-container">
+            <div class="footer-col">
+                <h4>ARANHA</h4>
+                <p>Área reservada para o cliente acompanhar seus dados e próximas evoluções da conta.</p>
+            </div>
+            <div class="footer-col">
+                <h4>NAVEGAÇÃO</h4>
+                <nav>
+                    <a href="../../index.html">Página Inicial</a>
+                    <a href="../catalogo/index.html">Catálogo</a>
+                    <a href="../contato/index.html">Contato</a>
+                </nav>
+            </div>
+            <div class="footer-col">
+                <h4>ACESSO</h4>
+                <a href="#login-card">Entrar</a>
+                <a href="#cadastro-card">Criar conta</a>
+            </div>
+            <div class="footer-col">
+                <h4>SUPORTE</h4>
+                <a href="mailto:contato@aranharoupas.com.br">contato@aranharoupas.com.br</a>
+                <a href="tel:+5511999999999">(11) 99999-9999</a>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2026 AuryxTech - Transformando ideias em código.</p>
+        </div>
+    </footer>
+
+    <script src="../../json/storefront.js"></script>
+    <script type="module" src="login.js"></script>
+</body>
+</html>
