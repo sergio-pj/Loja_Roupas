@@ -83,7 +83,7 @@ if (contactForm) {
 			mensagem
 		].join('\n');
 
-		const mailto = `mailto:contato@aranharoupas.com.br?subject=${encodeURIComponent(assunto)}&body=${encodeURIComponent(body)}`;
+		const mailto = `mailto:mateusyuriaranha@gmail.com?subject=${encodeURIComponent(assunto)}&body=${encodeURIComponent(body)}`;
 		window.location.href = mailto;
 
 		if (feedback) {

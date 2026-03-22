@@ -11,6 +11,105 @@ function toggleMenu() {
     }
 }
 
+const CATALOG_DATA_URL = new URL('pages/catalogo/catalogo.json', window.location.href).href;
+let homeMediaCarouselCleanups = [];
+
+function resolveProductImages(product) {
+    const sources = Array.isArray(product.galeria) && product.galeria.length ? product.galeria : [product.imagem];
+
+    return sources
+        .filter(Boolean)
+        .map(source => new URL(source, CATALOG_DATA_URL).href);
+}
+
+function buildMediaCarouselMarkup(images, altText, className = '') {
+    const carouselClassName = ['media-carousel', className].filter(Boolean).join(' ');
+    const slides = images.map((source, index) => `
+        <img class="media-carousel-slide${index === 0 ? ' is-active' : ''}" src="${source}" alt="${altText} - visual ${index + 1}" loading="${index === 0 ? 'eager' : 'lazy'}">
+    `).join('');
+
+    const dots = images.length > 1
+        ? `
+            <div class="media-carousel-dots" aria-label="Navegação da galeria">
+                ${images.map((_, index) => `
+                    <button type="button" class="media-carousel-dot${index === 0 ? ' is-active' : ''}" data-slide-index="${index}" aria-label="Ver imagem ${index + 1}"></button>
+                `).join('')}
+            </div>
+        `
+        : '';
+
+    return `
+        <div class="${carouselClassName}" data-media-carousel data-interval="2400">
+            <div class="media-carousel-frame">
+                <div class="media-carousel-slides">${slides}</div>
+                ${dots}
+            </div>
+        </div>
+    `;
+}
+
+function setupMediaCarousel(carousel) {
+    const slides = Array.from(carousel.querySelectorAll('.media-carousel-slide'));
+    const dots = Array.from(carousel.querySelectorAll('.media-carousel-dot'));
+
+    if (slides.length <= 1) {
+        return () => {};
+    }
+
+    let activeIndex = 0;
+    let intervalId = null;
+    const intervalMs = Number(carousel.getAttribute('data-interval')) || 2400;
+
+    const showSlide = nextIndex => {
+        activeIndex = nextIndex;
+        slides.forEach((slide, index) => {
+            slide.classList.toggle('is-active', index === activeIndex);
+        });
+        dots.forEach((dot, index) => {
+            dot.classList.toggle('is-active', index === activeIndex);
+            dot.setAttribute('aria-pressed', String(index === activeIndex));
+        });
+    };
+
+    const stopAutoplay = () => {
+        if (intervalId) {
+            window.clearInterval(intervalId);
+            intervalId = null;
+        }
+    };
+
+    const startAutoplay = () => {
+        stopAutoplay();
+        intervalId = window.setInterval(() => {
+            showSlide((activeIndex + 1) % slides.length);
+        }, intervalMs);
+    };
+
+    dots.forEach((dot, index) => {
+        dot.addEventListener('click', () => {
+            showSlide(index);
+            startAutoplay();
+        });
+    });
+
+    carousel.addEventListener('mouseenter', stopAutoplay);
+    carousel.addEventListener('mouseleave', startAutoplay);
+    carousel.addEventListener('focusin', stopAutoplay);
+    carousel.addEventListener('focusout', startAutoplay);
+
+    showSlide(0);
+    startAutoplay();
+
+    return () => {
+        stopAutoplay();
+    };
+}
+
+function initializeHomeMediaCarousels(root) {
+    homeMediaCarouselCleanups.forEach(cleanup => cleanup());
+    homeMediaCarouselCleanups = Array.from(root.querySelectorAll('[data-media-carousel]')).map(setupMediaCarousel);
+}
+
 const homeCarouselItems = [
     {
         nome: 'Marina S.',
@@ -169,19 +268,21 @@ async function carregarProdutos() {
         return;
     }
 
-    const response = await fetch('pages/catalogo/catalogo.json');
+    const response = await fetch(CATALOG_DATA_URL);
     const produtos = await response.json();
     const destaques = produtos.slice(0, 3);
 
     container.innerHTML = destaques.map(prod => `
         <article class="product-card">
             <a class="product-card-link" href="pages/produto/index.html?id=${prod.id}">
-                <img src="${prod.imagem}" alt="${prod.nome}">
+                ${buildMediaCarouselMarkup(resolveProductImages(prod), prod.nome, 'home-product-carousel')}
                 <h3>${prod.nome}</h3>
                 <p class="price">R$ ${prod.preco.toFixed(2).replace('.', ',')}</p>
             </a>
         </article>
     `).join('');
+
+    initializeHomeMediaCarousels(container);
 }
 
 carregarProdutos();

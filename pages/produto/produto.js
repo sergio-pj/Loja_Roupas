@@ -1,5 +1,6 @@
 const params = new URLSearchParams(window.location.search);
 const productId = Number(params.get('id'));
+const CATALOG_DATA_URL = new URL('../catalogo/catalogo.json', window.location.href).href;
 
 const stateElement = document.getElementById('product-state');
 const layoutElement = document.getElementById('product-layout');
@@ -7,7 +8,7 @@ const detailsElement = document.getElementById('product-details');
 const measuresElement = document.getElementById('product-measures');
 const relatedSectionElement = document.getElementById('related-products-section');
 
-const productImage = document.getElementById('product-image');
+const productGalleryMedia = document.getElementById('product-gallery-media');
 const productEyebrow = document.getElementById('product-eyebrow');
 const productName = document.getElementById('product-name');
 const productSubtitle = document.getElementById('product-subtitle');
@@ -30,6 +31,155 @@ let currentProduct = null;
 let allProducts = [];
 let selectedSize = '';
 let productRelatedStartIndex = 0;
+let productMediaCarouselCleanups = [];
+
+function resolveProductImages(product) {
+    const sources = Array.isArray(product.galeria) && product.galeria.length ? product.galeria : [product.imagem];
+
+    return sources
+        .filter(Boolean)
+        .map(source => new URL(source, CATALOG_DATA_URL).href);
+}
+
+function buildMediaCarouselMarkup(images, altText, className = '') {
+    const carouselClassName = ['media-carousel', className].filter(Boolean).join(' ');
+    const slides = images.map((source, index) => `
+        <img class="media-carousel-slide${index === 0 ? ' is-active' : ''}" src="${source}" alt="${altText} - visual ${index + 1}" loading="${index === 0 ? 'eager' : 'lazy'}">
+    `).join('');
+
+    const dots = images.length > 1
+        ? `
+            <div class="media-carousel-dots" aria-label="Navegação da galeria">
+                ${images.map((_, index) => `
+                    <button type="button" class="media-carousel-dot${index === 0 ? ' is-active' : ''}" data-slide-index="${index}" aria-label="Ver imagem ${index + 1}"></button>
+                `).join('')}
+            </div>
+        `
+        : '';
+
+    return `
+        <div class="${carouselClassName}" data-media-carousel data-interval="2500">
+            <div class="media-carousel-frame">
+                <div class="media-carousel-slides">${slides}</div>
+                ${dots}
+            </div>
+        </div>
+    `;
+}
+
+function buildProductGalleryMarkup(images, altText) {
+    const slides = images.map((source, index) => `
+        <img class="media-carousel-slide${index === 0 ? ' is-active' : ''}" src="${source}" alt="${altText} - visual ${index + 1}" loading="${index === 0 ? 'eager' : 'lazy'}">
+    `).join('');
+
+    const dots = images.length > 1
+        ? `
+            <div class="media-carousel-dots" aria-label="Navegação da galeria">
+                ${images.map((_, index) => `
+                    <button type="button" class="media-carousel-dot${index === 0 ? ' is-active' : ''}" data-slide-index="${index}" aria-label="Ver imagem ${index + 1}"></button>
+                `).join('')}
+            </div>
+        `
+        : '';
+
+    const thumbs = images.length > 1
+        ? `
+            <div class="product-gallery-thumbs" aria-label="Miniaturas da galeria">
+                ${images.map((source, index) => `
+                    <button type="button" class="product-gallery-thumb${index === 0 ? ' is-active' : ''}" data-slide-index="${index}" aria-label="Selecionar visual ${index + 1}">
+                        <img src="${source}" alt="${altText} miniatura ${index + 1}" loading="lazy">
+                    </button>
+                `).join('')}
+            </div>
+        `
+        : '';
+
+    return `
+        <div class="media-carousel product-detail-carousel" data-media-carousel data-interval="2500">
+            <div class="media-carousel-frame">
+                <div class="product-gallery-surface">
+                    <div class="media-carousel-slides">${slides}</div>
+                </div>
+                ${dots}
+            </div>
+            ${thumbs}
+        </div>
+    `;
+}
+
+function setupMediaCarousel(carousel) {
+    const slides = Array.from(carousel.querySelectorAll('.media-carousel-slide'));
+    const dots = Array.from(carousel.querySelectorAll('.media-carousel-dot'));
+    const thumbs = Array.from(carousel.querySelectorAll('.product-gallery-thumb'));
+
+    if (slides.length <= 1) {
+        return () => {};
+    }
+
+    let activeIndex = 0;
+    let intervalId = null;
+    const intervalMs = Number(carousel.getAttribute('data-interval')) || 2500;
+
+    const showSlide = nextIndex => {
+        activeIndex = nextIndex;
+        slides.forEach((slide, index) => {
+            slide.classList.toggle('is-active', index === activeIndex);
+        });
+        dots.forEach((dot, index) => {
+            dot.classList.toggle('is-active', index === activeIndex);
+            dot.setAttribute('aria-pressed', String(index === activeIndex));
+        });
+        thumbs.forEach((thumb, index) => {
+            thumb.classList.toggle('is-active', index === activeIndex);
+            thumb.setAttribute('aria-pressed', String(index === activeIndex));
+        });
+    };
+
+    const stopAutoplay = () => {
+        if (intervalId) {
+            window.clearInterval(intervalId);
+            intervalId = null;
+        }
+    };
+
+    const startAutoplay = () => {
+        stopAutoplay();
+        intervalId = window.setInterval(() => {
+            showSlide((activeIndex + 1) % slides.length);
+        }, intervalMs);
+    };
+
+    dots.forEach((dot, index) => {
+        dot.addEventListener('click', () => {
+            showSlide(index);
+            startAutoplay();
+        });
+    });
+
+    thumbs.forEach((thumb, index) => {
+        thumb.addEventListener('click', () => {
+            showSlide(index);
+            startAutoplay();
+        });
+    });
+
+    carousel.addEventListener('mouseenter', stopAutoplay);
+    carousel.addEventListener('mouseleave', startAutoplay);
+    carousel.addEventListener('focusin', stopAutoplay);
+    carousel.addEventListener('focusout', startAutoplay);
+
+    showSlide(0);
+    startAutoplay();
+
+    return () => {
+        stopAutoplay();
+    };
+}
+
+function initializeProductMediaCarousels() {
+    productMediaCarouselCleanups.forEach(cleanup => cleanup());
+    productMediaCarouselCleanups = Array.from(document.querySelectorAll('[data-media-carousel]')).map(setupMediaCarousel);
+}
 
 function toggleMenu() {
     const sidebar = document.getElementById('sidebar');
@@ -110,7 +260,7 @@ function renderRelated(product) {
     relatedProductsContainer.innerHTML = orderedRelated.map(item => `
         <a class="related-card" href="./index.html?id=${item.id}">
             <div class="related-card-media">
-                <img src="${item.imagem}" alt="${item.nome}">
+                ${buildMediaCarouselMarkup(resolveProductImages(item), item.nome, 'related-product-carousel')}
             </div>
             <p>${item.subtitulo || (item.categoria === 'oversized' ? 'Oversized Aranha' : 'Camiseta Aranha')}</p>
             <strong>${item.nome}</strong>
@@ -119,6 +269,7 @@ function renderRelated(product) {
     `).join('');
 
     relatedSectionElement.hidden = related.length === 0;
+    initializeProductMediaCarousels();
 }
 
 function renderProduct(product) {
@@ -132,8 +283,7 @@ function renderProduct(product) {
     detailsElement.hidden = false;
     measuresElement.hidden = false;
 
-    productImage.src = product.imagem;
-    productImage.alt = product.nome;
+    productGalleryMedia.innerHTML = buildProductGalleryMarkup(resolveProductImages(product), product.nome);
     productEyebrow.textContent = `${product.categoria === 'oversized' ? 'Oversized' : 'Camiseta'} | ${product.cor === 'escura' ? 'Peça escura' : 'Peça clara'}`;
     productName.textContent = product.nome;
     productSubtitle.textContent = product.subtitulo || '';
@@ -178,7 +328,7 @@ async function loadProduct() {
     }
 
     try {
-        const response = await fetch('../catalogo/catalogo.json');
+        const response = await fetch(CATALOG_DATA_URL);
         allProducts = await response.json();
         const product = allProducts.find(item => Number(item.id) === productId);
 

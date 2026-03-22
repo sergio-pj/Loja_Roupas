@@ -3,6 +3,104 @@ let filtroAtual = 'todos';
 let termoBuscaAtual = '';
 let paginaAtual = 1;
 const itensPorPagina = 6;
+const CATALOG_DATA_URL = new URL('catalogo.json', window.location.href).href;
+let catalogMediaCarouselCleanups = [];
+
+function resolveProductImages(produto) {
+    const sources = Array.isArray(produto.galeria) && produto.galeria.length ? produto.galeria : [produto.imagem];
+
+    return sources
+        .filter(Boolean)
+        .map(source => new URL(source, CATALOG_DATA_URL).href);
+}
+
+function buildMediaCarouselMarkup(images, altText, className = '') {
+    const carouselClassName = ['media-carousel', className].filter(Boolean).join(' ');
+    const slides = images.map((source, index) => `
+        <img class="media-carousel-slide${index === 0 ? ' is-active' : ''}" src="${source}" alt="${altText} - visual ${index + 1}" loading="${index === 0 ? 'eager' : 'lazy'}">
+    `).join('');
+
+    const dots = images.length > 1
+        ? `
+            <div class="media-carousel-dots" aria-label="Navegação da galeria">
+                ${images.map((_, index) => `
+                    <button type="button" class="media-carousel-dot${index === 0 ? ' is-active' : ''}" data-slide-index="${index}" aria-label="Ver imagem ${index + 1}"></button>
+                `).join('')}
+            </div>
+        `
+        : '';
+
+    return `
+        <div class="${carouselClassName}" data-media-carousel data-interval="2400">
+            <div class="media-carousel-frame">
+                <div class="media-carousel-slides">${slides}</div>
+                ${dots}
+            </div>
+        </div>
+    `;
+}
+
+function setupMediaCarousel(carousel) {
+    const slides = Array.from(carousel.querySelectorAll('.media-carousel-slide'));
+    const dots = Array.from(carousel.querySelectorAll('.media-carousel-dot'));
+
+    if (slides.length <= 1) {
+        return () => {};
+    }
+
+    let activeIndex = 0;
+    let intervalId = null;
+    const intervalMs = Number(carousel.getAttribute('data-interval')) || 2400;
+
+    const showSlide = nextIndex => {
+        activeIndex = nextIndex;
+        slides.forEach((slide, index) => {
+            slide.classList.toggle('is-active', index === activeIndex);
+        });
+        dots.forEach((dot, index) => {
+            dot.classList.toggle('is-active', index === activeIndex);
+            dot.setAttribute('aria-pressed', String(index === activeIndex));
+        });
+    };
+
+    const stopAutoplay = () => {
+        if (intervalId) {
+            window.clearInterval(intervalId);
+            intervalId = null;
+        }
+    };
+
+    const startAutoplay = () => {
+        stopAutoplay();
+        intervalId = window.setInterval(() => {
+            showSlide((activeIndex + 1) % slides.length);
+        }, intervalMs);
+    };
+
+    dots.forEach((dot, index) => {
+        dot.addEventListener('click', () => {
+            showSlide(index);
+            startAutoplay();
+        });
+    });
+
+    carousel.addEventListener('mouseenter', stopAutoplay);
+    carousel.addEventListener('mouseleave', startAutoplay);
+    carousel.addEventListener('focusin', stopAutoplay);
+    carousel.addEventListener('focusout', startAutoplay);
+
+    showSlide(0);
+    startAutoplay();
+
+    return () => {
+        stopAutoplay();
+    };
+}
+
+function initializeCatalogMediaCarousels(root) {
+    catalogMediaCarouselCleanups.forEach(cleanup => cleanup());
+    catalogMediaCarouselCleanups = Array.from(root.querySelectorAll('[data-media-carousel]')).map(setupMediaCarousel);
+}
 
 function getProdutosFiltrados() {
     return produtosDados.filter(produto => {
@@ -67,7 +165,7 @@ function aplicarFiltroInicial() {
 // Busca os dados do JSON
 async function carregarProdutos() {
     try {
-        const response = await fetch('catalogo.json');
+        const response = await fetch(CATALOG_DATA_URL);
         produtosDados = await response.json();
         aplicarFiltroInicial();
         atualizarCatalogo();
@@ -85,12 +183,11 @@ function exibirProdutos(lista) {
         const card = `
             <div class="product-card">
                 <a class="product-image" href="../produto/index.html?id=${produto.id}" aria-label="Abrir produto ${produto.nome}">
-                    <img src="${produto.imagem}" alt="${produto.nome}">
-                    <div class="product-image-badges">
-                        <img src="../../assets/AranhaPrinc_Logo.png" alt="Logo Aranha" class="product-logo-badge">
-                        <span class="product-cart-badge"><i class="fas fa-cart-shopping"></i></span>
-                    </div>
+                    ${buildMediaCarouselMarkup(resolveProductImages(produto), produto.nome, 'catalog-product-carousel')}
                 </a>
+                <button type="button" class="product-floating-cart" data-product-id="${produto.id}" aria-label="Adicionar ${produto.nome} ao carrinho">
+                    <i class="fas fa-cart-shopping"></i>
+                </button>
                 <div class="product-info">
                     <a class="product-title-link" href="../produto/index.html?id=${produto.id}">
                         <h4>${produto.nome}</h4>
@@ -105,6 +202,8 @@ function exibirProdutos(lista) {
         `;
         container.innerHTML += card;
     });
+
+    initializeCatalogMediaCarousels(container);
 }
 
 // Funções de Filtro (Categorias e Cores)
@@ -137,10 +236,35 @@ document.addEventListener('click', event => {
     }
 
     const pageButton = target.closest('.pagination-button');
+    const cartButton = target.closest('.product-floating-cart');
 
     if (pageButton) {
         paginaAtual = Number(pageButton.getAttribute('data-page')) || 1;
         atualizarCatalogo();
+        return;
+    }
+
+    if (cartButton) {
+        const productId = Number(cartButton.getAttribute('data-product-id'));
+        const produto = produtosDados.find(item => Number(item.id) === productId);
+
+        if (!produto || !window.storefront) {
+            return;
+        }
+
+        const added = window.storefront.addToCart(produto, { tamanho: 'M' });
+
+        if (!added) {
+            return;
+        }
+
+        cartButton.classList.add('is-added');
+        cartButton.innerHTML = '<i class="fas fa-check"></i>';
+
+        window.setTimeout(() => {
+            cartButton.classList.remove('is-added');
+            cartButton.innerHTML = '<i class="fas fa-cart-shopping"></i>';
+        }, 1200);
         return;
     }
 });

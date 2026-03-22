@@ -39,15 +39,21 @@
   },
   {
     "id": 3,
-    "nome": "Camiseta Bege",
+    "nome": "Camiseta Off White",
     "preco": 79.90,
     "categoria": "camisetas",
     "cor": "clara",
-    "imagem": "../../assets/CamisaModeloBege.png",
-    "subtitulo": "Base clara versátil para produções suaves e elegantes.",
-    "descricao": "A Camiseta Bege entrega neutralidade sofisticada, com construção simples e foco em conforto visual e funcional.",
-    "destaque": "Tom neutro, modelagem equilibrada e fácil combinação com peças escuras ou naturais.",
-    "composicao": "Malha leve com toque seco e acabamento confortável.",
+    "imagem": "../../assets/modelofrente_brancasnome.svg",
+    "galeria": [
+      "../../assets/modelofrente_brancasnome.svg",
+      "../../assets/modelocosta_brancasnome.svg",
+      "../../assets/modelofrente_brancacnome.svg",
+      "../../assets/modelocosta_brancacnome.svg"
+    ],
+    "subtitulo": "Base off white com leitura limpa e 4 variações visuais da peça.",
+    "descricao": "A Off White entra como peça clara principal da Aranha, com presença minimalista, visual refinado e galeria completa para mostrar frente e costas em quatro composições.",
+    "destaque": "Tom claro versátil, visual premium e carrossel com as quatro artes da branca.",
+    "composicao": "Malha premium com toque macio, estrutura leve e acabamento pensado para uso diário.",
     "cuidados": [
       "Lavar separadamente na primeira lavagem.",
       "Usar sabão neutro.",
