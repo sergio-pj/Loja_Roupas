@@ -104,7 +104,10 @@
                         <span>Cupom</span>
                         <input type="text" id="coupon-code" name="coupon_code" placeholder="PRIMEIRACOMPRA">
                     </label>
-                    <button type="submit" class="secondary-button">Aplicar cupom</button>
+                    <div class="coupon-actions">
+                        <button type="submit" class="secondary-button">Aplicar cupom</button>
+                        <button type="button" id="remove-coupon-button" class="secondary-button secondary-button-muted" hidden>Remover cupom</button>
+                    </div>
                     <p id="coupon-feedback" class="auth-feedback">Cupom inicial disponível: PRIMEIRACOMPRA.</p>
                 </form>
 

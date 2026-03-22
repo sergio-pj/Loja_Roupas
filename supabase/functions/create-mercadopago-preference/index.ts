@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { serve } from 'https://deno.land/std@0.224.0/http/server.ts';
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 
@@ -56,6 +57,107 @@ function getPublicRedirectBaseUrl(siteUrl: string) {
     }
 }
 
+function buildMercadoPagoItems(orderItems: Array<Record<string, unknown>>, orderTotalAmount: number, shippingAmount: number) {
+    const normalizedShippingAmount = Math.max(0, Number(shippingAmount || 0));
+    const productTargetCents = Math.max(0, Math.round((Number(orderTotalAmount || 0) - normalizedShippingAmount) * 100));
+
+    const expandedUnits = orderItems.flatMap(item => {
+        const quantity = Math.max(1, Number(item.quantity || 1));
+        const baseUnitCents = Math.max(0, Math.round(Number(item.unit_price || 0) * 100));
+        const pictureUrl = getMercadoPagoPictureUrl(String(item.product_image || ''));
+
+        return Array.from({ length: quantity }, () => ({
+            id: String(item.product_id),
+            title: String(item.product_name || 'Produto Aranha'),
+            description: String(item.category || 'Produto Aranha'),
+            picture_url: pictureUrl,
+            baseUnitCents
+        }));
+    });
+
+    const subtotalCents = expandedUnits.reduce((sum, item) => sum + item.baseUnitCents, 0);
+
+    const pricedUnits = expandedUnits.map(item => ({
+        ...item,
+        exactCents: subtotalCents > 0 ? (item.baseUnitCents * productTargetCents) / subtotalCents : 0,
+        allocatedCents: 0,
+        remainder: 0
+    }));
+
+    let allocatedCents = 0;
+
+    pricedUnits.forEach(item => {
+        item.allocatedCents = Math.floor(item.exactCents);
+        item.remainder = item.exactCents - item.allocatedCents;
+        allocatedCents += item.allocatedCents;
+    });
+
+    let remainingCents = Math.max(0, productTargetCents - allocatedCents);
+
+    pricedUnits
+        .sort((left, right) => right.remainder - left.remainder)
+        .forEach(item => {
+            if (remainingCents <= 0) {
+                return;
+            }
+
+            item.allocatedCents += 1;
+            remainingCents -= 1;
+        });
+
+    const groupedItems = new Map<string, {
+        id: string;
+        title: string;
+        description: string;
+        picture_url?: string;
+        quantity: number;
+        unit_price: number;
+    }>();
+
+    pricedUnits.forEach(item => {
+        const unitPrice = Number((item.allocatedCents / 100).toFixed(2));
+        const groupKey = [item.id, item.title, item.description, item.picture_url || '', unitPrice.toFixed(2)].join('::');
+        const currentItem = groupedItems.get(groupKey);
+
+        if (currentItem) {
+            currentItem.quantity += 1;
+            return;
+        }
+
+        groupedItems.set(groupKey, {
+            id: item.id,
+            title: item.title,
+            description: item.description,
+            picture_url: item.picture_url || undefined,
+            quantity: 1,
+            unit_price: unitPrice
+        });
+    });
+
+    const mercadoPagoItems = Array.from(groupedItems.values()).map(item => ({
+        id: item.id,
+        title: item.title,
+        description: item.description,
+        quantity: item.quantity,
+        currency_id: 'BRL',
+        unit_price: item.unit_price,
+        ...(item.picture_url ? { picture_url: item.picture_url } : {})
+    }));
+
+    if (normalizedShippingAmount > 0) {
+        mercadoPagoItems.push({
+            id: 'shipping',
+            title: 'Frete',
+            description: 'Entrega do pedido',
+            quantity: 1,
+            currency_id: 'BRL',
+            unit_price: Number(normalizedShippingAmount.toFixed(2))
+        });
+    }
+
+    return mercadoPagoItems;
+}
+
 serve(async request => {
     if (request.method === 'OPTIONS') {
         return new Response('ok', { headers: corsHeaders });
@@ -111,7 +213,7 @@ serve(async request => {
 
         const { data: order, error: orderError } = await adminClient
             .from('orders')
-            .select('id, user_id, subtotal_amount, discount_amount, total_amount, coupon_code, shipping_zip_code, order_items(product_id, product_name, product_image, category, quantity, unit_price)')
+            .select('id, user_id, subtotal_amount, discount_amount, total_amount, shipping_amount, coupon_code, shipping_zip_code, order_items(product_id, product_name, product_image, category, quantity, unit_price)')
             .eq('id', orderId)
             .eq('user_id', userData.user.id)
             .single();
@@ -132,27 +234,7 @@ serve(async request => {
             });
         }
 
-        const items = orderItems.map(item => {
-            const mappedItem = {
-                id: String(item.product_id),
-                title: item.product_name,
-                description: item.category || 'Produto Aranha',
-                quantity: Number(item.quantity),
-                currency_id: 'BRL',
-                unit_price: Number(item.unit_price)
-            };
-
-            const pictureUrl = getMercadoPagoPictureUrl(item.product_image);
-
-            if (pictureUrl) {
-                return {
-                    ...mappedItem,
-                    picture_url: pictureUrl
-                };
-            }
-
-            return mappedItem;
-        });
+        const items = buildMercadoPagoItems(orderItems, Number(order.total_amount || 0), Number(order.shipping_amount || 0));
 
         const redirectBaseUrl = getPublicRedirectBaseUrl(publicSiteUrl);
 

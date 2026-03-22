@@ -60,6 +60,39 @@ body {
     border-left: 4px solid #1a1714;
 }
 
+.filtros-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 18px;
+}
+
+.filtros-header span {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: #888;
+}
+
+.filtros-toggle {
+    border: 1px solid #ddd6cf;
+    background: #fff;
+    border-radius: 999px;
+    width: 42px;
+    height: 42px;
+    cursor: pointer;
+}
+
+.filtros-body {
+    display: grid;
+    gap: 20px;
+}
+
+.filtros-body:not(.is-open) {
+    display: none;
+}
+
 .filtros-sidebar h3 {
     font-size: 12px;
     text-transform: uppercase;
@@ -89,8 +122,13 @@ body {
 /* Card de Produto Minimalista */
 .product-card {
     background: #fff;
-    padding: 10px;
+    padding: 14px;
     transition: 0.4s;
+    border-radius: 18px;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    min-height: 420px;
 }
 
 .product-card:hover {
@@ -104,6 +142,45 @@ body {
     transition: transform 0.5s ease;
 }
 
+.product-image {
+    position: relative;
+    min-height: 250px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #f7f4ee;
+    border-radius: 14px;
+    padding: 10px;
+    text-decoration: none;
+}
+
+.product-image-badges {
+    position: absolute;
+    right: 12px;
+    bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.product-logo-badge {
+    width: 22px;
+    height: 22px;
+    object-fit: contain;
+}
+
+.product-cart-badge {
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.92);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: #1a1714;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.12);
+}
+
 /* Efeito de zoom que sugeri antes */
 .product-card:hover .product-image img {
     transform: scale(1.0);
@@ -114,6 +191,15 @@ body {
     font-size: 15px;
     margin-bottom: 5px;
     color: #1a1714;
+    min-height: 40px;
+}
+
+.product-title-link {
+    text-decoration: none;
+}
+
+.product-title-link:hover h4 {
+    color: #5e5851;
 }
 
 .product-info .price {
@@ -172,7 +258,21 @@ body {
     transition: all 0.4s ease;
     margin-top: 15px;
     border-radius: 2px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    text-decoration: none;
 }
+
+.btn-detalhes:visited {
+    color: #fff;
+}
+
+.btn-detalhes:hover {
+    color: #fff;
+}
+
 
 .btn-detalhes:hover {
     background-color: transparent;
@@ -229,6 +329,29 @@ body {
     margin-top: 24px;
 }
 
+.catalog-pagination {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 30px;
+}
+
+.pagination-button {
+    border: 1px solid #d6cdc2;
+    background: #fff;
+    color: #1a1714;
+    border-radius: 999px;
+    min-width: 42px;
+    height: 42px;
+    cursor: pointer;
+    font-weight: 700;
+}
+
+.pagination-button.is-active {
+    background: #1a1714;
+    color: #fff;
+}
+
 /* Se quiser esconder o texto no mobile e deixar só o ícone */
 @media (max-width: 1024px) {
     .catalogo-container {
@@ -236,12 +359,12 @@ body {
         padding: 40px 24px 48px;
     }
 
-    .filtros-sidebar {
-        width: 220px;
-    }
-
     .product-image img {
         height: 220px;
+    }
+
+    .product-card {
+        min-height: 390px;
     }
 }
 
@@ -257,6 +380,10 @@ body {
         position: static;
         top: auto;
         padding: 20px;
+    }
+
+    .filtros-body:not(.is-open) {
+        display: none;
     }
 
     .grupo-filtros {
@@ -294,6 +421,14 @@ body {
         padding: 0;
     }
 
+    .product-card {
+        min-height: 360px;
+    }
+
+    .product-info h4 {
+        min-height: 52px;
+    }
+
     .user-link span {
         display: none;
     }
@@ -308,16 +443,28 @@ body {
         grid-template-columns: 1fr;
     }
 
-    .product-grid {
-        grid-template-columns: 1fr;
+    .product-image img {
+        height: 165px;
     }
 
-    .product-image img {
-        height: 200px;
+    .product-image {
+        min-height: 165px;
+    }
+
+    .product-card {
+        min-height: 310px;
+        padding: 10px;
+    }
+
+    .product-info h4 {
+        font-size: 14px;
+        min-height: 50px;
     }
 
     .btn-detalhes {
-        padding: 11px 16px;
+        padding: 11px 10px;
         letter-spacing: 1px;
+        font-size: 11px;
+        min-height: 52px;
     }
 }

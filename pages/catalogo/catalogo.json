@@ -5,15 +5,37 @@
     "preco": 79.90,
     "categoria": "camisetas",
     "cor": "escura",
-    "imagem": "../../assets/CamisaModeloPreta.png"
+    "imagem": "../../assets/CamisaModeloPreta.png",
+    "subtitulo": "Essencial escura com caimento limpo e presença forte.",
+    "descricao": "A All Black foi pensada para compor um visual urbano direto, com leitura minimalista e acabamento confortável para uso diário.",
+    "destaque": "Modelagem reta, toque macio e presença marcante em composições monocromáticas.",
+    "composicao": "Malha premium de algodão com toque suave e estrutura leve.",
+    "cuidados": [
+      "Lavar do avesso com cores similares.",
+      "Não usar alvejante.",
+      "Passar em temperatura baixa.",
+      "Secar à sombra para preservar a cor."
+    ],
+    "tamanhos": ["P", "M", "G", "GG"]
   },
   {
     "id": 2,
     "nome": "Oversized Smoke",
     "preco": 79.90,
-    "categoria": "camisetas",
+    "categoria": "oversized",
     "cor": "clara",
-    "imagem": "../../assets/CamisaModeloBege.png"
+    "imagem": "../../assets/CamisaModeloBege.png",
+    "subtitulo": "Silhueta ampla para um visual contemporâneo e confortável.",
+    "descricao": "A Oversized Smoke trabalha volume e leveza em uma peça pensada para layering e combinações com pegada street refinada.",
+    "destaque": "Caimento solto, ombro deslocado e leitura casual premium.",
+    "composicao": "Algodão encorpado com respirabilidade equilibrada para o dia a dia.",
+    "cuidados": [
+      "Lavar com água fria.",
+      "Evitar máquina em ciclos agressivos.",
+      "Não secar em tambor.",
+      "Armazenar dobrada para manter o shape."
+    ],
+    "tamanhos": ["P", "M", "G", "GG"]
   },
   {
     "id": 3,
@@ -21,6 +43,17 @@
     "preco": 79.90,
     "categoria": "camisetas",
     "cor": "clara",
-    "imagem": "../../assets/CamisaModeloBege.png"
+    "imagem": "../../assets/CamisaModeloBege.png",
+    "subtitulo": "Base clara versátil para produções suaves e elegantes.",
+    "descricao": "A Camiseta Bege entrega neutralidade sofisticada, com construção simples e foco em conforto visual e funcional.",
+    "destaque": "Tom neutro, modelagem equilibrada e fácil combinação com peças escuras ou naturais.",
+    "composicao": "Malha leve com toque seco e acabamento confortável.",
+    "cuidados": [
+      "Lavar separadamente na primeira lavagem.",
+      "Usar sabão neutro.",
+      "Não deixar de molho por longos períodos.",
+      "Secar em local ventilado."
+    ],
+    "tamanhos": ["P", "M", "G", "GG"]
   }
 ]

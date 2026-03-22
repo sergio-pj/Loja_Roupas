@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Produto | Aranha</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="../../style.css">
+    <link rel="stylesheet" href="produto.css">
+</head>
+<body>
+    <div id="overlay" onclick="toggleMenu()"></div>
+
+    <div id="sidebar" class="sidebar">
+        <a href="javascript:void(0)" class="closebtn" onclick="toggleMenu()">×</a>
+        <div class="sidebar-content">
+            <h3>Navegação</h3>
+            <nav class="sidebar-links">
+                <a href="../../index.html">Início</a>
+                <a href="../catalogo/index.html">Catálogo</a>
+                <a href="../quemsomos/index.html">Quem Somos</a>
+                <a href="../contato/index.html">Contato</a>
+                <a href="../carrinho/index.html">Carrinho</a>
+                <a href="../login/index.html" data-auth-link>Minha Conta</a>
+            </nav>
+        </div>
+    </div>
+
+    <header class="main-header">
+        <div class="menu-icon" onclick="toggleMenu()">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
+
+        <div class="search-bar">
+            <input type="text" placeholder="O que está procurando?">
+        </div>
+
+        <div class="header-actions">
+            <a href="../carrinho/index.html" class="header-icon-link" aria-label="Abrir carrinho">
+                <i class="fas fa-bag-shopping"></i>
+                <span class="cart-badge" data-cart-count hidden>0</span>
+            </a>
+            <a href="../login/index.html" class="header-icon-link" data-auth-link aria-label="Abrir area do cliente">
+                <i class="fas fa-user-circle"></i>
+            </a>
+        </div>
+    </header>
+
+    <main class="product-page">
+        <section id="product-state" class="product-state">Carregando produto...</section>
+
+        <section id="product-layout" class="product-layout" hidden>
+            <div class="product-gallery-card">
+                <div class="product-gallery-main">
+                    <img id="product-image" src="" alt="">
+                    <div class="product-gallery-badge">
+                        <img src="../../assets/AranhaPrinc_Logo.png" alt="Logo Aranha">
+                        <span>Seleção Aranha</span>
+                    </div>
+                </div>
+                <div class="product-gallery-note">
+                    <i class="fas fa-truck-fast"></i>
+                    <span>Envio para todo o Brasil com checkout seguro.</span>
+                </div>
+            </div>
+
+            <div class="product-summary-card">
+                <p id="product-eyebrow" class="product-eyebrow"></p>
+                <h1 id="product-name"></h1>
+                <p id="product-subtitle" class="product-subtitle"></p>
+                <p id="product-price" class="product-price"></p>
+                <p id="product-description" class="product-description"></p>
+
+                <div class="product-highlight-box">
+                    <strong>Destaque</strong>
+                    <p id="product-highlight"></p>
+                </div>
+
+                <div class="product-section-block">
+                    <div class="section-header-inline">
+                        <h2>Tamanho</h2>
+                        <span id="selected-size-label">Selecione um tamanho</span>
+                    </div>
+                    <div id="size-options" class="size-options"></div>
+                </div>
+
+                <div class="product-section-block shipping-block">
+                    <label for="product-cep">Simular entrega</label>
+                    <div class="shipping-inline">
+                        <input id="product-cep" type="text" inputmode="numeric" placeholder="Digite seu CEP">
+                        <button id="shipping-check-button" type="button" class="secondary-button">Consultar</button>
+                    </div>
+                    <p id="shipping-result" class="product-feedback muted">Informe seu CEP para visualizar a prévia de entrega.</p>
+                </div>
+
+                <div class="product-action-row">
+                    <button id="add-cart-button" type="button" class="secondary-button product-secondary-cta">Adicionar ao carrinho</button>
+                    <button id="buy-now-button" type="button" class="newsletter-button product-primary-cta">Comprar agora</button>
+                </div>
+
+                <p id="product-feedback" class="product-feedback"></p>
+
+                <div class="product-benefits-grid">
+                    <article>
+                        <i class="fas fa-shirt"></i>
+                        <strong>Modelagem premium</strong>
+                        <span>Caimento pensado para uso diário com presença visual forte.</span>
+                    </article>
+                    <article>
+                        <i class="fas fa-shield-heart"></i>
+                        <strong>Compra segura</strong>
+                        <span>Fluxo conectado ao carrinho e checkout atual da loja.</span>
+                    </article>
+                    <article>
+                        <i class="fas fa-repeat"></i>
+                        <strong>Troca facilitada</strong>
+                        <span>Suporte direto para dúvidas de tamanho e acompanhamento.</span>
+                    </article>
+                </div>
+            </div>
+        </section>
+
+        <section id="product-details" class="product-details-grid" hidden>
+            <article class="product-detail-card">
+                <p class="detail-eyebrow">Composição</p>
+                <h2>Estrutura da peça</h2>
+                <p id="product-composition"></p>
+            </article>
+
+            <article class="product-detail-card">
+                <p class="detail-eyebrow">Cuidados</p>
+                <h2>Conservação</h2>
+                <ul id="product-care-list" class="product-care-list"></ul>
+            </article>
+        </section>
+
+        <section id="product-measures" class="product-measures-section" hidden>
+            <div class="section-heading">
+                <p>Guia rápido</p>
+                <h2>Tabela de medidas</h2>
+            </div>
+            <div class="product-table-wrapper">
+                <table class="product-size-table">
+                    <thead>
+                        <tr>
+                            <th>Tamanho</th>
+                            <th>Tórax</th>
+                            <th>Comprimento</th>
+                            <th>Manga</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>P</td><td>96 cm</td><td>69 cm</td><td>21 cm</td></tr>
+                        <tr><td>M</td><td>102 cm</td><td>72 cm</td><td>22 cm</td></tr>
+                        <tr><td>G</td><td>108 cm</td><td>74 cm</td><td>23 cm</td></tr>
+                        <tr><td>GG</td><td>114 cm</td><td>77 cm</td><td>24 cm</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <section id="related-products-section" class="related-products-section" hidden>
+            <div class="section-heading">
+                <p>Continue explorando</p>
+                <h2>Produtos relacionados</h2>
+            </div>
+            <div class="product-feedback-carousel-header">
+                <p>Mais peças da curadoria Aranha para continuar a navegação.</p>
+                <button id="product-feedback-next" class="product-feedback-arrow" type="button" aria-label="Ver próximos feedbacks">
+                    <i class="fas fa-arrow-right"></i>
+                </button>
+            </div>
+            <div class="product-feedback-viewport">
+                <div id="related-products" class="related-products-grid"></div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="main-footer catalogo-footer">
+        <div class="footer-container">
+            <div class="footer-col">
+                <h4>ARANHA</h4>
+                <p>Peças com identidade visual forte, navegação limpa e foco em experiência premium.</p>
+            </div>
+
+            <div class="footer-col">
+                <h4>NAVEGAÇÃO</h4>
+                <nav>
+                    <a href="../../index.html">Página Inicial</a>
+                    <a href="../catalogo/index.html">Catálogo</a>
+                    <a href="../contato/index.html">Contato</a>
+                </nav>
+            </div>
+
+            <div class="footer-col">
+                <h4>CONTATO</h4>
+                <a href="../contato/index.html">Página de Contato</a>
+                <a href="mailto:contato@aranharoupas.com.br">contato@aranharoupas.com.br</a>
+                <a href="tel:+5511999999999">(11) 99999-9999</a>
+            </div>
+
+            <div class="footer-col">
+                <h4>ÁREA DO CLIENTE</h4>
+                <a href="../login/index.html">Entrar ou criar conta</a>
+                <a href="../minha-conta/index.html">Minha Conta</a>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2026 AuryxTech - Transformando ideias em código.</p>
+        </div>
+    </footer>
+
+    <script src="../../json/storefront.js"></script>
+    <script src="produto.js"></script>
+</body>
+</html>

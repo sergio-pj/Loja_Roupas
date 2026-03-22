@@ -40,12 +40,6 @@
         <input type="text" placeholder="O que está procurando?">
     </div>
 
-    <nav class="nav-menu">
-        <a href="../../index.html">Início</a>
-        <a href="../quemsomos/index.html">Quem Somos</a>
-        <a href="../contato/index.html">Contato</a>
-    </nav>
-
     <div class="header-actions">
         <a href="../carrinho/index.html" class="header-icon-link" aria-label="Abrir carrinho">
             <i class="fas fa-bag-shopping"></i>
@@ -60,7 +54,14 @@
 
    <main class="catalogo-container">
         <aside class="filtros-sidebar">
-            
+            <div class="filtros-header">
+                <span>Filtrar por:</span>
+                <button type="button" class="filtros-toggle" id="filtros-toggle" aria-expanded="true" aria-controls="filtros-body">
+                    <i class="fas fa-ellipsis-h"></i>
+                </button>
+            </div>
+
+            <div class="filtros-body" id="filtros-body">
             <div class="sessao-filtro">
                 <h3>Filtrar por Estilo</h3>
                 <div class="grupo-filtros">
@@ -77,6 +78,7 @@
                     <button onclick="filtrar('escura')">Peças Escuras</button>
                 </div>
             </div>
+            </div>
 
         </aside>
 
@@ -84,6 +86,7 @@
                 <h2 class="titulo-sessao">Catálogo Aranha</h2>
                     <div id="lista-produtos" class="product-grid">
                     </div>
+                    <div id="catalog-pagination" class="catalog-pagination" hidden></div>
             </section>
     </main>
     <footer class="main-footer catalogo-footer">

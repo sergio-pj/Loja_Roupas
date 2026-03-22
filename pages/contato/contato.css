@@ -172,6 +172,7 @@ body {
 .contact-link-card span {
 	color: #5e5851;
 	margin-top: 4px;
+	word-break: break-word;
 }
 
 .contact-note {

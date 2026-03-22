@@ -242,6 +242,12 @@ body {
     margin-top: 18px;
 }
 
+.coupon-actions {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
 .coupon-form .secondary-button {
     justify-self: start;
     border: 1px solid #1a1714;
@@ -256,6 +262,17 @@ body {
     cursor: pointer;
     box-shadow: 0 14px 28px rgba(26, 23, 20, 0.16);
     transition: transform 0.22s ease, box-shadow 0.22s ease, opacity 0.22s ease;
+}
+
+.coupon-form .secondary-button.secondary-button-muted {
+    background: transparent;
+    color: #1a1714;
+    box-shadow: none;
+}
+
+.coupon-form .secondary-button.secondary-button-muted:hover {
+    background: rgba(26, 23, 20, 0.06);
+    transform: translateY(-2px);
 }
 
 .coupon-form .secondary-button:hover {
@@ -370,5 +387,9 @@ body {
     .secondary-button,
     .newsletter-button {
         width: 100%;
+    }
+
+    .coupon-actions {
+        flex-direction: column;
     }
 }

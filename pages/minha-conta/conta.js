@@ -31,12 +31,27 @@ const addressRecipient = document.getElementById('address-recipient');
 const addressLines = document.getElementById('address-lines');
 const addressForm = document.getElementById('address-form');
 const addressFeedback = document.getElementById('address-feedback');
+const editAddressButton = document.getElementById('edit-address-button');
+const addressCardActions = document.getElementById('address-card-actions');
 const ordersEmpty = document.getElementById('orders-empty');
 const ordersList = document.getElementById('orders-list');
 const ordersFeedback = document.getElementById('orders-feedback');
 
 let currentUser = null;
 let currentAddressId = null;
+let isAddressEditing = false;
+
+function setAddressFormVisibility(visible) {
+    if (!addressForm) {
+        return;
+    }
+
+    addressForm.hidden = !visible;
+
+    if (addressCardActions) {
+        addressCardActions.hidden = visible || !currentAddressId;
+    }
+}
 
 function formatCurrency(value) {
     return Number(value || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
@@ -255,6 +270,7 @@ function renderAddress(address, fallbackName) {
     if (!address) {
         addressEmpty.hidden = false;
         addressCard.hidden = true;
+        setAddressFormVisibility(true);
         return;
     }
 
@@ -271,6 +287,10 @@ function renderAddress(address, fallbackName) {
     ].filter(Boolean);
 
     addressLines.textContent = lines.join(' | ');
+
+    if (!isAddressEditing) {
+        setAddressFormVisibility(false);
+    }
 }
 
 async function loadAccount() {
@@ -330,9 +350,11 @@ async function loadAccount() {
 
     const primaryAddress = addresses && addresses.length ? addresses[0] : null;
     currentAddressId = primaryAddress?.id || null;
+    isAddressEditing = !primaryAddress;
 
     renderAddress(primaryAddress, profile?.full_name || metadata.full_name || '');
     fillAddressForm(primaryAddress, profile?.full_name || metadata.full_name || '', profile?.phone || metadata.phone || '');
+    setAddressFormVisibility(!primaryAddress);
     await loadOrders(user.id);
 }
 
@@ -381,9 +403,18 @@ if (addressForm) {
         }
 
         currentAddressId = data.id;
+        isAddressEditing = false;
         renderAddress(data, payload.recipient_name);
         fillAddressForm(data, payload.recipient_name, payload.phone);
         addressFeedback.textContent = 'Endereco salvo com sucesso.';
+    });
+}
+
+if (editAddressButton) {
+    editAddressButton.addEventListener('click', () => {
+        isAddressEditing = true;
+        setAddressFormVisibility(true);
+        addressFeedback.textContent = 'Atualize os dados e salve novamente.';
     });
 }
 

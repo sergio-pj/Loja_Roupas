@@ -39,6 +39,7 @@ const shippingFeedback = document.getElementById('shipping-feedback');
 const couponForm = document.getElementById('coupon-form');
 const couponCode = document.getElementById('coupon-code');
 const couponFeedback = document.getElementById('coupon-feedback');
+const removeCouponButton = document.getElementById('remove-coupon-button');
 const checkoutButton = document.getElementById('checkout-button');
 const checkoutFeedback = document.getElementById('checkout-feedback');
 const summarySubtotal = document.getElementById('summary-subtotal');
@@ -82,6 +83,23 @@ function clearAppliedCoupon() {
     if (couponCode) {
         couponCode.value = '';
     }
+}
+
+function syncCouponStateMessage() {
+    if (removeCouponButton) {
+        removeCouponButton.hidden = !appliedCoupon;
+    }
+
+    if (!couponFeedback) {
+        return;
+    }
+
+    if (appliedCoupon === firstPurchaseCoupon && couponEligibility.canUseFirstPurchase) {
+        couponFeedback.textContent = 'Cupom aplicado: 10% de desconto liberado para a primeira compra aprovada.';
+        return;
+    }
+
+    couponFeedback.textContent = couponEligibility.reason;
 }
 
 async function loadCouponEligibility() {
@@ -275,7 +293,7 @@ async function persistOrderDraft() {
         product_id: Number(item.id),
         product_name: item.nome,
         product_image: item.imagem,
-        category: item.categoria || null,
+        category: item.tamanho ? `${item.categoria || 'Colecao Aranha'} | Tam ${item.tamanho}` : item.categoria || null,
         color: item.cor || null,
         unit_price: Number(item.preco.toFixed(2)),
         quantity: Number(item.quantity),
@@ -366,6 +384,7 @@ function renderCart() {
     cartLoginRequired.hidden = isLoggedIn;
     cartEmpty.hidden = !isLoggedIn || cart.length > 0;
     checkoutButton.disabled = !isLoggedIn || cart.length === 0;
+    syncCouponStateMessage();
 
     if (!isLoggedIn || !cart.length) {
         renderSummary([]);
@@ -383,17 +402,17 @@ function renderCart() {
                 <div class="cart-item-header">
                     <div>
                         <h3 class="cart-item-title">${item.nome}</h3>
-                        <p class="cart-item-meta">Categoria: ${item.categoria || 'Colecao Aranha'}</p>
+                        <p class="cart-item-meta">Categoria: ${item.categoria || 'Colecao Aranha'}${item.tamanho ? ` | Tamanho: ${item.tamanho}` : ''}</p>
                     </div>
                     <strong class="cart-item-price">${formatPrice(item.preco)}</strong>
                 </div>
                 <div class="cart-item-actions">
                     <div class="quantity-control">
-                        <button type="button" data-action="decrease" data-id="${item.id}" aria-label="Diminuir quantidade">-</button>
+                        <button type="button" data-action="decrease" data-key="${item.cartItemKey}" aria-label="Diminuir quantidade">-</button>
                         <span>${item.quantity}</span>
-                        <button type="button" data-action="increase" data-id="${item.id}" aria-label="Aumentar quantidade">+</button>
+                        <button type="button" data-action="increase" data-key="${item.cartItemKey}" aria-label="Aumentar quantidade">+</button>
                     </div>
-                    <button type="button" class="remove-button" data-action="remove" data-id="${item.id}">Remover</button>
+                    <button type="button" class="remove-button" data-action="remove" data-key="${item.cartItemKey}">Remover</button>
                 </div>
             </div>
         `;
@@ -412,29 +431,29 @@ cartItemsContainer.addEventListener('click', event => {
     }
 
     const action = target.getAttribute('data-action');
-    const id = Number(target.getAttribute('data-id'));
+    const cartItemKey = target.getAttribute('data-key');
 
-    if (!action || !id) {
+    if (!action || !cartItemKey) {
         return;
     }
 
     const cart = window.storefront.getCart();
-    const item = cart.find(entry => Number(entry.id) === id);
+    const item = cart.find(entry => entry.cartItemKey === cartItemKey);
 
     if (!item) {
         return;
     }
 
     if (action === 'increase') {
-        window.storefront.updateCartItemQuantity(id, item.quantity + 1);
+        window.storefront.updateCartItemQuantity(cartItemKey, item.quantity + 1);
     }
 
     if (action === 'decrease') {
-        window.storefront.updateCartItemQuantity(id, item.quantity - 1);
+        window.storefront.updateCartItemQuantity(cartItemKey, item.quantity - 1);
     }
 
     if (action === 'remove') {
-        window.storefront.removeCartItem(id);
+        window.storefront.removeCartItem(cartItemKey);
     }
 
     renderCart();
@@ -489,8 +508,15 @@ if (couponForm) {
 
         appliedCoupon = code;
         window.localStorage.setItem(couponKey, appliedCoupon);
-        couponFeedback.textContent = 'Cupom aplicado: 10% de desconto liberado para a primeira compra aprovada.';
         renderCart();
+    });
+}
+
+if (removeCouponButton) {
+    removeCouponButton.addEventListener('click', () => {
+        clearAppliedCoupon();
+        renderCart();
+        couponFeedback.textContent = 'Cupom removido do resumo da compra.';
     });
 }
 
@@ -563,9 +589,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     if (couponFeedback) {
-        couponFeedback.textContent = appliedCoupon === firstPurchaseCoupon && couponEligibility.canUseFirstPurchase
-            ? 'Cupom aplicado: 10% de desconto liberado para a primeira compra aprovada.'
-            : couponEligibility.reason;
+        syncCouponStateMessage();
     }
 
     renderCart();
