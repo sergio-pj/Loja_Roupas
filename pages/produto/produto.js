@@ -9,6 +9,7 @@ const measuresElement = document.getElementById('product-measures');
 const relatedSectionElement = document.getElementById('related-products-section');
 
 const productGalleryMedia = document.getElementById('product-gallery-media');
+const productGalleryThumbs = document.getElementById('product-gallery-thumbs');
 const productEyebrow = document.getElementById('product-eyebrow');
 const productName = document.getElementById('product-name');
 const productSubtitle = document.getElementById('product-subtitle');
@@ -82,18 +83,6 @@ function buildProductGalleryMarkup(images, altText) {
         `
         : '';
 
-    const thumbs = images.length > 1
-        ? `
-            <div class="product-gallery-thumbs" aria-label="Miniaturas da galeria">
-                ${images.map((source, index) => `
-                    <button type="button" class="product-gallery-thumb${index === 0 ? ' is-active' : ''}" data-slide-index="${index}" aria-label="Selecionar visual ${index + 1}">
-                        <img src="${source}" alt="${altText} miniatura ${index + 1}" loading="lazy">
-                    </button>
-                `).join('')}
-            </div>
-        `
-        : '';
-
     return `
         <div class="media-carousel product-detail-carousel" data-media-carousel data-interval="2500">
             <div class="media-carousel-frame">
@@ -102,15 +91,28 @@ function buildProductGalleryMarkup(images, altText) {
                 </div>
                 ${dots}
             </div>
-            ${thumbs}
         </div>
     `;
+}
+
+function buildProductGalleryThumbsMarkup(images, altText) {
+    if (images.length <= 1) {
+        return '';
+    }
+
+    return images.map((source, index) => `
+        <button type="button" class="product-gallery-thumb${index === 0 ? ' is-active' : ''}" data-slide-index="${index}" aria-label="Selecionar visual ${index + 1}">
+            <img src="${source}" alt="${altText} miniatura ${index + 1}" loading="lazy">
+        </button>
+    `).join('');
 }
 
 function setupMediaCarousel(carousel) {
     const slides = Array.from(carousel.querySelectorAll('.media-carousel-slide'));
     const dots = Array.from(carousel.querySelectorAll('.media-carousel-dot'));
-    const thumbs = Array.from(carousel.querySelectorAll('.product-gallery-thumb'));
+    const thumbs = carousel.classList.contains('product-detail-carousel')
+        ? Array.from(document.querySelectorAll('.product-gallery-thumb'))
+        : Array.from(carousel.querySelectorAll('.product-gallery-thumb'));
 
     if (slides.length <= 1) {
         return () => {};
@@ -283,7 +285,10 @@ function renderProduct(product) {
     detailsElement.hidden = false;
     measuresElement.hidden = false;
 
-    productGalleryMedia.innerHTML = buildProductGalleryMarkup(resolveProductImages(product), product.nome);
+    const productImages = resolveProductImages(product);
+
+    productGalleryMedia.innerHTML = buildProductGalleryMarkup(productImages, product.nome);
+    productGalleryThumbs.innerHTML = buildProductGalleryThumbsMarkup(productImages, product.nome);
     productEyebrow.textContent = `${product.categoria === 'oversized' ? 'Oversized' : 'Camiseta'} | ${product.cor === 'escura' ? 'Peça escura' : 'Peça clara'}`;
     productName.textContent = product.nome;
     productSubtitle.textContent = product.subtitulo || '';
@@ -297,6 +302,7 @@ function renderProduct(product) {
 
     renderSizes(product);
     renderRelated(product);
+    initializeProductMediaCarousels();
 }
 
 function addCurrentProductToCart(redirectToCart) {

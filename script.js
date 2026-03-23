@@ -13,6 +13,9 @@ function toggleMenu() {
 
 const CATALOG_DATA_URL = new URL('pages/catalogo/catalogo.json', window.location.href).href;
 let homeMediaCarouselCleanups = [];
+let homeMediaCarouselSyncIntervalId = null;
+let homeMediaCarouselSyncIndex = 0;
+const homeMediaCarouselPauseSet = new Set();
 
 function resolveProductImages(product) {
     const sources = Array.isArray(product.galeria) && product.galeria.length ? product.galeria : [product.imagem];
@@ -48,66 +51,123 @@ function buildMediaCarouselMarkup(images, altText, className = '') {
     `;
 }
 
-function setupMediaCarousel(carousel) {
+function createMediaCarouselController(carousel) {
     const slides = Array.from(carousel.querySelectorAll('.media-carousel-slide'));
     const dots = Array.from(carousel.querySelectorAll('.media-carousel-dot'));
 
     if (slides.length <= 1) {
-        return () => {};
+        return null;
     }
 
-    let activeIndex = 0;
-    let intervalId = null;
-    const intervalMs = Number(carousel.getAttribute('data-interval')) || 2400;
-
     const showSlide = nextIndex => {
-        activeIndex = nextIndex;
+        const normalizedIndex = nextIndex % slides.length;
+
         slides.forEach((slide, index) => {
-            slide.classList.toggle('is-active', index === activeIndex);
+            slide.classList.toggle('is-active', index === normalizedIndex);
         });
         dots.forEach((dot, index) => {
-            dot.classList.toggle('is-active', index === activeIndex);
-            dot.setAttribute('aria-pressed', String(index === activeIndex));
+            dot.classList.toggle('is-active', index === normalizedIndex);
+            dot.setAttribute('aria-pressed', String(index === normalizedIndex));
         });
-    };
-
-    const stopAutoplay = () => {
-        if (intervalId) {
-            window.clearInterval(intervalId);
-            intervalId = null;
-        }
-    };
-
-    const startAutoplay = () => {
-        stopAutoplay();
-        intervalId = window.setInterval(() => {
-            showSlide((activeIndex + 1) % slides.length);
-        }, intervalMs);
     };
 
     dots.forEach((dot, index) => {
         dot.addEventListener('click', () => {
-            showSlide(index);
-            startAutoplay();
+            homeMediaCarouselSyncIndex = index;
+            synchronizeHomeMediaCarousels();
+            restartHomeMediaCarouselSync();
         });
     });
 
-    carousel.addEventListener('mouseenter', stopAutoplay);
-    carousel.addEventListener('mouseleave', startAutoplay);
-    carousel.addEventListener('focusin', stopAutoplay);
-    carousel.addEventListener('focusout', startAutoplay);
+    const pause = () => {
+        homeMediaCarouselPauseSet.add(carousel);
+        stopHomeMediaCarouselSync();
+    };
 
-    showSlide(0);
-    startAutoplay();
+    const resume = () => {
+        homeMediaCarouselPauseSet.delete(carousel);
+
+        if (homeMediaCarouselPauseSet.size === 0) {
+            startHomeMediaCarouselSync();
+        }
+    };
+
+    carousel.addEventListener('mouseenter', pause);
+    carousel.addEventListener('mouseleave', resume);
+    carousel.addEventListener('focusin', pause);
+    carousel.addEventListener('focusout', resume);
+
+    showSlide(homeMediaCarouselSyncIndex);
 
     return () => {
-        stopAutoplay();
+        homeMediaCarouselPauseSet.delete(carousel);
+        carousel.removeEventListener('mouseenter', pause);
+        carousel.removeEventListener('mouseleave', resume);
+        carousel.removeEventListener('focusin', pause);
+        carousel.removeEventListener('focusout', resume);
     };
+}
+
+function stopHomeMediaCarouselSync() {
+    if (homeMediaCarouselSyncIntervalId) {
+        window.clearInterval(homeMediaCarouselSyncIntervalId);
+        homeMediaCarouselSyncIntervalId = null;
+    }
+}
+
+function synchronizeHomeMediaCarousels() {
+    Array.from(document.querySelectorAll('[data-media-carousel]')).forEach(carousel => {
+        const slides = Array.from(carousel.querySelectorAll('.media-carousel-slide'));
+        const dots = Array.from(carousel.querySelectorAll('.media-carousel-dot'));
+
+        if (slides.length <= 1) {
+            return;
+        }
+
+        const normalizedIndex = homeMediaCarouselSyncIndex % slides.length;
+
+        slides.forEach((slide, index) => {
+            slide.classList.toggle('is-active', index === normalizedIndex);
+        });
+
+        dots.forEach((dot, index) => {
+            dot.classList.toggle('is-active', index === normalizedIndex);
+            dot.setAttribute('aria-pressed', String(index === normalizedIndex));
+        });
+    });
+}
+
+function startHomeMediaCarouselSync() {
+    if (homeMediaCarouselSyncIntervalId || homeMediaCarouselPauseSet.size > 0) {
+        return;
+    }
+
+    homeMediaCarouselSyncIntervalId = window.setInterval(() => {
+        homeMediaCarouselSyncIndex += 1;
+        synchronizeHomeMediaCarousels();
+    }, 2400);
+}
+
+function restartHomeMediaCarouselSync() {
+    stopHomeMediaCarouselSync();
+
+    if (homeMediaCarouselPauseSet.size === 0) {
+        startHomeMediaCarouselSync();
+    }
 }
 
 function initializeHomeMediaCarousels(root) {
     homeMediaCarouselCleanups.forEach(cleanup => cleanup());
-    homeMediaCarouselCleanups = Array.from(root.querySelectorAll('[data-media-carousel]')).map(setupMediaCarousel);
+    stopHomeMediaCarouselSync();
+    homeMediaCarouselPauseSet.clear();
+
+    homeMediaCarouselCleanups = Array.from(root.querySelectorAll('[data-media-carousel]'))
+        .map(createMediaCarouselController)
+        .filter(Boolean);
+
+    homeMediaCarouselSyncIndex = 0;
+    synchronizeHomeMediaCarousels();
+    startHomeMediaCarouselSync();
 }
 
 const homeCarouselItems = [

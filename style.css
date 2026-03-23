@@ -7,6 +7,10 @@
     box-sizing: border-box; 
 }
 
+[hidden] {
+    display: none !important;
+}
+
 html, body {
     width: 100%;
     overflow-x: hidden;
@@ -862,17 +866,22 @@ body {
 
 @media (max-width: 480px) {
     .hero-banner {
-        height: 340px !important;
-        min-height: 340px;
+        height: auto !important;
+        min-height: 0;
+        aspect-ratio: 9 / 4;
         padding: 0;
         margin: 0;
         display: flex;
         align-items: center;
         justify-content: center;
-        background-position: 60% 22%;
-        background-size: cover;
+        background-position: center top;
+        background-size: contain;
         background-repeat: no-repeat;
-        background-color: #d8d5cf;
+        background-color: #f3f1ec;
+    }
+
+    .banner-overlay {
+        background: transparent;
     }
 
     /* Como a imagem já tem texto, vamos esconder o texto do HTML para não encavalar */
@@ -881,7 +890,7 @@ body {
     }
 
     .brand-overlap {
-        margin-top: -42px;
+        margin-top: -54px;
         display: flex;
         justify-content: center;
         position: relative;
@@ -889,12 +898,14 @@ body {
     }
 
     .overlap-box {
-        width: calc(100% - 24px);
-        padding: 20px 15px;
+        width: calc(100% - 38px);
+        max-width: 296px;
+        padding: 12px 12px 14px;
     }
     
     .overlap-box img {
-        width: 50px; /* Deixa o logo da caixa menor no celular */
+        width: 34px; /* Deixa o logo da caixa menor no celular */
+        margin-bottom: 10px;
     }
 
     .main-header { 
@@ -939,11 +950,15 @@ body {
     }
 
     .overlap-box h2 {
-        font-size: 1.8rem;
+        font-size: 1.28rem;
+        margin-bottom: 6px;
+        letter-spacing: 2px;
     }
 
     .overlap-box p {
-        font-size: 0.95rem;
+        font-size: 0.82rem;
+        line-height: 1.45;
+        max-width: 235px;
     }
 
     .home-carousel-section {

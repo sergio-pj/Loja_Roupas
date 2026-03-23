@@ -22,7 +22,7 @@ window.toggleMenu = toggleMenu;
 const firstPurchaseCoupon = 'PRIMEIRACOMPRA';
 const couponKey = 'aranha-cart-coupon';
 const orderDraftKey = 'aranha-order-draft';
-let appliedCoupon = window.localStorage.getItem(couponKey) || '';
+let appliedCoupon = '';
 let currentUser = null;
 let couponEligibility = {
     checked: false,
@@ -46,6 +46,39 @@ const summarySubtotal = document.getElementById('summary-subtotal');
 const summaryDiscount = document.getElementById('summary-discount');
 const summaryShipping = document.getElementById('summary-shipping');
 const summaryTotal = document.getElementById('summary-total');
+
+function getUserScopedStorageKey(baseKey, userId = currentUser?.id || window.storefront?.getCurrentUserId?.()) {
+    const normalizedUserId = String(userId || '').trim();
+
+    if (!normalizedUserId) {
+        return '';
+    }
+
+    if (window.storefront?.getScopedStorageKey) {
+        return window.storefront.getScopedStorageKey(baseKey, normalizedUserId);
+    }
+
+    return `${baseKey}:${normalizedUserId}`;
+}
+
+function loadAppliedCoupon() {
+    if (!currentUser) {
+        appliedCoupon = '';
+
+        if (couponCode) {
+            couponCode.value = '';
+        }
+
+        return;
+    }
+
+    const scopedCouponKey = getUserScopedStorageKey(couponKey, currentUser.id);
+    appliedCoupon = scopedCouponKey ? window.localStorage.getItem(scopedCouponKey) || '' : '';
+
+    if (couponCode) {
+        couponCode.value = appliedCoupon;
+    }
+}
 
 async function syncAuthState() {
     const { data, error } = await supabase.auth.getSession();
@@ -78,7 +111,12 @@ function isMissingSchemaError(error) {
 
 function clearAppliedCoupon() {
     appliedCoupon = '';
-    window.localStorage.removeItem(couponKey);
+
+    const scopedCouponKey = getUserScopedStorageKey(couponKey);
+
+    if (scopedCouponKey) {
+        window.localStorage.removeItem(scopedCouponKey);
+    }
 
     if (couponCode) {
         couponCode.value = '';
@@ -238,7 +276,8 @@ async function persistOrderDraft() {
         coupon_snapshot: buildCouponSnapshot(discount)
     };
 
-    let draftId = window.localStorage.getItem(orderDraftKey) || '';
+    const scopedOrderDraftKey = getUserScopedStorageKey(orderDraftKey, currentUser.id);
+    let draftId = scopedOrderDraftKey ? window.localStorage.getItem(scopedOrderDraftKey) || '' : '';
 
     if (draftId) {
         const { data: updatedOrder, error: updateError } = await supabase
@@ -313,7 +352,9 @@ async function persistOrderDraft() {
         };
     }
 
-    window.localStorage.setItem(orderDraftKey, draftId);
+    if (scopedOrderDraftKey) {
+        window.localStorage.setItem(scopedOrderDraftKey, draftId);
+    }
 
     return {
         ok: true,
@@ -507,7 +548,12 @@ if (couponForm) {
         }
 
         appliedCoupon = code;
-        window.localStorage.setItem(couponKey, appliedCoupon);
+        const scopedCouponKey = getUserScopedStorageKey(couponKey);
+
+        if (scopedCouponKey) {
+            window.localStorage.setItem(scopedCouponKey, appliedCoupon);
+        }
+
         renderCart();
     });
 }
@@ -563,30 +609,41 @@ if (checkoutButton) {
     });
 }
 
-supabase.auth.onAuthStateChange((_event, session) => {
+supabase.auth.onAuthStateChange(async (_event, session) => {
     if (session?.user) {
         currentUser = session.user;
         window.storefront.setAuth({
             userId: session.user.id,
             email: session.user.email || ''
         });
+        loadAppliedCoupon();
+        await loadCouponEligibility();
     } else {
         currentUser = null;
-        clearAppliedCoupon();
-        window.localStorage.removeItem(orderDraftKey);
+        appliedCoupon = '';
+
+        if (couponCode) {
+            couponCode.value = '';
+        }
+
+        couponEligibility = {
+            checked: true,
+            schemaReady: true,
+            canUseFirstPurchase: false,
+            reason: 'Faça login para validar cupons da conta.'
+        };
+
         window.storefront.clearAuth();
     }
 
+    syncCouponStateMessage();
     renderCart();
 });
 
 document.addEventListener('DOMContentLoaded', async () => {
     await syncAuthState();
+    loadAppliedCoupon();
     await loadCouponEligibility();
-
-    if (couponCode && appliedCoupon) {
-        couponCode.value = appliedCoupon;
-    }
 
     if (couponFeedback) {
         syncCouponStateMessage();

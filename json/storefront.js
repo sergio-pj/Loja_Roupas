@@ -14,6 +14,15 @@
         return safeParse(window.localStorage.getItem(AUTH_KEY), null);
     }
 
+    function getCurrentUserId() {
+        return String(getAuth()?.userId || '').trim();
+    }
+
+    function getScopedStorageKey(baseKey, userId = getCurrentUserId()) {
+        const normalizedUserId = String(userId || '').trim();
+        return normalizedUserId ? `${baseKey}:${normalizedUserId}` : baseKey;
+    }
+
     function setAuth(authData) {
         window.localStorage.setItem(AUTH_KEY, JSON.stringify(authData));
         syncAuthLinks();
@@ -31,8 +40,7 @@
         return Boolean(authData && authData.userId);
     }
 
-    function getCart() {
-        const rawCart = safeParse(window.localStorage.getItem(CART_KEY), []);
+    function normalizeCartItems(rawCart) {
         let hasLegacyItem = false;
 
         const normalizedCart = rawCart.map(item => {
@@ -48,15 +56,62 @@
             };
         });
 
+        return { normalizedCart, hasLegacyItem };
+    }
+
+    function migrateLegacyCart(userId) {
+        const normalizedUserId = String(userId || '').trim();
+
+        if (!normalizedUserId) {
+            return;
+        }
+
+        const scopedKey = getScopedStorageKey(CART_KEY, normalizedUserId);
+
+        if (window.localStorage.getItem(scopedKey)) {
+            return;
+        }
+
+        const legacyRawCart = safeParse(window.localStorage.getItem(CART_KEY), []);
+
+        if (!Array.isArray(legacyRawCart) || !legacyRawCart.length) {
+            return;
+        }
+
+        const { normalizedCart } = normalizeCartItems(legacyRawCart);
+        window.localStorage.setItem(scopedKey, JSON.stringify(normalizedCart));
+        window.localStorage.removeItem(CART_KEY);
+    }
+
+    function getCart() {
+        const userId = getCurrentUserId();
+
+        if (!userId) {
+            return [];
+        }
+
+        migrateLegacyCart(userId);
+
+        const scopedKey = getScopedStorageKey(CART_KEY, userId);
+        const rawCart = safeParse(window.localStorage.getItem(scopedKey), []);
+        const { normalizedCart, hasLegacyItem } = normalizeCartItems(rawCart);
+
         if (hasLegacyItem) {
-            window.localStorage.setItem(CART_KEY, JSON.stringify(normalizedCart));
+            window.localStorage.setItem(scopedKey, JSON.stringify(normalizedCart));
         }
 
         return normalizedCart;
     }
 
     function saveCart(cart) {
-        window.localStorage.setItem(CART_KEY, JSON.stringify(cart));
+        const userId = getCurrentUserId();
+
+        if (!userId) {
+            updateCartCount();
+            return;
+        }
+
+        window.localStorage.setItem(getScopedStorageKey(CART_KEY, userId), JSON.stringify(cart));
         updateCartCount();
     }
 
@@ -168,6 +223,8 @@
 
     window.storefront = {
         getAuth,
+        getCurrentUserId,
+        getScopedStorageKey,
         setAuth,
         clearAuth,
         isLoggedIn,

@@ -5,6 +5,9 @@ let paginaAtual = 1;
 const itensPorPagina = 6;
 const CATALOG_DATA_URL = new URL('catalogo.json', window.location.href).href;
 let catalogMediaCarouselCleanups = [];
+let catalogMediaCarouselSyncIntervalId = null;
+let catalogMediaCarouselSyncIndex = 0;
+const catalogMediaCarouselPauseSet = new Set();
 
 function resolveProductImages(produto) {
     const sources = Array.isArray(produto.galeria) && produto.galeria.length ? produto.galeria : [produto.imagem];
@@ -40,66 +43,123 @@ function buildMediaCarouselMarkup(images, altText, className = '') {
     `;
 }
 
-function setupMediaCarousel(carousel) {
+function createMediaCarouselController(carousel) {
     const slides = Array.from(carousel.querySelectorAll('.media-carousel-slide'));
     const dots = Array.from(carousel.querySelectorAll('.media-carousel-dot'));
 
     if (slides.length <= 1) {
-        return () => {};
+        return null;
     }
 
-    let activeIndex = 0;
-    let intervalId = null;
-    const intervalMs = Number(carousel.getAttribute('data-interval')) || 2400;
-
     const showSlide = nextIndex => {
-        activeIndex = nextIndex;
+        const normalizedIndex = nextIndex % slides.length;
+
         slides.forEach((slide, index) => {
-            slide.classList.toggle('is-active', index === activeIndex);
+            slide.classList.toggle('is-active', index === normalizedIndex);
         });
         dots.forEach((dot, index) => {
-            dot.classList.toggle('is-active', index === activeIndex);
-            dot.setAttribute('aria-pressed', String(index === activeIndex));
+            dot.classList.toggle('is-active', index === normalizedIndex);
+            dot.setAttribute('aria-pressed', String(index === normalizedIndex));
         });
-    };
-
-    const stopAutoplay = () => {
-        if (intervalId) {
-            window.clearInterval(intervalId);
-            intervalId = null;
-        }
-    };
-
-    const startAutoplay = () => {
-        stopAutoplay();
-        intervalId = window.setInterval(() => {
-            showSlide((activeIndex + 1) % slides.length);
-        }, intervalMs);
     };
 
     dots.forEach((dot, index) => {
         dot.addEventListener('click', () => {
-            showSlide(index);
-            startAutoplay();
+            catalogMediaCarouselSyncIndex = index;
+            synchronizeCatalogMediaCarousels();
+            restartCatalogMediaCarouselSync();
         });
     });
 
-    carousel.addEventListener('mouseenter', stopAutoplay);
-    carousel.addEventListener('mouseleave', startAutoplay);
-    carousel.addEventListener('focusin', stopAutoplay);
-    carousel.addEventListener('focusout', startAutoplay);
+    const pause = () => {
+        catalogMediaCarouselPauseSet.add(carousel);
+        stopCatalogMediaCarouselSync();
+    };
 
-    showSlide(0);
-    startAutoplay();
+    const resume = () => {
+        catalogMediaCarouselPauseSet.delete(carousel);
+
+        if (catalogMediaCarouselPauseSet.size === 0) {
+            startCatalogMediaCarouselSync();
+        }
+    };
+
+    carousel.addEventListener('mouseenter', pause);
+    carousel.addEventListener('mouseleave', resume);
+    carousel.addEventListener('focusin', pause);
+    carousel.addEventListener('focusout', resume);
+
+    showSlide(catalogMediaCarouselSyncIndex);
 
     return () => {
-        stopAutoplay();
+        catalogMediaCarouselPauseSet.delete(carousel);
+        carousel.removeEventListener('mouseenter', pause);
+        carousel.removeEventListener('mouseleave', resume);
+        carousel.removeEventListener('focusin', pause);
+        carousel.removeEventListener('focusout', resume);
     };
+}
+
+function stopCatalogMediaCarouselSync() {
+    if (catalogMediaCarouselSyncIntervalId) {
+        window.clearInterval(catalogMediaCarouselSyncIntervalId);
+        catalogMediaCarouselSyncIntervalId = null;
+    }
+}
+
+function synchronizeCatalogMediaCarousels() {
+    Array.from(document.querySelectorAll('[data-media-carousel]')).forEach(carousel => {
+        const slides = Array.from(carousel.querySelectorAll('.media-carousel-slide'));
+        const dots = Array.from(carousel.querySelectorAll('.media-carousel-dot'));
+
+        if (slides.length <= 1) {
+            return;
+        }
+
+        const normalizedIndex = catalogMediaCarouselSyncIndex % slides.length;
+
+        slides.forEach((slide, index) => {
+            slide.classList.toggle('is-active', index === normalizedIndex);
+        });
+
+        dots.forEach((dot, index) => {
+            dot.classList.toggle('is-active', index === normalizedIndex);
+            dot.setAttribute('aria-pressed', String(index === normalizedIndex));
+        });
+    });
+}
+
+function startCatalogMediaCarouselSync() {
+    if (catalogMediaCarouselSyncIntervalId || catalogMediaCarouselPauseSet.size > 0) {
+        return;
+    }
+
+    catalogMediaCarouselSyncIntervalId = window.setInterval(() => {
+        catalogMediaCarouselSyncIndex += 1;
+        synchronizeCatalogMediaCarousels();
+    }, 2400);
+}
+
+function restartCatalogMediaCarouselSync() {
+    stopCatalogMediaCarouselSync();
+
+    if (catalogMediaCarouselPauseSet.size === 0) {
+        startCatalogMediaCarouselSync();
+    }
 }
 
 function initializeCatalogMediaCarousels(root) {
     catalogMediaCarouselCleanups.forEach(cleanup => cleanup());
-    catalogMediaCarouselCleanups = Array.from(root.querySelectorAll('[data-media-carousel]')).map(setupMediaCarousel);
+    stopCatalogMediaCarouselSync();
+    catalogMediaCarouselPauseSet.clear();
+
+    catalogMediaCarouselCleanups = Array.from(root.querySelectorAll('[data-media-carousel]'))
+        .map(createMediaCarouselController)
+        .filter(Boolean);
+
+    catalogMediaCarouselSyncIndex = 0;
+    synchronizeCatalogMediaCarousels();
+    startCatalogMediaCarouselSync();
 }
 
 function getProdutosFiltrados() {
