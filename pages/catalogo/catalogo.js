@@ -245,7 +245,7 @@ function exibirProdutos(lista) {
                 <a class="product-image" href="../produto/index.html?id=${produto.id}" aria-label="Abrir produto ${produto.nome}">
                     ${buildMediaCarouselMarkup(resolveProductImages(produto), produto.nome, 'catalog-product-carousel')}
                 </a>
-                <button type="button" class="product-floating-cart" data-product-id="${produto.id}" aria-label="Adicionar ${produto.nome} ao carrinho">
+                <button type="button" class="product-floating-cart" data-product-id="${produto.id}" aria-label="Escolher tamanho de ${produto.nome}" title="Escolher tamanho antes de adicionar">
                     <i class="fas fa-cart-shopping"></i>
                 </button>
                 <div class="product-info">
@@ -306,25 +306,11 @@ document.addEventListener('click', event => {
 
     if (cartButton) {
         const productId = Number(cartButton.getAttribute('data-product-id'));
-        const produto = produtosDados.find(item => Number(item.id) === productId);
-
-        if (!produto || !window.storefront) {
+        if (!productId) {
             return;
         }
 
-        const added = window.storefront.addToCart(produto, { tamanho: 'M' });
-
-        if (!added) {
-            return;
-        }
-
-        cartButton.classList.add('is-added');
-        cartButton.innerHTML = '<i class="fas fa-check"></i>';
-
-        window.setTimeout(() => {
-            cartButton.classList.remove('is-added');
-            cartButton.innerHTML = '<i class="fas fa-cart-shopping"></i>';
-        }, 1200);
+        window.location.href = `../produto/index.html?id=${productId}`;
         return;
     }
 });

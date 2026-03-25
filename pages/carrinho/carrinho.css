@@ -206,6 +206,10 @@ body {
     width: fit-content;
 }
 
+.empty-state button {
+    width: fit-content;
+}
+
 .auth-form {
     display: grid;
     gap: 12px;
@@ -295,6 +299,24 @@ body {
     gap: 14px;
     margin: 24px 0;
     padding: 20px 0;
+}
+
+.cart-debug-panel {
+    margin-top: 18px;
+    padding-top: 18px;
+    border-top: 1px dashed #d9d0c6;
+}
+
+.cart-debug-output {
+    margin-top: 10px;
+    padding: 14px;
+    border-radius: 16px;
+    background: #171411;
+    color: #f7f1e8;
+    font: 12px/1.6 'Courier New', monospace;
+    white-space: pre-wrap;
+    word-break: break-word;
+    overflow-x: auto;
 }
 
 .summary-line {

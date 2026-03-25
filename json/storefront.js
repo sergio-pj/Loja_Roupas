@@ -10,12 +10,82 @@
         }
     }
 
+    function getSupabaseSessionAuth() {
+        const storageKeys = Object.keys(window.localStorage);
+        const authTokenKey = storageKeys.find(key => /^sb-[a-z0-9]+-auth-token$/i.test(key));
+
+        if (!authTokenKey) {
+            return null;
+        }
+
+        const rawSession = safeParse(window.localStorage.getItem(authTokenKey), null);
+        const session = rawSession?.currentSession
+            || rawSession?.session
+            || rawSession?.data?.session
+            || rawSession
+            || null;
+        const user = session?.user || rawSession?.user || null;
+        const expiresAt = Number(session?.expires_at || 0);
+
+        if (expiresAt && Date.now() >= expiresAt * 1000) {
+            return null;
+        }
+
+        if (!user?.id) {
+            return null;
+        }
+
+        return {
+            userId: user.id,
+            email: user.email || ''
+        };
+    }
+
+    function hasSupabaseTokenStorage() {
+        return Object.keys(window.localStorage).some(key => /^sb-[a-z0-9]+-auth-token$/i.test(key));
+    }
+
     function getAuth() {
-        return safeParse(window.localStorage.getItem(AUTH_KEY), null);
+        return safeParse(window.localStorage.getItem(AUTH_KEY), null) || getSupabaseSessionAuth();
+    }
+
+    function hasActiveSession() {
+        const supabaseAuth = getSupabaseSessionAuth();
+
+        if (supabaseAuth?.userId) {
+            return true;
+        }
+
+        const localAuth = safeParse(window.localStorage.getItem(AUTH_KEY), null);
+        return Boolean(localAuth?.userId && hasSupabaseTokenStorage());
     }
 
     function getCurrentUserId() {
         return String(getAuth()?.userId || '').trim();
+    }
+
+    function normalizeCartImagePath(source) {
+        const rawSource = String(source || '').trim();
+
+        if (!rawSource) {
+            return '';
+        }
+
+        if (/^(https?:|data:|blob:)/i.test(rawSource)) {
+            return rawSource;
+        }
+
+        if (rawSource.startsWith('/assets/')) {
+            return rawSource;
+        }
+
+        const assetsIndex = rawSource.indexOf('assets/');
+
+        if (assetsIndex >= 0) {
+            return `/${rawSource.slice(assetsIndex)}`;
+        }
+
+        return rawSource;
     }
 
     function getScopedStorageKey(baseKey, userId = getCurrentUserId()) {
@@ -36,27 +106,39 @@
     }
 
     function isLoggedIn() {
-        const authData = getAuth();
-        return Boolean(authData && authData.userId);
+        return hasActiveSession();
     }
 
     function normalizeCartItems(rawCart) {
         let hasLegacyItem = false;
+        let hasUpdatedImagePath = false;
 
         const normalizedCart = rawCart.map(item => {
             if (item && item.cartItemKey) {
-                return item;
+                const normalizedImage = normalizeCartImagePath(item.imagem);
+
+                if (normalizedImage !== String(item.imagem || '')) {
+                    hasUpdatedImagePath = true;
+                }
+
+                return {
+                    ...item,
+                    imagem: normalizedImage
+                };
             }
 
             hasLegacyItem = true;
 
-            return {
+            const normalizedItem = {
                 ...normalizeProduct(item, { tamanho: item?.tamanho || '' }),
                 quantity: Number(item?.quantity || 1)
             };
+
+            normalizedItem.imagem = normalizeCartImagePath(normalizedItem.imagem);
+            return normalizedItem;
         });
 
-        return { normalizedCart, hasLegacyItem };
+        return { normalizedCart, hasLegacyItem, hasUpdatedImagePath };
     }
 
     function migrateLegacyCart(userId) {
@@ -94,9 +176,9 @@
 
         const scopedKey = getScopedStorageKey(CART_KEY, userId);
         const rawCart = safeParse(window.localStorage.getItem(scopedKey), []);
-        const { normalizedCart, hasLegacyItem } = normalizeCartItems(rawCart);
+        const { normalizedCart, hasLegacyItem, hasUpdatedImagePath } = normalizeCartItems(rawCart);
 
-        if (hasLegacyItem) {
+        if (hasLegacyItem || hasUpdatedImagePath) {
             window.localStorage.setItem(scopedKey, JSON.stringify(normalizedCart));
         }
 
@@ -127,7 +209,7 @@
             cartItemKey: buildCartItemKey(product.id, tamanhoSelecionado),
             nome: product.nome,
             preco: Number(product.preco),
-            imagem: product.imagem,
+            imagem: normalizeCartImagePath(product.imagem),
             categoria: product.categoria || '',
             cor: product.cor || '',
             tamanho: tamanhoSelecionado
@@ -165,11 +247,18 @@
     }
 
     function ensureLoggedIn(actionLabel) {
-        if (isLoggedIn()) {
+        if (hasActiveSession()) {
             return true;
         }
 
-        window.alert(`Faça login para ${actionLabel}.`);
+        clearAuth();
+
+        if (String(actionLabel || '').toLowerCase().includes('adicionar')) {
+            window.alert('Para adicionar ao carrinho, favor realizar o login.');
+        } else {
+            window.alert(`Faça login para ${actionLabel}.`);
+        }
+
         redirectToLogin();
         return false;
     }

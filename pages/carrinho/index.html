@@ -93,6 +93,31 @@
                     <h2>Resumo da compra</h2>
                 </div>
 
+                <section id="cart-debug-panel" class="cart-debug-panel" hidden>
+                    <p class="cart-kicker">Diagnóstico</p>
+                    <pre id="cart-debug-output" class="cart-debug-output"></pre>
+                </section>
+
+                <script>
+                    (function () {
+                        const params = new URLSearchParams(window.location.search);
+
+                        if (params.get('debug') !== '1') {
+                            return;
+                        }
+
+                        const panel = document.getElementById('cart-debug-panel');
+                        const output = document.getElementById('cart-debug-output');
+
+                        if (!panel || !output) {
+                            return;
+                        }
+
+                        panel.hidden = false;
+                        output.textContent = 'debug bootstrap: HTML carregado; aguardando carrinho.js';
+                    })();
+                </script>
+
                 <form id="shipping-form" class="auth-form">
                     <label>
                         <span>CEP para frete</span>
