@@ -224,7 +224,23 @@ function aplicarFiltroInicial() {
 
 // Busca os dados do JSON
 async function carregarProdutos() {
+    // tenta buscar do Supabase se disponível, senão usa o JSON estático
     try {
+        if (window.supabase) {
+            const { data, error } = await window.supabase.from('produtos').select('*').order('id', { ascending: true });
+            if (!error && Array.isArray(data) && data.length) {
+                produtosDados = data.map(p => ({
+                    ...p,
+                    // garante que propriedades estejam definidas como no JSON (galeria optional)
+                    galeria: p.galeria || [],
+                    imagem: p.imagem || ''
+                }));
+                aplicarFiltroInicial();
+                atualizarCatalogo();
+                return;
+            }
+        }
+
         const response = await fetch(CATALOG_DATA_URL);
         produtosDados = await response.json();
         aplicarFiltroInicial();
