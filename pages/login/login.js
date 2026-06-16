@@ -118,13 +118,27 @@ if (loginForm) {
         const email = String(formData.get('email') || '').trim();
         const password = String(formData.get('password') || '');
 
-            // login local para o administrador (fallback)
+            // login local para o administrador (tenta autenticar no Supabase primeiro)
             if (email.toLowerCase() === ADMIN_EMAIL.toLowerCase() && password === ADMIN_PASSWORD) {
-                // registra sessão local via storefront para uso nas páginas existentes
+                try {
+                    const { data: adminData, error: adminErr } = await supabase.auth.signInWithPassword({ email: ADMIN_EMAIL, password: ADMIN_PASSWORD });
+                    if (!adminErr && adminData && adminData.user) {
+                        if (window.storefront) {
+                            window.storefront.setAuth({ userId: adminData.user.id, email: adminData.user.email || '' });
+                        }
+                        loginFeedback.textContent = 'Login de administrador realizado (Supabase). Redirecionando...';
+                        window.location.href = getRedirectTarget();
+                        return;
+                    }
+                } catch (e) {
+                    // segue para fallback
+                }
+
+                // fallback local se nao conseguir autenticar no Supabase
                 if (window.storefront) {
                     window.storefront.setAuth({ userId: 'admin-local', email: ADMIN_EMAIL });
                 }
-                loginFeedback.textContent = 'Login de administrador realizado. Redirecionando...';
+                loginFeedback.textContent = 'Login de administrador (local) realizado. Aviso: uploads/inserções podem falhar sem conta Supabase.';
                 window.location.href = getRedirectTarget();
                 return;
             }
