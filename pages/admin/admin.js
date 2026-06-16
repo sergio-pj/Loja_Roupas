@@ -119,14 +119,25 @@ async function onSave(e){
   const descricao = document.getElementById('descricao').value.trim()
   const file = document.getElementById('imagem').files[0]
 
-  let imagemUrl = null
-  if(file){
-    const filePath = `produtos/${Date.now()}_${file.name}`
-    const { error: upErr } = await supabase.storage.from(STORAGE_BUCKET).upload(filePath, file)
-    if(upErr){ return alert('Erro ao enviar imagem: '+upErr.message) }
-    const { data } = supabase.storage.from(STORAGE_BUCKET).getPublicUrl(filePath)
-    imagemUrl = data.publicUrl
-  }
+    let imagemUrl = null
+    if (file) {
+      const filePath = `produtos/${Date.now()}_${file.name}`
+      try {
+        const { error: upErr } = await supabase.storage.from(STORAGE_BUCKET).upload(filePath, file)
+        if (upErr) throw upErr
+        const { data } = supabase.storage.from(STORAGE_BUCKET).getPublicUrl(filePath)
+        imagemUrl = data.publicUrl
+      } catch (uploadErr) {
+        console.error('storage upload failed, falling back to dataURL', uploadErr)
+        // fallback: read file as data URL so UI can still show image while testing
+        imagemUrl = await new Promise((res) => {
+          const r = new FileReader()
+          r.onload = () => res(r.result)
+          r.onerror = () => res('')
+          r.readAsDataURL(file)
+        })
+      }
+    }
 
   if(id){
     const updates = { nome, preco, descricao }

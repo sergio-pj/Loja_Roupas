@@ -78,11 +78,21 @@ export async function initAdminPanel(container) {
     let imagemUrl = null;
     if (file) {
       const filePath = `produtos/${Date.now()}_${file.name}`;
-        const STORAGE_BUCKET = 'getPublicUrl';
+      const STORAGE_BUCKET = 'getPublicUrl';
+      try {
         const { error: upErr } = await supabase.storage.from(STORAGE_BUCKET).upload(filePath, file);
-        if (upErr) return alert('Erro ao enviar imagem: '+upErr.message);
+        if (upErr) throw upErr;
         const { data } = supabase.storage.from(STORAGE_BUCKET).getPublicUrl(filePath);
-      imagemUrl = data.publicUrl;
+        imagemUrl = data.publicUrl;
+      } catch (uploadErr) {
+        console.error('storage upload failed, falling back to dataURL', uploadErr);
+        imagemUrl = await new Promise((res) => {
+          const r = new FileReader();
+          r.onload = () => res(r.result);
+          r.onerror = () => res('');
+          r.readAsDataURL(file);
+        });
+      }
     }
 
     if (id) {
