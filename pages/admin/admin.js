@@ -1,7 +1,7 @@
 import { supabase } from '../../json/supabase-browser.js'
 
 // Altere este e-mail para o do dono do projeto (padrão de teste)
-const ADMIN_EMAIL = 'dono@exemplo.com'
+const ADMIN_EMAIL = 'sergiopaulo.almeida04@gmail.com'
 
 const els = {
   email: document.getElementById('email'),
