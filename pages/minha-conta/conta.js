@@ -48,6 +48,10 @@ function setAddressFormVisibility(visible) {
 
     addressForm.hidden = !visible;
 
+    if (!visible && addressFeedback) {
+        addressFeedback.textContent = '';
+    }
+
     if (addressCardActions) {
         addressCardActions.hidden = visible || !currentAddressId;
     }
@@ -406,6 +410,7 @@ if (addressForm) {
         isAddressEditing = false;
         renderAddress(data, payload.recipient_name);
         fillAddressForm(data, payload.recipient_name, payload.phone);
+        setAddressFormVisibility(false);
         addressFeedback.textContent = 'Endereco salvo com sucesso.';
     });
 }

@@ -5,28 +5,9 @@ let paginaAtual = 1;
 const itensPorPagina = 6;
 const CATALOG_DATA_URL = new URL('catalogo.json', window.location.href).href;
 let catalogMediaCarouselCleanups = [];
-
-// Repair helper: try to fix common duplicated-extension mistakes before falling back
-if (!window._repairImageSrc) {
-    window._repairImageSrc = function(img) {
-        try {
-            if (!img || !img.src) return;
-            const src = String(img.src);
-            // Try collapse duplicated extensions like .png.png or .svg.svg
-            const dupFixed = src.replace(/(\.(png|jpg|jpeg|svg))(\.(png|jpg|jpeg|svg))+$/i, '$1');
-            if (dupFixed !== src) {
-                img.onerror = null;
-                img.src = dupFixed;
-                return;
-            }
-            // If still failing, final fallback
-            img.onerror = null;
-            img.src = '../../assets/Fundo_Cabeçalho.png';
-        } catch (err) {
-            try { img.onerror = null; img.src = '../../assets/Fundo_Cabeçalho.png'; } catch(e){}
-        }
-    };
-}
+let catalogMediaCarouselSyncIntervalId = null;
+let catalogMediaCarouselSyncIndex = 0;
+const catalogMediaCarouselPauseSet = new Set();
 
 function resolveProductImages(produto) {
     const sources = Array.isArray(produto.galeria) && produto.galeria.length ? produto.galeria : [produto.imagem];
@@ -39,7 +20,7 @@ function resolveProductImages(produto) {
 function buildMediaCarouselMarkup(images, altText, className = '') {
     const carouselClassName = ['media-carousel', className].filter(Boolean).join(' ');
     const slides = images.map((source, index) => `
-        <img class="media-carousel-slide${index === 0 ? ' is-active' : ''}" src="${source}" alt="${altText} - visual ${index + 1}" loading="${index === 0 ? 'eager' : 'lazy'}" onerror="window._repairImageSrc && window._repairImageSrc(this)">
+        <img class="media-carousel-slide${index === 0 ? ' is-active' : ''}" src="${source}" alt="${altText} - visual ${index + 1}" loading="${index === 0 ? 'eager' : 'lazy'}">
     `).join('');
 
     const dots = images.length > 1
@@ -62,110 +43,123 @@ function buildMediaCarouselMarkup(images, altText, className = '') {
     `;
 }
 
-function setupMediaCarousel(carousel) {
+function createMediaCarouselController(carousel) {
     const slides = Array.from(carousel.querySelectorAll('.media-carousel-slide'));
     const dots = Array.from(carousel.querySelectorAll('.media-carousel-dot'));
 
     if (slides.length <= 1) {
-        return () => {};
+        return null;
     }
 
-    let activeIndex = 0;
-    let intervalId = null;
-    const intervalMs = Number(carousel.getAttribute('data-interval')) || 2400;
+    const showSlide = nextIndex => {
+        const normalizedIndex = nextIndex % slides.length;
 
-    const showSlide = (nextIndex, emit = true) => {
-        activeIndex = Math.max(0, Math.min(nextIndex, slides.length - 1));
         slides.forEach((slide, index) => {
-            slide.classList.toggle('is-active', index === activeIndex);
+            slide.classList.toggle('is-active', index === normalizedIndex);
         });
         dots.forEach((dot, index) => {
-            dot.classList.toggle('is-active', index === activeIndex);
-            dot.setAttribute('aria-pressed', String(index === activeIndex));
+            dot.classList.toggle('is-active', index === normalizedIndex);
+            dot.setAttribute('aria-pressed', String(index === normalizedIndex));
         });
-
-        if (emit) {
-            const event = new CustomEvent('catalog-carousel-sync', {
-                detail: { index: activeIndex, source: carousel.dataset.carouselId, sourceLength: slides.length }
-            });
-            document.dispatchEvent(event);
-        }
-    };
-
-    const stopAutoplay = () => {
-        if (intervalId) {
-            window.clearInterval(intervalId);
-            intervalId = null;
-        }
-    };
-
-    const startAutoplay = () => {
-        stopAutoplay();
-        intervalId = window.setInterval(() => {
-            showSlide((activeIndex + 1) % slides.length);
-        }, intervalMs);
     };
 
     dots.forEach((dot, index) => {
         dot.addEventListener('click', () => {
-            showSlide(index);
-            startAutoplay();
+            catalogMediaCarouselSyncIndex = index;
+            synchronizeCatalogMediaCarousels();
+            restartCatalogMediaCarouselSync();
         });
     });
 
-    // Do not stop autoplay on mouse hover — keep rotation consistent across cards.
-    // Keep focus handlers for keyboard accessibility.
-    carousel.addEventListener('focusin', stopAutoplay);
-    carousel.addEventListener('focusout', startAutoplay);
+    const pause = () => {
+        catalogMediaCarouselPauseSet.add(carousel);
+        stopCatalogMediaCarouselSync();
+    };
 
-    showSlide(0);
-    startAutoplay();
+    const resume = () => {
+        catalogMediaCarouselPauseSet.delete(carousel);
 
-    // Expose setter for external synchronization without re-emitting
-    carousel.__setSlide = idx => showSlide(idx, false);
+        if (catalogMediaCarouselPauseSet.size === 0) {
+            startCatalogMediaCarouselSync();
+        }
+    };
+
+    carousel.addEventListener('mouseenter', pause);
+    carousel.addEventListener('mouseleave', resume);
+    carousel.addEventListener('focusin', pause);
+    carousel.addEventListener('focusout', resume);
+
+    showSlide(catalogMediaCarouselSyncIndex);
 
     return () => {
-        stopAutoplay();
-        // cleanup any attached setter
-        try { delete carousel.__setSlide; } catch {}
+        catalogMediaCarouselPauseSet.delete(carousel);
+        carousel.removeEventListener('mouseenter', pause);
+        carousel.removeEventListener('mouseleave', resume);
+        carousel.removeEventListener('focusin', pause);
+        carousel.removeEventListener('focusout', resume);
     };
+}
+
+function stopCatalogMediaCarouselSync() {
+    if (catalogMediaCarouselSyncIntervalId) {
+        window.clearInterval(catalogMediaCarouselSyncIntervalId);
+        catalogMediaCarouselSyncIntervalId = null;
+    }
+}
+
+function synchronizeCatalogMediaCarousels() {
+    Array.from(document.querySelectorAll('[data-media-carousel]')).forEach(carousel => {
+        const slides = Array.from(carousel.querySelectorAll('.media-carousel-slide'));
+        const dots = Array.from(carousel.querySelectorAll('.media-carousel-dot'));
+
+        if (slides.length <= 1) {
+            return;
+        }
+
+        const normalizedIndex = catalogMediaCarouselSyncIndex % slides.length;
+
+        slides.forEach((slide, index) => {
+            slide.classList.toggle('is-active', index === normalizedIndex);
+        });
+
+        dots.forEach((dot, index) => {
+            dot.classList.toggle('is-active', index === normalizedIndex);
+            dot.setAttribute('aria-pressed', String(index === normalizedIndex));
+        });
+    });
+}
+
+function startCatalogMediaCarouselSync() {
+    if (catalogMediaCarouselSyncIntervalId || catalogMediaCarouselPauseSet.size > 0) {
+        return;
+    }
+
+    catalogMediaCarouselSyncIntervalId = window.setInterval(() => {
+        catalogMediaCarouselSyncIndex += 1;
+        synchronizeCatalogMediaCarousels();
+    }, 2400);
+}
+
+function restartCatalogMediaCarouselSync() {
+    stopCatalogMediaCarouselSync();
+
+    if (catalogMediaCarouselPauseSet.size === 0) {
+        startCatalogMediaCarouselSync();
+    }
 }
 
 function initializeCatalogMediaCarousels(root) {
     catalogMediaCarouselCleanups.forEach(cleanup => cleanup());
-    catalogMediaCarouselCleanups = [];
+    stopCatalogMediaCarouselSync();
+    catalogMediaCarouselPauseSet.clear();
 
-    const carousels = Array.from(root.querySelectorAll('[data-media-carousel]'));
-    carousels.forEach((carousel, idx) => {
-        carousel.dataset.carouselId = `catalog-carousel-${idx}`;
-        const cleanup = setupMediaCarousel(carousel);
-        catalogMediaCarouselCleanups.push(cleanup);
-    });
+    catalogMediaCarouselCleanups = Array.from(root.querySelectorAll('[data-media-carousel]'))
+        .map(createMediaCarouselController)
+        .filter(Boolean);
 
-    // Register a single global sync listener (guard against multiple registrations)
-    if (!document._catalogCarouselSyncRegistered) {
-        document._catalogCarouselSyncRegistered = true;
-        document.addEventListener('catalog-carousel-sync', e => {
-            const { index, source, sourceLength } = e.detail || {};
-            const carouselsNow = Array.from(document.querySelectorAll('[data-media-carousel]'));
-            carouselsNow.forEach(carousel => {
-                if (carousel.dataset.carouselId === source) return;
-                const targetSlides = Array.from(carousel.querySelectorAll('.media-carousel-slide'));
-                const targetLength = targetSlides.length || 1;
-
-                let mappedIndex = typeof index === 'number' ? index : 0;
-                if (typeof sourceLength === 'number' && sourceLength > 0) {
-                    mappedIndex = Math.round(index * (targetLength / sourceLength));
-                }
-
-                mappedIndex = Math.max(0, Math.min(mappedIndex, targetLength - 1));
-
-                if (typeof carousel.__setSlide === 'function') {
-                    carousel.__setSlide(mappedIndex);
-                }
-            });
-        });
-    }
+    catalogMediaCarouselSyncIndex = 0;
+    synchronizeCatalogMediaCarousels();
+    startCatalogMediaCarouselSync();
 }
 
 function getProdutosFiltrados() {
@@ -251,7 +245,7 @@ function exibirProdutos(lista) {
                 <a class="product-image" href="../produto/index.html?id=${produto.id}" aria-label="Abrir produto ${produto.nome}">
                     ${buildMediaCarouselMarkup(resolveProductImages(produto), produto.nome, 'catalog-product-carousel')}
                 </a>
-                <button type="button" class="product-floating-cart" data-product-id="${produto.id}" aria-label="Adicionar ${produto.nome} ao carrinho">
+                <button type="button" class="product-floating-cart" data-product-id="${produto.id}" aria-label="Escolher tamanho de ${produto.nome}" title="Escolher tamanho antes de adicionar">
                     <i class="fas fa-cart-shopping"></i>
                 </button>
                 <div class="product-info">
@@ -312,25 +306,11 @@ document.addEventListener('click', event => {
 
     if (cartButton) {
         const productId = Number(cartButton.getAttribute('data-product-id'));
-        const produto = produtosDados.find(item => Number(item.id) === productId);
-
-        if (!produto || !window.storefront) {
+        if (!productId) {
             return;
         }
 
-        const added = window.storefront.addToCart(produto, { tamanho: 'M' });
-
-        if (!added) {
-            return;
-        }
-
-        cartButton.classList.add('is-added');
-        cartButton.innerHTML = '<i class="fas fa-check"></i>';
-
-        window.setTimeout(() => {
-            cartButton.classList.remove('is-added');
-            cartButton.innerHTML = '<i class="fas fa-cart-shopping"></i>';
-        }, 1200);
+        window.location.href = `../produto/index.html?id=${productId}`;
         return;
     }
 });

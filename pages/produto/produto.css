@@ -36,12 +36,10 @@
 }
 
 .product-gallery-main {
+    display: flex;
     min-height: 640px;
     border-radius: 24px;
     background: radial-gradient(circle at top, rgba(255, 255, 255, 0.95), rgba(232, 226, 216, 0.88));
-    display: flex;
-    align-items: center;
-    justify-content: center;
     position: relative;
     overflow: hidden;
 }
@@ -51,17 +49,34 @@
 .product-detail-carousel .media-carousel-frame,
 .product-detail-carousel .media-carousel-slides {
     width: 100%;
+}
+
+.product-gallery-media {
+    flex: 1;
+    min-height: inherit;
+}
+
+.product-detail-carousel,
+.product-detail-carousel .media-carousel-slides {
     height: 100%;
+}
+
+.product-detail-carousel {
+    min-height: inherit;
 }
 
 .product-detail-carousel .media-carousel-frame {
     min-height: 640px;
+    height: 100%;
     padding: 20px 20px 62px;
+    display: flex;
 }
 
 .product-gallery-surface {
+    flex: 1;
     width: 100%;
     height: 100%;
+    min-height: 0;
     border-radius: 22px;
     background: linear-gradient(180deg, #ede8df 0%, #f5f1ea 100%);
     box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.7);
@@ -69,29 +84,15 @@
     overflow: hidden;
 }
 
-/* Garantir que a superfície reserve espaço e centralize a imagem principal */
-.product-gallery-surface {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 28px;
-    box-sizing: border-box;
-}
-
-/* Imagem principal: tamanho fixo máximo para evitar reflows ao trocar src */
-#product-main-image {
-    width: 100%;
-    max-width: 520px;
-    max-height: 560px;
-    height: auto;
-    object-fit: contain;
-    display: block;
-}
-
 .product-gallery-surface .media-carousel-slide {
+    width: 100%;
+    height: 100%;
+    max-width: none;
+    max-height: none;
     padding: 28px;
+    object-fit: contain;
+    object-position: center;
 }
-
 
 .product-gallery-thumbs {
     margin-top: 16px;
@@ -100,9 +101,8 @@
     gap: 12px;
 }
 
-/* Mantemos border constante para evitar mudanças de layout ao ativar */
 .product-gallery-thumb {
-    border: 2px solid transparent;
+    border: 1px solid #e3d8ca;
     background: linear-gradient(180deg, #f6f1e9 0%, #fff 100%);
     border-radius: 18px;
     min-height: 108px;
@@ -128,75 +128,10 @@
     object-fit: contain;
 }
 
-/* Mobile adjustments */
-@media (max-width: 720px) {
-    .product-page {
-        width: calc(100% - 32px);
-        margin: 20px auto 40px;
-        grid-template-columns: 1fr;
-    }
-
-    .product-gallery-main {
-        min-height: 420px;
-    }
-
-    .product-gallery-surface {
-        padding: 16px;
-    }
-
-    #product-main-image {
-        max-width: 100%;
-        max-height: 420px;
-    }
-
-    .product-gallery-thumbs {
-        margin-top: 12px;
-        display: flex;
-        gap: 10px;
-        overflow-x: auto;
-        padding-bottom: 6px;
-    }
-
-    .product-gallery-thumb {
-        flex: 0 0 86px;
-        min-height: 86px;
-        padding: 6px;
-    }
-
-    .product-gallery-badge {
-        left: 12px;
-        top: 12px;
-        padding: 8px 10px;
-        font-size: 11px;
-    }
-
-    .product-gallery-card {
-        padding: 12px;
-    }
-
-    .product-summary-card {
-        padding: 20px;
-    }
-
-    .product-action-row {
-        grid-template-columns: 1fr;
-    }
-
-    .shipping-inline {
-        flex-direction: row;
-        gap: 8px;
-    }
-
-    #shipping-check-button {
-        min-width: 84px;
-        padding: 10px 12px;
-    }
-}
-
 .product-gallery-badge {
     position: absolute;
     left: 18px;
-    top: 18px;
+    bottom: 18px;
     display: inline-flex;
     align-items: center;
     gap: 10px;
@@ -212,6 +147,9 @@
 .product-gallery-badge img {
     width: 24px;
     height: 24px;
+    max-width: 24px;
+    max-height: 24px;
+    object-fit: contain;
 }
 
 .product-gallery-note {
@@ -332,6 +270,7 @@
 .shipping-inline {
     display: flex;
     gap: 12px;
+    align-items: stretch;
 }
 
 .shipping-inline input {
@@ -344,28 +283,44 @@
     background: #fff;
 }
 
-/* Estilo do botão Consultar */
-#shipping-check-button {
-    border-radius: 12px;
-    padding: 10px 16px;
-    min-width: 96px;
-    height: 48px;
+.secondary-button {
+    appearance: none;
+    border: 1px solid #1a1714;
+    background: #fff;
+    color: #1a1714;
+    border-radius: 999px;
+    padding: 0 20px;
+    min-height: 50px;
+    font: inherit;
+    font-weight: 700;
+    letter-spacing: 0.2px;
+    cursor: pointer;
     display: inline-flex;
     align-items: center;
     justify-content: center;
+    text-align: center;
+    transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
+}
+
+.secondary-button:hover {
     background: #1a1714;
     color: #fff;
-    border: 1px solid #1a1714;
-    cursor: pointer;
-    transition: background 0.15s ease, transform 0.08s ease;
+    transform: translateY(-1px);
 }
 
-#shipping-check-button:hover {
-    background: #000;
+.secondary-button:active {
+    transform: translateY(0);
 }
 
-#shipping-check-button:active {
-    transform: translateY(1px);
+.secondary-button:focus-visible {
+    outline: 2px solid rgba(26, 23, 20, 0.2);
+    outline-offset: 2px;
+}
+
+#shipping-check-button {
+    flex: 0 0 auto;
+    min-width: 132px;
+    white-space: nowrap;
 }
 
 .product-action-row {
@@ -688,6 +643,11 @@
 
     .shipping-inline {
         flex-direction: column;
+    }
+
+    #shipping-check-button {
+        width: 100%;
+        min-width: 0;
     }
 
     .section-header-inline {
