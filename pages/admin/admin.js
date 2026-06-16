@@ -1,7 +1,7 @@
 import { supabase } from '../../json/supabase-browser.js'
 
-// Altere este e-mail para o do dono do projeto (padrão de teste)
-const ADMIN_EMAIL = 'sergiopaulo.almeida04@gmail.com'
+// Emails autorizados para acessar o admin (padrão: dono e conta local)
+const ADMIN_EMAILS = ['sergiopaulo.almeida04@gmail.com', 'aranha.admin@gmail.com']
 
 const els = {
   email: document.getElementById('email'),
@@ -23,7 +23,7 @@ async function init(){
   const { data: { session } } = await supabase.auth.getSession()
   // permitir sessão local via storefront (admin local)
   const local = window.storefront && window.storefront.getAuth ? window.storefront.getAuth() : null
-  if (!session && local && String(local.email || '').toLowerCase() === ADMIN_EMAIL.toLowerCase()) {
+  if (!session && local && ADMIN_EMAILS.includes(String(local.email || '').toLowerCase())) {
     handleSession({ user: { email: local.email } })
   } else {
     handleSession(session)
