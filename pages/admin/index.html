@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Admin — Loja Roupas</title>
+  <link rel="stylesheet" href="admin.css">
+</head>
+<body>
+  <main class="container">
+    <h1>Admin — Conteúdo</h1>
+
+    <section id="auth">
+      <div id="auth-area">
+        <input id="email" type="email" placeholder="Email para login (magic link)" />
+        <button id="btn-signin">Enviar link</button>
+        <button id="btn-signout" hidden>Sair</button>
+      </div>
+      <div id="user-info" hidden></div>
+    </section>
+
+    <section id="editor" hidden>
+      <h2>Novo produto / editar</h2>
+      <form id="product-form">
+        <input id="prod-id" type="hidden">
+        <input id="nome" placeholder="Nome" required>
+        <input id="preco" placeholder="Preço" type="number" step="0.01">
+        <textarea id="descricao" placeholder="Descrição (curta)"></textarea>
+        <input id="imagem" type="file" accept="image/*">
+        <div class="actions">
+          <button type="submit">Salvar</button>
+          <button id="btn-cancel" type="button">Cancelar</button>
+        </div>
+      </form>
+    </section>
+
+    <section id="list">
+      <h2>Produtos</h2>
+      <div id="products"></div>
+    </section>
+  </main>
+
+  <script type="module" src="admin.js"></script>
+</body>
+</html>
