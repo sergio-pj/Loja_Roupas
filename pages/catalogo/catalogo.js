@@ -227,7 +227,7 @@ async function carregarProdutos() {
     // tenta buscar do Supabase se disponível, senão usa o JSON estático
     try {
         if (window.supabase) {
-            const { data, error } = await window.supabase.from('produtos').select('*').order('id', { ascending: true });
+            const { data, error } = await window.supabase.from('produtos').select('*').order('id', { ascending: false });
             if (!error && Array.isArray(data) && data.length) {
                 produtosDados = data.map(p => ({
                     ...p,
@@ -360,3 +360,17 @@ if (filtrosToggle && filtrosBody) {
         filtrosBody.classList.add('is-open');
     }
 }
+
+// botão de recarregar catálogo (útil em desenvolvimento)
+document.addEventListener('DOMContentLoaded', () => {
+    const btn = document.getElementById('reload-catalog');
+    if (btn) {
+        btn.addEventListener('click', async () => {
+            btn.disabled = true;
+            btn.textContent = 'Recarregando...';
+            await carregarProdutos();
+            btn.disabled = false;
+            btn.textContent = 'Recarregar catálogo';
+        });
+    }
+});
