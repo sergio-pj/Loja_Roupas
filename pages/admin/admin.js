@@ -1,5 +1,8 @@
 import { supabase } from '../../json/supabase-browser.js'
 
+// Altere este e-mail para o do dono do projeto (padrão de teste)
+const ADMIN_EMAIL = 'dono@exemplo.com'
+
 const els = {
   email: document.getElementById('email'),
   btnSignin: document.getElementById('btn-signin'),
@@ -26,6 +29,13 @@ async function init(){
 
 function handleSession(session){
   if(session?.user){
+    // se estiver logado, garantir que seja o email do admin
+    if(ADMIN_EMAIL && String(session.user.email || '').toLowerCase() !== ADMIN_EMAIL.toLowerCase()){
+      supabase.auth.signOut()
+      alert('Email não autorizado para acessar o painel de administração.')
+      return
+    }
+
     els.btnSignin.hidden = true
     els.btnSignout.hidden = false
     els.userInfo.hidden = false
@@ -42,6 +52,11 @@ function handleSession(session){
 async function signIn(){
   const email = els.email.value.trim()
   if(!email) return alert('Informe um email válido')
+  // impedir envios para emails não autorizados (padrão simples)
+  if(ADMIN_EMAIL && email.toLowerCase() !== ADMIN_EMAIL.toLowerCase()){
+    return alert(`Acesso restrito: use o email ${ADMIN_EMAIL} ou altere ADMIN_EMAIL em pages/admin/admin.js`)
+  }
+
   const { error } = await supabase.auth.signInWithOtp({ email })
   if(error) return alert('Erro ao enviar link: ' + error.message)
   alert('Link enviado para o email. Verifique a caixa de entrada.')
