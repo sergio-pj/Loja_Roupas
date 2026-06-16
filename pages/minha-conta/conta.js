@@ -303,15 +303,23 @@ function renderAddress(address, fallbackName) {
 async function loadAccount() {
     const { data, error } = await supabase.auth.getUser();
 
-    if (error || !data.user) {
+    let user = data?.user || null;
+
+    // fallback: aceitar sessão local definida por storefront (admin local)
+    if (!user && window.storefront) {
+        const local = window.storefront.getAuth && window.storefront.getAuth();
+        if (local && String(local.email || '').toLowerCase() === ADMIN_EMAIL.toLowerCase()) {
+            user = { id: local.userId || 'admin-local', email: local.email, user_metadata: {} };
+        }
+    }
+
+    if (!user) {
         if (window.storefront) {
             window.storefront.clearAuth();
         }
         window.location.href = '../login/index.html';
         return;
     }
-
-    const user = data.user;
     currentUser = user;
     if (window.storefront) {
         window.storefront.setAuth({
@@ -321,11 +329,21 @@ async function loadAccount() {
     }
     const metadata = user.user_metadata || {};
 
-    const { data: profile, error: profileError } = await supabase
-        .from('profiles')
-        .select('full_name, email, phone')
-        .eq('id', user.id)
-        .maybeSingle();
+    let profile = null;
+    let profileError = null;
+
+    if (String(user.id).startsWith('admin-local')) {
+        // conta local do admin — não há perfil no Supabase
+        profile = { full_name: 'Administrador', email: user.email, phone: '' };
+    } else {
+        const res = await supabase
+            .from('profiles')
+            .select('full_name, email, phone')
+            .eq('id', user.id)
+            .maybeSingle();
+        profile = res.data;
+        profileError = res.error;
+    }
 
     if (profileError && !profileError.message.toLowerCase().includes('relation "profiles" does not exist')) {
         accountFeedback.textContent = profileError.message;

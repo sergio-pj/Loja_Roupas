@@ -1,5 +1,9 @@
 import { supabase } from '../../json/supabase-browser.js';
 
+// Credenciais locais de administrador (login simples sem depender de SMTP)
+const ADMIN_EMAIL = 'aranha.admin@gmail.com'
+const ADMIN_PASSWORD = 'aranha123'
+
 const loginForm = document.getElementById('login-form');
 const registerForm = document.getElementById('register-form');
 const loginFeedback = document.getElementById('login-feedback');
@@ -114,12 +118,23 @@ if (loginForm) {
         const email = String(formData.get('email') || '').trim();
         const password = String(formData.get('password') || '');
 
-        const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+            // login local para o administrador (fallback)
+            if (email.toLowerCase() === ADMIN_EMAIL.toLowerCase() && password === ADMIN_PASSWORD) {
+                // registra sessão local via storefront para uso nas páginas existentes
+                if (window.storefront) {
+                    window.storefront.setAuth({ userId: 'admin-local', email: ADMIN_EMAIL });
+                }
+                loginFeedback.textContent = 'Login de administrador realizado. Redirecionando...';
+                window.location.href = getRedirectTarget();
+                return;
+            }
 
-        if (error) {
-            loginFeedback.textContent = toFriendlyAuthMessage(error.message);
-            return;
-        }
+            const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+
+            if (error) {
+                loginFeedback.textContent = toFriendlyAuthMessage(error.message);
+                return;
+            }
 
         if (data.user) {
             if (window.storefront) {

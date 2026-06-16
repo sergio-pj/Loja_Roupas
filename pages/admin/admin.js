@@ -21,7 +21,13 @@ async function init(){
   els.btnCancel.addEventListener('click', resetForm)
 
   const { data: { session } } = await supabase.auth.getSession()
-  handleSession(session)
+  // permitir sessão local via storefront (admin local)
+  const local = window.storefront && window.storefront.getAuth ? window.storefront.getAuth() : null
+  if (!session && local && String(local.email || '').toLowerCase() === ADMIN_EMAIL.toLowerCase()) {
+    handleSession({ user: { email: local.email } })
+  } else {
+    handleSession(session)
+  }
   supabase.auth.onAuthStateChange((event, session) => handleSession(session))
 
   await loadProducts()
