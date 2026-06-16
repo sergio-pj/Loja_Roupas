@@ -2,6 +2,10 @@ import { supabase } from '../../json/supabase-browser.js'
 
 // Emails autorizados para acessar o admin (padrão: dono e conta local)
 const ADMIN_EMAILS = ['sergiopaulo.almeida04@gmail.com', 'aranha.admin@gmail.com']
+// email primário (usado para mensagens/checagens simples)
+const ADMIN_EMAIL = ADMIN_EMAILS[0]
+// bucket de storage usado no projeto (ajuste se seu bucket tiver outro nome)
+const STORAGE_BUCKET = 'getPublicUrl'
 
 const els = {
   email: document.getElementById('email'),
@@ -118,9 +122,9 @@ async function onSave(e){
   let imagemUrl = null
   if(file){
     const filePath = `produtos/${Date.now()}_${file.name}`
-    const { error: upErr } = await supabase.storage.from('public').upload(filePath, file)
+    const { error: upErr } = await supabase.storage.from(STORAGE_BUCKET).upload(filePath, file)
     if(upErr){ return alert('Erro ao enviar imagem: '+upErr.message) }
-    const { data } = supabase.storage.from('public').getPublicUrl(filePath)
+    const { data } = supabase.storage.from(STORAGE_BUCKET).getPublicUrl(filePath)
     imagemUrl = data.publicUrl
   }
 

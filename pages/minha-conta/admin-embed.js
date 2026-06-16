@@ -78,9 +78,10 @@ export async function initAdminPanel(container) {
     let imagemUrl = null;
     if (file) {
       const filePath = `produtos/${Date.now()}_${file.name}`;
-      const { error: upErr } = await supabase.storage.from('public').upload(filePath, file);
-      if (upErr) return alert('Erro ao enviar imagem: '+upErr.message);
-      const { data } = supabase.storage.from('public').getPublicUrl(filePath);
+        const STORAGE_BUCKET = 'getPublicUrl';
+        const { error: upErr } = await supabase.storage.from(STORAGE_BUCKET).upload(filePath, file);
+        if (upErr) return alert('Erro ao enviar imagem: '+upErr.message);
+        const { data } = supabase.storage.from(STORAGE_BUCKET).getPublicUrl(filePath);
       imagemUrl = data.publicUrl;
     }
 
