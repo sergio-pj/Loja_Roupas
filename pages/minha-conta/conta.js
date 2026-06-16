@@ -308,7 +308,7 @@ async function loadAccount() {
     // fallback: aceitar sessão local definida por storefront (admin local)
     if (!user && window.storefront) {
         const local = window.storefront.getAuth && window.storefront.getAuth();
-        if (local && String(local.email || '').toLowerCase() === ADMIN_EMAIL.toLowerCase()) {
+        if (local && ADMIN_EMAILS.includes(String(local.email || '').toLowerCase())) {
             user = { id: local.userId || 'admin-local', email: local.email, user_metadata: {} };
         }
     }
