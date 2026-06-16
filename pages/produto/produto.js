@@ -33,6 +33,26 @@ let selectedSize = '';
 let productRelatedStartIndex = 0;
 let productMediaCarouselCleanups = [];
 
+// Repair helper: try to fix common duplicated-extension mistakes before falling back
+if (!window._repairImageSrc) {
+    window._repairImageSrc = function(img) {
+        try {
+            if (!img || !img.src) return;
+            const src = String(img.src);
+            const dupFixed = src.replace(/(\.(png|jpg|jpeg|svg))(\.(png|jpg|jpeg|svg))+$/i, '$1');
+            if (dupFixed !== src) {
+                img.onerror = null;
+                img.src = dupFixed;
+                return;
+            }
+            img.onerror = null;
+            img.src = '../../assets/Fundo_Cabeçalho.png';
+        } catch (err) {
+            try { img.onerror = null; img.src = '../../assets/Fundo_Cabeçalho.png'; } catch(e){}
+        }
+    };
+}
+
 function resolveProductImages(product) {
     const sources = Array.isArray(product.galeria) && product.galeria.length ? product.galeria : [product.imagem];
 
@@ -44,7 +64,7 @@ function resolveProductImages(product) {
 function buildMediaCarouselMarkup(images, altText, className = '') {
     const carouselClassName = ['media-carousel', className].filter(Boolean).join(' ');
     const slides = images.map((source, index) => `
-        <img class="media-carousel-slide${index === 0 ? ' is-active' : ''}" src="${source}" alt="${altText} - visual ${index + 1}" loading="${index === 0 ? 'eager' : 'lazy'}">
+        <img class="media-carousel-slide${index === 0 ? ' is-active' : ''}" src="${source}" alt="${altText} - visual ${index + 1}" loading="${index === 0 ? 'eager' : 'lazy'}" onerror="window._repairImageSrc && window._repairImageSrc(this)">
     `).join('');
 
     const dots = images.length > 1
@@ -68,25 +88,14 @@ function buildMediaCarouselMarkup(images, altText, className = '') {
 }
 
 function buildProductGalleryMarkup(images, altText) {
-    const slides = images.map((source, index) => `
-        <img class="media-carousel-slide${index === 0 ? ' is-active' : ''}" src="${source}" alt="${altText} - visual ${index + 1}" loading="${index === 0 ? 'eager' : 'lazy'}">
-    `).join('');
-
-    const dots = images.length > 1
-        ? `
-            <div class="media-carousel-dots" aria-label="Navegação da galeria">
-                ${images.map((_, index) => `
-                    <button type="button" class="media-carousel-dot${index === 0 ? ' is-active' : ''}" data-slide-index="${index}" aria-label="Ver imagem ${index + 1}"></button>
-                `).join('')}
-            </div>
-        `
-        : '';
+    // Simples layout: uma imagem principal e miniaturas abaixo.
+    const mainSrc = images && images.length ? images[0] : '';
 
     const thumbs = images.length > 1
         ? `
             <div class="product-gallery-thumbs" aria-label="Miniaturas da galeria">
                 ${images.map((source, index) => `
-                    <button type="button" class="product-gallery-thumb${index === 0 ? ' is-active' : ''}" data-slide-index="${index}" aria-label="Selecionar visual ${index + 1}">
+                    <button type="button" class="product-gallery-thumb${index === 0 ? ' is-active' : ''}" data-src="${source}" aria-label="Selecionar visual ${index + 1}">
                         <img src="${source}" alt="${altText} miniatura ${index + 1}" loading="lazy">
                     </button>
                 `).join('')}
@@ -95,12 +104,9 @@ function buildProductGalleryMarkup(images, altText) {
         : '';
 
     return `
-        <div class="media-carousel product-detail-carousel" data-media-carousel data-interval="2500">
-            <div class="media-carousel-frame">
-                <div class="product-gallery-surface">
-                    <div class="media-carousel-slides">${slides}</div>
-                </div>
-                ${dots}
+        <div class="product-detail-view">
+            <div class="product-gallery-surface">
+                <img id="product-main-image" src="${mainSrc}" alt="${altText}" loading="eager" onerror="window._repairImageSrc && window._repairImageSrc(this)">
             </div>
             ${thumbs}
         </div>
@@ -120,8 +126,8 @@ function setupMediaCarousel(carousel) {
     let intervalId = null;
     const intervalMs = Number(carousel.getAttribute('data-interval')) || 2500;
 
-    const showSlide = nextIndex => {
-        activeIndex = nextIndex;
+    const showSlide = (nextIndex, emit = true) => {
+        activeIndex = Math.max(0, Math.min(nextIndex, slides.length - 1));
         slides.forEach((slide, index) => {
             slide.classList.toggle('is-active', index === activeIndex);
         });
@@ -133,6 +139,13 @@ function setupMediaCarousel(carousel) {
             thumb.classList.toggle('is-active', index === activeIndex);
             thumb.setAttribute('aria-pressed', String(index === activeIndex));
         });
+
+        if (emit) {
+            const event = new CustomEvent('catalog-carousel-sync', {
+                detail: { index: activeIndex, source: carousel.dataset.carouselId, sourceLength: slides.length }
+            });
+            document.dispatchEvent(event);
+        }
     };
 
     const stopAutoplay = () => {
@@ -163,22 +176,56 @@ function setupMediaCarousel(carousel) {
         });
     });
 
-    carousel.addEventListener('mouseenter', stopAutoplay);
-    carousel.addEventListener('mouseleave', startAutoplay);
+    // Do not stop autoplay on mouse hover to prevent the large gallery from freezing.
     carousel.addEventListener('focusin', stopAutoplay);
     carousel.addEventListener('focusout', startAutoplay);
 
     showSlide(0);
     startAutoplay();
 
+    // Expose setter for external synchronization without re-emitting
+    carousel.__setSlide = idx => showSlide(idx, false);
+
     return () => {
         stopAutoplay();
+        try { delete carousel.__setSlide; } catch {}
     };
 }
 
 function initializeProductMediaCarousels() {
     productMediaCarouselCleanups.forEach(cleanup => cleanup());
-    productMediaCarouselCleanups = Array.from(document.querySelectorAll('[data-media-carousel]')).map(setupMediaCarousel);
+    productMediaCarouselCleanups = [];
+
+    const carousels = Array.from(document.querySelectorAll('[data-media-carousel]'));
+    carousels.forEach((carousel, idx) => {
+        carousel.dataset.carouselId = `product-carousel-${idx}`;
+        const cleanup = setupMediaCarousel(carousel);
+        productMediaCarouselCleanups.push(cleanup);
+    });
+
+    if (!document._catalogCarouselSyncRegistered) {
+        document._catalogCarouselSyncRegistered = true;
+        document.addEventListener('catalog-carousel-sync', e => {
+            const { index, source, sourceLength } = e.detail || {};
+            const carouselsNow = Array.from(document.querySelectorAll('[data-media-carousel]'));
+            carouselsNow.forEach(carousel => {
+                if (carousel.dataset.carouselId === source) return;
+                const targetSlides = Array.from(carousel.querySelectorAll('.media-carousel-slide'));
+                const targetLength = targetSlides.length || 1;
+
+                let mappedIndex = typeof index === 'number' ? index : 0;
+                if (typeof sourceLength === 'number' && sourceLength > 0) {
+                    mappedIndex = Math.round(index * (targetLength / sourceLength));
+                }
+
+                mappedIndex = Math.max(0, Math.min(mappedIndex, targetLength - 1));
+
+                if (typeof carousel.__setSlide === 'function') {
+                    carousel.__setSlide(mappedIndex);
+                }
+            });
+        });
+    }
 }
 
 function toggleMenu() {
@@ -284,6 +331,23 @@ function renderProduct(product) {
     measuresElement.hidden = false;
 
     productGalleryMedia.innerHTML = buildProductGalleryMarkup(resolveProductImages(product), product.nome);
+    // Conectar miniaturas para trocar a imagem principal (modo manual, sem carrossel)
+    (function setupThumbs() {
+        const mainImg = document.getElementById('product-main-image');
+        const thumbs = Array.from(productGalleryMedia.querySelectorAll('.product-gallery-thumb'));
+
+        if (!mainImg || !thumbs.length) return;
+
+        thumbs.forEach(thumb => {
+            thumb.addEventListener('click', () => {
+                const src = thumb.getAttribute('data-src');
+                if (!src) return;
+                mainImg.src = src;
+                thumbs.forEach(t => t.classList.remove('is-active'));
+                thumb.classList.add('is-active');
+            });
+        });
+    })();
     productEyebrow.textContent = `${product.categoria === 'oversized' ? 'Oversized' : 'Camiseta'} | ${product.cor === 'escura' ? 'Peça escura' : 'Peça clara'}`;
     productName.textContent = product.nome;
     productSubtitle.textContent = product.subtitulo || '';
@@ -338,6 +402,25 @@ async function loadProduct() {
         }
 
         renderProduct(product);
+        // Repair helper: try to fix common duplicated-extension mistakes before falling back
+        if (!window._repairImageSrc) {
+            window._repairImageSrc = function(img) {
+                try {
+                    if (!img || !img.src) return;
+                    const src = String(img.src);
+                    const dupFixed = src.replace(/(\.(png|jpg|jpeg|svg))(\.(png|jpg|jpeg|svg))+$/i, '$1');
+                    if (dupFixed !== src) {
+                        img.onerror = null;
+                        img.src = dupFixed;
+                        return;
+                    }
+                    img.onerror = null;
+                    img.src = '../../assets/Fundo_Cabeçalho.png';
+                } catch (err) {
+                    try { img.onerror = null; img.src = '../../assets/Fundo_Cabeçalho.png'; } catch(e){}
+                }
+            };
+        }
     } catch (error) {
         console.error('Erro ao carregar produto:', error);
         setState('Não foi possível carregar o produto agora.', true);

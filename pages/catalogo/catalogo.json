@@ -5,7 +5,13 @@
     "preco": 79.90,
     "categoria": "camisetas",
     "cor": "escura",
-    "imagem": "../../assets/CamisaModeloPreta.png",
+    "imagem": "../../assets/modelofrente_pretasnome.png",
+    "galeria": [
+      "../../assets/modelofrente_pretasnome.png",
+      "../../assets/modelofrente_pretacnome.png",
+      "../../assets/modelocosta_pretasnome.png",
+      "../../assets/modelocosta_pretacnome.png"
+    ],
     "subtitulo": "Essencial escura com caimento limpo e presença forte.",
     "descricao": "A All Black foi pensada para compor um visual urbano direto, com leitura minimalista e acabamento confortável para uso diário.",
     "destaque": "Modelagem reta, toque macio e presença marcante em composições monocromáticas.",
@@ -24,7 +30,13 @@
     "preco": 79.90,
     "categoria": "oversized",
     "cor": "clara",
-    "imagem": "../../assets/CamisaModeloBege.png",
+    "imagem": "../../assets/modelofrente_begesnome.png",
+    "galeria": [
+      "../../assets/modelofrente_begesnome.png",
+      "../../assets/modelocostas_begecnome.png",
+      "../../assets/modelofrente_begecnome.png",
+      "../../assets/modelocostas_begecnome.png"
+    ],
     "subtitulo": "Silhueta ampla para um visual contemporâneo e confortável.",
     "descricao": "A Oversized Smoke trabalha volume e leveza em uma peça pensada para layering e combinações com pegada street refinada.",
     "destaque": "Caimento solto, ombro deslocado e leitura casual premium.",

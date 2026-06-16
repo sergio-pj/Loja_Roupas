@@ -6,6 +6,28 @@ const itensPorPagina = 6;
 const CATALOG_DATA_URL = new URL('catalogo.json', window.location.href).href;
 let catalogMediaCarouselCleanups = [];
 
+// Repair helper: try to fix common duplicated-extension mistakes before falling back
+if (!window._repairImageSrc) {
+    window._repairImageSrc = function(img) {
+        try {
+            if (!img || !img.src) return;
+            const src = String(img.src);
+            // Try collapse duplicated extensions like .png.png or .svg.svg
+            const dupFixed = src.replace(/(\.(png|jpg|jpeg|svg))(\.(png|jpg|jpeg|svg))+$/i, '$1');
+            if (dupFixed !== src) {
+                img.onerror = null;
+                img.src = dupFixed;
+                return;
+            }
+            // If still failing, final fallback
+            img.onerror = null;
+            img.src = '../../assets/Fundo_Cabeçalho.png';
+        } catch (err) {
+            try { img.onerror = null; img.src = '../../assets/Fundo_Cabeçalho.png'; } catch(e){}
+        }
+    };
+}
+
 function resolveProductImages(produto) {
     const sources = Array.isArray(produto.galeria) && produto.galeria.length ? produto.galeria : [produto.imagem];
 
@@ -17,7 +39,7 @@ function resolveProductImages(produto) {
 function buildMediaCarouselMarkup(images, altText, className = '') {
     const carouselClassName = ['media-carousel', className].filter(Boolean).join(' ');
     const slides = images.map((source, index) => `
-        <img class="media-carousel-slide${index === 0 ? ' is-active' : ''}" src="${source}" alt="${altText} - visual ${index + 1}" loading="${index === 0 ? 'eager' : 'lazy'}">
+        <img class="media-carousel-slide${index === 0 ? ' is-active' : ''}" src="${source}" alt="${altText} - visual ${index + 1}" loading="${index === 0 ? 'eager' : 'lazy'}" onerror="window._repairImageSrc && window._repairImageSrc(this)">
     `).join('');
 
     const dots = images.length > 1
@@ -52,8 +74,8 @@ function setupMediaCarousel(carousel) {
     let intervalId = null;
     const intervalMs = Number(carousel.getAttribute('data-interval')) || 2400;
 
-    const showSlide = nextIndex => {
-        activeIndex = nextIndex;
+    const showSlide = (nextIndex, emit = true) => {
+        activeIndex = Math.max(0, Math.min(nextIndex, slides.length - 1));
         slides.forEach((slide, index) => {
             slide.classList.toggle('is-active', index === activeIndex);
         });
@@ -61,6 +83,13 @@ function setupMediaCarousel(carousel) {
             dot.classList.toggle('is-active', index === activeIndex);
             dot.setAttribute('aria-pressed', String(index === activeIndex));
         });
+
+        if (emit) {
+            const event = new CustomEvent('catalog-carousel-sync', {
+                detail: { index: activeIndex, source: carousel.dataset.carouselId, sourceLength: slides.length }
+            });
+            document.dispatchEvent(event);
+        }
     };
 
     const stopAutoplay = () => {
@@ -84,22 +113,59 @@ function setupMediaCarousel(carousel) {
         });
     });
 
-    carousel.addEventListener('mouseenter', stopAutoplay);
-    carousel.addEventListener('mouseleave', startAutoplay);
+    // Do not stop autoplay on mouse hover — keep rotation consistent across cards.
+    // Keep focus handlers for keyboard accessibility.
     carousel.addEventListener('focusin', stopAutoplay);
     carousel.addEventListener('focusout', startAutoplay);
 
     showSlide(0);
     startAutoplay();
 
+    // Expose setter for external synchronization without re-emitting
+    carousel.__setSlide = idx => showSlide(idx, false);
+
     return () => {
         stopAutoplay();
+        // cleanup any attached setter
+        try { delete carousel.__setSlide; } catch {}
     };
 }
 
 function initializeCatalogMediaCarousels(root) {
     catalogMediaCarouselCleanups.forEach(cleanup => cleanup());
-    catalogMediaCarouselCleanups = Array.from(root.querySelectorAll('[data-media-carousel]')).map(setupMediaCarousel);
+    catalogMediaCarouselCleanups = [];
+
+    const carousels = Array.from(root.querySelectorAll('[data-media-carousel]'));
+    carousels.forEach((carousel, idx) => {
+        carousel.dataset.carouselId = `catalog-carousel-${idx}`;
+        const cleanup = setupMediaCarousel(carousel);
+        catalogMediaCarouselCleanups.push(cleanup);
+    });
+
+    // Register a single global sync listener (guard against multiple registrations)
+    if (!document._catalogCarouselSyncRegistered) {
+        document._catalogCarouselSyncRegistered = true;
+        document.addEventListener('catalog-carousel-sync', e => {
+            const { index, source, sourceLength } = e.detail || {};
+            const carouselsNow = Array.from(document.querySelectorAll('[data-media-carousel]'));
+            carouselsNow.forEach(carousel => {
+                if (carousel.dataset.carouselId === source) return;
+                const targetSlides = Array.from(carousel.querySelectorAll('.media-carousel-slide'));
+                const targetLength = targetSlides.length || 1;
+
+                let mappedIndex = typeof index === 'number' ? index : 0;
+                if (typeof sourceLength === 'number' && sourceLength > 0) {
+                    mappedIndex = Math.round(index * (targetLength / sourceLength));
+                }
+
+                mappedIndex = Math.max(0, Math.min(mappedIndex, targetLength - 1));
+
+                if (typeof carousel.__setSlide === 'function') {
+                    carousel.__setSlide(mappedIndex);
+                }
+            });
+        });
+    }
 }
 
 function getProdutosFiltrados() {

@@ -14,15 +14,43 @@
     <div id="sidebar" class="sidebar">
         <a href="javascript:void(0)" class="closebtn" onclick="toggleMenu()">×</a>
         <div class="sidebar-content">
-            <h3>Navegação</h3>
-            <nav class="sidebar-links">
-                <a href="../../index.html">Início</a>
-                <a href="../catalogo/index.html">Catálogo</a>
-                <a href="../quemsomos/index.html">Quem Somos</a>
-                <a href="../contato/index.html">Contato</a>
-                <a href="../carrinho/index.html">Carrinho</a>
-                <a href="../login/index.html" data-auth-link>Minha Conta</a>
-            </nav>
+            <div class="sidebar-user-quick">
+                <i class="fas fa-user-circle"></i>
+                <div class="user-quick-text">
+                    <strong class="greeting">Olá, visitante</strong>
+                    <span class="auth-links"><a href="../login/index.html">Entrar</a> ou <a href="../login/index.html">Cadastrar</a></span>
+                </div>
+            </div>
+            <script>
+                (function(){
+                    const key = 'aranhaUser';
+                    const raw = localStorage.getItem(key);
+                    const container = document.querySelector('.sidebar-user-quick .user-quick-text');
+                    if(!container) return;
+                    if(raw) {
+                        try{ const user = JSON.parse(raw); const name = user && (user.nome || user.name) ? (user.nome || user.name) : 'cliente'; container.innerHTML = `<strong class="greeting">Olá, ${name}</strong>`; }catch(e){}
+                    }
+                })();
+            </script>
+
+            <div class="sidebar-categories">
+                <h3>Categorias</h3>
+                <nav class="sidebar-links sidebar-categories-list">
+                    <a href="../catalogo/index.html">MOLETONS</a>
+                    <a href="../catalogo/index.html">CAMISETAS</a>
+                    <a href="../catalogo/index.html">SHORTS E BERMUDAS</a>
+                    <a href="../catalogo/index.html">KIT'S</a>
+                </nav>
+            </div>
+
+            <div class="sidebar-account">
+                <nav class="sidebar-links sidebar-account-list">
+                    <a href="../contato/index.html" class="account-link"><i class="fas fa-headset"></i> Central de Atendimento</a>
+                    <a href="../login/index.html" class="account-link"><i class="fas fa-user-circle"></i> Minha Conta</a>
+                    <a href="../minha-conta/index.html" class="account-link"><i class="fas fa-box"></i> Meus Pedidos</a>
+                    <a href="../carrinho/index.html" class="account-link"><i class="fas fa-truck"></i> Rastrear Pedidos</a>
+                </nav>
+            </div>
         </div>
     </div>
 
@@ -41,9 +69,6 @@
             <a href="../carrinho/index.html" class="header-icon-link" aria-label="Abrir carrinho">
                 <i class="fas fa-bag-shopping"></i>
                 <span class="cart-badge" data-cart-count hidden>0</span>
-            </a>
-            <a href="../login/index.html" class="header-icon-link" data-auth-link aria-label="Abrir area do cliente">
-                <i class="fas fa-user-circle"></i>
             </a>
         </div>
     </header>

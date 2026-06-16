@@ -69,15 +69,29 @@
     overflow: hidden;
 }
 
-.product-gallery-main img {
-    width: min(100%, 520px);
+/* Garantir que a superfície reserve espaço e centralize a imagem principal */
+.product-gallery-surface {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 28px;
+    box-sizing: border-box;
+}
+
+/* Imagem principal: tamanho fixo máximo para evitar reflows ao trocar src */
+#product-main-image {
+    width: 100%;
+    max-width: 520px;
     max-height: 560px;
+    height: auto;
     object-fit: contain;
+    display: block;
 }
 
 .product-gallery-surface .media-carousel-slide {
     padding: 28px;
 }
+
 
 .product-gallery-thumbs {
     margin-top: 16px;
@@ -86,8 +100,9 @@
     gap: 12px;
 }
 
+/* Mantemos border constante para evitar mudanças de layout ao ativar */
 .product-gallery-thumb {
-    border: 1px solid #e3d8ca;
+    border: 2px solid transparent;
     background: linear-gradient(180deg, #f6f1e9 0%, #fff 100%);
     border-radius: 18px;
     min-height: 108px;
@@ -113,10 +128,75 @@
     object-fit: contain;
 }
 
+/* Mobile adjustments */
+@media (max-width: 720px) {
+    .product-page {
+        width: calc(100% - 32px);
+        margin: 20px auto 40px;
+        grid-template-columns: 1fr;
+    }
+
+    .product-gallery-main {
+        min-height: 420px;
+    }
+
+    .product-gallery-surface {
+        padding: 16px;
+    }
+
+    #product-main-image {
+        max-width: 100%;
+        max-height: 420px;
+    }
+
+    .product-gallery-thumbs {
+        margin-top: 12px;
+        display: flex;
+        gap: 10px;
+        overflow-x: auto;
+        padding-bottom: 6px;
+    }
+
+    .product-gallery-thumb {
+        flex: 0 0 86px;
+        min-height: 86px;
+        padding: 6px;
+    }
+
+    .product-gallery-badge {
+        left: 12px;
+        top: 12px;
+        padding: 8px 10px;
+        font-size: 11px;
+    }
+
+    .product-gallery-card {
+        padding: 12px;
+    }
+
+    .product-summary-card {
+        padding: 20px;
+    }
+
+    .product-action-row {
+        grid-template-columns: 1fr;
+    }
+
+    .shipping-inline {
+        flex-direction: row;
+        gap: 8px;
+    }
+
+    #shipping-check-button {
+        min-width: 84px;
+        padding: 10px 12px;
+    }
+}
+
 .product-gallery-badge {
     position: absolute;
     left: 18px;
-    bottom: 18px;
+    top: 18px;
     display: inline-flex;
     align-items: center;
     gap: 10px;
@@ -262,6 +342,30 @@
     padding: 14px 18px;
     font: inherit;
     background: #fff;
+}
+
+/* Estilo do botão Consultar */
+#shipping-check-button {
+    border-radius: 12px;
+    padding: 10px 16px;
+    min-width: 96px;
+    height: 48px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: #1a1714;
+    color: #fff;
+    border: 1px solid #1a1714;
+    cursor: pointer;
+    transition: background 0.15s ease, transform 0.08s ease;
+}
+
+#shipping-check-button:hover {
+    background: #000;
+}
+
+#shipping-check-button:active {
+    transform: translateY(1px);
 }
 
 .product-action-row {

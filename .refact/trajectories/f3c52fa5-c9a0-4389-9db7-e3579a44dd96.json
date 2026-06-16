@@ -1,0 +1,54 @@
+{
+  "id": "f3c52fa5-c9a0-4389-9db7-e3579a44dd96",
+  "title": "Revisão de código solicitada.",
+  "model": "google_gemini/gemini-pro-latest",
+  "mode": "agent",
+  "tool_use": "agent",
+  "messages": [
+    {
+      "message_id": "5c729960-9fae-42a8-8e74-85e67d7d29b5",
+      "role": "system",
+      "content": "You are Refact Agent working with a weaker open-source or local model.\n\nUse native tool calling if available.\nIf native tool calling fails, emit exactly one strict fallback tool call in one of these formats:\n\n1. Function style:\n   tool_name({\"arg\":\"value\"})\n\n2. JSON fence:\n   ```json\n   {\"tool\":\"tool_name\",\"arguments\":{\"arg\":\"value\"}}\n   ```\n\n3. XML style:\n   <tool name=\"tool_name\">{\"arg\":\"value\"}</tool>\n\nAdditional rules:\n- Never emit more than one fallback tool call in a single response.\n- Do not add explanation before or after the fallback tool call.\n- Use exact tool names and valid JSON object arguments.\n- After a tool result, continue with either another tool call or a plain answer.\n"
+    },
+    {
+      "message_id": "db8cf0f4-f98f-48da-86f4-a377da2d4933",
+      "role": "context_file",
+      "content": [
+        {
+          "file_name": "\\\\?\\C:\\Users\\sergi\\OneDrive\\Desktop\\Projetos\\Loja_Roupas\\.vscode\\settings.json",
+          "file_content": "{\r\n  \"liveServer.settings.port\": 5500,\r\n  \"liveServer.settings.host\": \"127.0.0.1\"\r\n}",
+          "line1": 1,
+          "line2": 4
+        }
+      ],
+      "tool_call_id": "project_context"
+    },
+    {
+      "message_id": "87f6700a-3db7-4735-a830-d9c7a99ec6d9",
+      "role": "user",
+      "content": "Bom dia, consegue conferir meu código?\n",
+      "checkpoints": [
+        {
+          "workspace_folder": "C:\\Users\\sergi\\OneDrive\\Desktop\\Projetos\\Loja_Roupas",
+          "commit_hash": "b3f91dafd23510e6d4750b3f044dbcc47c3994a7"
+        }
+      ]
+    },
+    {
+      "message_id": "7f1a63aa-3480-4091-96af-3b0adbca5d68",
+      "role": "error",
+      "content": "LLM error (429 Too Many Requests): [{\n  \"error\": {\n    \"code\": 429,\n    \"message\": \"You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. \\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_input_token_count, limit: 0, model: gemini-3.1-pro\\n* Quota exceeded for metric: generativelanguage.googleapis.com/gene"
+    }
+  ],
+  "created_at": "2026-06-02T15:19:34.562969500+00:00",
+  "boost_reasoning": false,
+  "checkpoints_enabled": true,
+  "context_tokens_cap": null,
+  "include_project_info": true,
+  "isTitleGenerated": true,
+  "auto_approve_editing_tools": true,
+  "auto_approve_dangerous_commands": false,
+  "auto_enrichment_enabled": false,
+  "root_chat_id": "f3c52fa5-c9a0-4389-9db7-e3579a44dd96",
+  "updated_at": "2026-06-02T15:21:01.631042300+00:00"
+}

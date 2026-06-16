@@ -12,27 +12,50 @@
 
     <div id="overlay" onclick="toggleMenu()"></div>
 
-<div id="sidebar" class="sidebar">
-    <a href="javascript:void(0)" class="closebtn" onclick="toggleMenu()">×</a>
-    <div class="sidebar-content">
-        <h3>Categorias</h3>
-        <nav class="sidebar-links">
-            <a href="#" onclick="filtrar('todos'); toggleMenu()">Todas as Camisas</a>
-            <a href="#" class="link-clara" onclick="filtrar('clara'); toggleMenu()">Camisas Claras</a>
-            <a href="#" class="link-escura" onclick="filtrar('escura'); toggleMenu()">Camisas Escuras</a>
-            <a href="pages/quemsomos/index.html">Quem Somos</a>
-            <a href="pages/catalogo/index.html">Catálogo</a>
-            <a href="pages/contato/index.html">Contato</a>
-            <a href="pages/carrinho/index.html">Carrinho</a>
-            <hr>
-            <a href="pages/login/index.html" class="user-link-sidebar">
-                <i class="fas fa-user-circle"></i> 
-                <span>Minha Conta</span>
-            </a>
-            <a href="pages/contato/index.html"><i class="fas fa-headset"></i> Suporte</a>
-        </nav>
+    <div id="sidebar" class="sidebar">
+        <a href="javascript:void(0)" class="closebtn" onclick="toggleMenu()">×</a>
+        <div class="sidebar-content">
+            <div class="sidebar-user-quick">
+                <i class="fas fa-user-circle"></i>
+                <div class="user-quick-text">
+                    <strong class="greeting">Olá, visitante</strong>
+                    <span class="auth-links"><a href="pages/login/index.html">Entrar</a> <span class="sep">ou</span> <a href="pages/login/index.html">Cadastrar</a></span>
+                </div>
+            </div>
+            <script>
+                (function(){
+                    const key = 'aranhaUser';
+                    const raw = localStorage.getItem(key);
+                    const container = document.querySelector('.sidebar-user-quick .user-quick-text');
+                    if(!container) return;
+                    if(raw) {
+                        try{
+                            const user = JSON.parse(raw);
+                            const name = user && (user.nome || user.name) ? (user.nome || user.name) : 'cliente';
+                            container.innerHTML = `<strong class="greeting">Olá, ${name}</strong>`;
+                        }catch(e){ /* ignorar, manter links */ }
+                    }
+                })();
+            </script>
+
+            <div class="sidebar-categories">
+                <h3>Categorias</h3>
+                <nav class="sidebar-links sidebar-categories-list">
+                    <a href="pages/catalogo/index.html">MOLETONS</a>
+                    <a href="pages/catalogo/index.html">CAMISETAS</a>
+                    <a href="pages/catalogo/index.html">Polo</a>
+                </nav>
+            </div>
+
+            <div class="sidebar-account">
+                <nav class="sidebar-links sidebar-account-list">
+                    <a href="pages/contato/index.html" class="account-link"><i class="fas fa-headset"></i> Central de Atendimento</a>
+                    <a href="pages/minha-conta/index.html" class="account-link"><i class="fas fa-box"></i> Meus Pedidos</a>
+                    <a href="pages/carrinho/index.html" class="account-link"><i class="fas fa-truck"></i> Rastrear Pedidos</a>
+                </nav>
+            </div>
+        </div>
     </div>
-</div>
 
 <header class="main-header">
     <div class="menu-icon" onclick="toggleMenu()">
@@ -55,9 +78,6 @@
         <a href="pages/carrinho/index.html" class="header-icon-link" aria-label="Abrir carrinho">
             <i class="fas fa-bag-shopping"></i>
             <span class="cart-badge" data-cart-count hidden>0</span>
-        </a>
-        <a href="pages/login/index.html" class="header-icon-link" data-auth-link aria-label="Abrir area do cliente">
-            <i class="fas fa-user-circle"></i>
         </a>
     </div>
 </header>
