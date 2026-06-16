@@ -1,5 +1,8 @@
 import { supabase } from '../../json/supabase-browser.js';
 
+// E-mail do administrador que verá a aba/ação extra na conta
+const ADMIN_EMAIL = 'sergiopaulo.almeida04@gmail.com'
+
 function toggleMenu() {
     const sidebar = document.getElementById('sidebar');
     const overlay = document.getElementById('overlay');
@@ -335,6 +338,24 @@ async function loadAccount() {
     profileName.textContent = profile?.full_name || metadata.full_name || 'Nao informado';
     profileEmail.textContent = profile?.email || user.email || 'Nao informado';
     profilePhone.textContent = profile?.phone || metadata.phone || 'Nao informado';
+
+    // se for o admin, adiciona botão de gerenciamento simples na UI da conta
+    try {
+        const isAdmin = String(user.email || '').toLowerCase() === ADMIN_EMAIL.toLowerCase();
+        if (isAdmin) {
+            const container = document.querySelector('#profile-card .profile-actions');
+            if (container && !document.getElementById('manage-site-btn')) {
+                const btn = document.createElement('a');
+                btn.id = 'manage-site-btn';
+                btn.className = 'secondary-button';
+                btn.href = '../admin/index.html';
+                btn.textContent = 'Gerenciar site';
+                container.insertBefore(btn, container.firstChild);
+            }
+        }
+    } catch (e) {
+        // ignore
+    }
 
     const { data: addresses, error: addressesError } = await supabase
         .from('addresses')
