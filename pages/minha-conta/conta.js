@@ -366,8 +366,25 @@ async function loadAccount() {
                 const btn = document.createElement('a');
                 btn.id = 'manage-site-btn';
                 btn.className = 'secondary-button';
-                btn.href = '../admin/index.html';
+                btn.href = '#';
                 btn.textContent = 'Gerenciar site';
+                btn.addEventListener('click', async (ev) => {
+                    ev.preventDefault();
+                    // load embedded admin panel
+                    if (document.getElementById('account-admin-panel')) {
+                        // toggle visibility
+                        const panel = document.getElementById('account-admin-panel');
+                        panel.hidden = !panel.hidden;
+                        return;
+                    }
+                    try {
+                        const mod = await import('./admin-embed.js');
+                        await mod.initAdminPanel(container.parentElement);
+                    } catch (e) {
+                        console.error('Erro ao carregar admin:', e);
+                        alert('Erro ao abrir painel administrativo. Veja console.');
+                    }
+                });
                 container.insertBefore(btn, container.firstChild);
             }
         }
