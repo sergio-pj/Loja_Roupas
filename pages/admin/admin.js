@@ -16,12 +16,18 @@ const els = {
   form: document.getElementById('product-form'),
   products: document.getElementById('products'),
   btnCancel: document.getElementById('btn-cancel'),
+  fileInput: document.getElementById('imagem'),
+  previewGallery: document.getElementById('preview-gallery')
 }
+
+let currentGallery = [] // URLs (existing + uploaded)
+let newFiles = [] // File objects selected but not yet uploaded
 
 async function init(){
   els.btnSignin.addEventListener('click', signIn)
   els.btnSignout.addEventListener('click', signOut)
   els.form.addEventListener('submit', onSave)
+  els.fileInput.addEventListener('change', onFilesSelected)
   els.btnCancel.addEventListener('click', resetForm)
 
   const { data: { session } } = await supabase.auth.getSession()
@@ -107,9 +113,46 @@ function fillForm(p){
   document.getElementById('descricao').value = p.descricao || ''
   els.editor.hidden = false
   window.scrollTo(0,0)
+  // populate gallery preview
+  currentGallery = Array.isArray(p.galeria) && p.galeria.length ? p.galeria.slice() : (p.imagem ? [p.imagem] : [])
+  newFiles = []
+  renderPreviewGallery()
 }
 
 function resetForm(){ els.form.reset(); document.getElementById('prod-id').value=''; els.editor.hidden = false }
+
+function onFilesSelected(e){
+  const files = Array.from(e.target.files || [])
+  // append to newFiles
+  newFiles = newFiles.concat(files)
+  renderPreviewGallery()
+}
+
+function renderPreviewGallery(){
+  const container = els.previewGallery
+  if(!container) return
+  container.innerHTML = ''
+  // existing URLs
+  currentGallery.forEach((url, idx) => {
+    const div = document.createElement('div'); div.className='thumb existing'
+    const img = document.createElement('img'); img.src = url; img.alt = 'imagem'; img.width = 80
+    const btn = document.createElement('button'); btn.textContent = 'Remover'; btn.addEventListener('click', ()=>{
+      currentGallery.splice(idx,1); renderPreviewGallery()
+    })
+    div.appendChild(img); div.appendChild(btn); container.appendChild(div)
+  })
+  // newFiles previews
+  newFiles.forEach((file, idx) => {
+    const div = document.createElement('div'); div.className='thumb new'
+    const img = document.createElement('img'); img.alt = file.name; img.width = 80
+    const btn = document.createElement('button'); btn.textContent = 'Remover'; btn.addEventListener('click', ()=>{
+      newFiles.splice(idx,1); renderPreviewGallery(); els.fileInput.value = ''
+    })
+    const reader = new FileReader(); reader.onload = ()=>{ img.src = reader.result }
+    reader.readAsDataURL(file)
+    div.appendChild(img); div.appendChild(btn); container.appendChild(div)
+  })
+}
 
 async function onSave(e){
   e.preventDefault()
@@ -117,41 +160,46 @@ async function onSave(e){
   const nome = document.getElementById('nome').value.trim()
   const preco = Number(document.getElementById('preco').value || 0)
   const descricao = document.getElementById('descricao').value.trim()
-  const file = document.getElementById('imagem').files[0]
+  const files = Array.from(document.getElementById('imagem').files || [])
 
-    let imagemUrl = null
-    if (file) {
+    // handle multiple files: upload newFiles and collect URLs (or dataURL fallback)
+    let galeria = currentGallery.slice()
+    for (const file of newFiles) {
       const filePath = `produtos/${Date.now()}_${file.name}`
       try {
         const { error: upErr } = await supabase.storage.from(STORAGE_BUCKET).upload(filePath, file)
         if (upErr) throw upErr
         const { data } = supabase.storage.from(STORAGE_BUCKET).getPublicUrl(filePath)
-        imagemUrl = data.publicUrl
+        if (data && data.publicUrl) galeria.push(data.publicUrl)
       } catch (uploadErr) {
-        console.error('storage upload failed, falling back to dataURL', uploadErr)
-        // fallback: read file as data URL so UI can still show image while testing
-        imagemUrl = await new Promise((res) => {
+        console.error('storage upload failed for', file.name, uploadErr)
+        const dataUrl = await new Promise((res) => {
           const r = new FileReader()
           r.onload = () => res(r.result)
           r.onerror = () => res('')
           r.readAsDataURL(file)
         })
+        if (dataUrl) galeria.push(dataUrl)
       }
     }
 
-  if(id){
-    const updates = { nome, preco, descricao }
-    if(imagemUrl) updates.imagem = imagemUrl
-    const { error } = await supabase.from('produtos').update(updates).eq('id', id)
+    if(id){
+      const updates = { nome, preco, descricao }
+      if(galeria && galeria.length) updates.galeria = galeria
+      else if (galeria && galeria.length === 1) updates.imagem = galeria[0]
+      const { error } = await supabase.from('produtos').update(updates).eq('id', id)
     if(error) return alert('Erro ao atualizar: '+error.message)
   } else {
-    const payload = { nome, preco, descricao }
-    if(imagemUrl) payload.imagem = imagemUrl
-    const { error } = await supabase.from('produtos').insert([payload])
+      const payload = { nome, preco, descricao }
+      if(galeria && galeria.length) payload.galeria = galeria
+      else if (galeria && galeria.length === 1) payload.imagem = galeria[0]
+      const { error } = await supabase.from('produtos').insert([payload])
     if(error) return alert('Erro ao inserir: '+error.message)
   }
-
-  resetForm(); await loadProducts(); alert('Salvo com sucesso')
+    // reset state and UI
+    currentGallery = []
+    newFiles = []
+    resetForm(); await loadProducts(); alert('Salvo com sucesso')
 }
 
 async function delProduct(id){
