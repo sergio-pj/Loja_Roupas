@@ -16,13 +16,23 @@
     <div id="sidebar" class="sidebar">
         <a href="javascript:void(0)" class="closebtn" onclick="toggleMenu()">×</a>
         <div class="sidebar-content">
-            <h3>Carrinho</h3>
-            <nav class="sidebar-links">
-                <a href="../../index.html">Início</a>
-                <a href="../catalogo/index.html">Catálogo</a>
-                <a href="../contato/index.html">Contato</a>
-                <a href="../login/index.html" data-auth-link>Minha Conta</a>
-            </nav>
+            <div class="sidebar-categories">
+                <h3>Categorias</h3>
+                <nav class="sidebar-links sidebar-categories-list">
+                    <a href="../catalogo/index.html">Catálogo</a>
+                    <a href="#">Todas as Camisas</a>
+                    <a href="#">Camisas Claras</a>
+                </nav>
+            </div>
+
+            <div class="sidebar-account">
+                <nav class="sidebar-links sidebar-account-list">
+                    <a href="../../index.html">Início</a>
+                    <a href="../catalogo/index.html">Catálogo</a>
+                    <a href="../contato/index.html">Contato</a>
+                    <a href="../login/index.html" data-auth-link>Minha Conta</a>
+                </nav>
+            </div>
         </div>
     </div>
 
@@ -48,9 +58,7 @@
                 <i class="fas fa-bag-shopping"></i>
                 <span class="cart-badge" data-cart-count hidden>0</span>
             </a>
-            <a href="../login/index.html" class="header-icon-link" data-auth-link aria-label="Abrir area do cliente">
-                <i class="fas fa-user-circle"></i>
-            </a>
+            </div>
         </div>
     </header>
 

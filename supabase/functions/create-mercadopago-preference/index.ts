@@ -243,6 +243,13 @@ serve(async request => {
             payer: {
                 email: userData.user.email || undefined
             },
+            payment_methods: {
+                excluded_payment_types: [
+                    { id: 'ticket' }, // Exclui boleto
+                    { id: 'atm' }     // Exclui pagamentos em lotéricas/caixas eletrônicos
+                ],
+                installments: 12
+            },
             external_reference: order.id,
             notification_url: `${supabaseUrl}/functions/v1/mercadopago-webhook`,
             statement_descriptor: 'ARANHA',
