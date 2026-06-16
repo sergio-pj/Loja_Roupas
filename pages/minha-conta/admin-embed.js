@@ -3,6 +3,15 @@ import { supabase } from '../../json/supabase-browser.js'
 export async function initAdminPanel(container) {
   if (!container) return;
 
+  // inject CSS for the embedded admin panel (once)
+  if (!document.getElementById('admin-embed-css')) {
+    const link = document.createElement('link');
+    link.rel = 'stylesheet';
+    link.href = './admin-embed.css';
+    link.id = 'admin-embed-css';
+    document.head.appendChild(link);
+  }
+
   // create panel markup
   const panel = document.createElement('div');
   panel.id = 'account-admin-panel';
