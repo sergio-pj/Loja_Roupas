@@ -58,12 +58,17 @@ function toggleMenu() {
         return;
     }
 
-    if (sidebar.style.width === '250px') {
-        sidebar.style.width = '0';
+    const isOpen = sidebar.classList.contains('open');
+    if (isOpen) {
+        sidebar.classList.remove('open');
         overlay.style.display = 'none';
+        document.body.classList.remove('no-scroll');
+        document.documentElement.classList.remove('no-scroll');
     } else {
-        sidebar.style.width = '250px';
+        sidebar.classList.add('open');
         overlay.style.display = 'block';
+        document.body.classList.add('no-scroll');
+        document.documentElement.classList.add('no-scroll');
     }
 }
 

@@ -7,11 +7,13 @@ function toggleMenu() {
         sidebar.classList.remove('open');
         overlay.style.display = "none";
         document.body.classList.remove('no-scroll');
+        document.documentElement.classList.remove('no-scroll');
     } else {
         sidebar.classList.add('open');
         overlay.style.display = "block";
         // Prevent background from scrolling when sidebar is open
         document.body.classList.add('no-scroll');
+        document.documentElement.classList.add('no-scroll');
     }
 }
 
@@ -26,12 +28,14 @@ function initComingSoonNotice() {
         modal.classList.remove('is-open');
         modal.setAttribute('aria-hidden', 'true');
         document.body.classList.remove('no-scroll');
+        document.documentElement.classList.remove('no-scroll');
     };
 
     const openModal = () => {
         modal.classList.add('is-open');
         modal.setAttribute('aria-hidden', 'false');
         document.body.classList.add('no-scroll');
+        document.documentElement.classList.add('no-scroll');
     };
 
     closeButton.addEventListener('click', closeModal);

@@ -11,15 +11,28 @@
     display: none !important;
 }
 
-html, body {
+html {
     width: 100%;
     overflow-x: hidden;
     scroll-behavior: smooth;
 }
 
+html.no-scroll {
+    overflow: hidden !important;
+    height: 100vh !important;
+    width: 100% !important;
+}
+
+body {
+    width: 100%;
+    overflow-x: hidden;
+}
+
 /* Prevent background scrolling when modal/sidebar is open */
 body.no-scroll {
     overflow: hidden !important;
+    height: 100vh !important;
+    width: 100% !important;
     touch-action: none;
 }
 
