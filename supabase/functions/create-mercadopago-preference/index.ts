@@ -250,11 +250,9 @@ serve(async request => {
                     { id: 'ticket' },        // boleto
                     { id: 'atm' },           // lotérica / caixa eletrônico
                     { id: 'digital_wallet' },
-                    { id: 'digital_currency' },
                     { id: 'voucher_card' },
                     { id: 'prepaid_card' }
                 ],
-                default_payment_method_id: 'pix',
                 installments: 1             // PIX não parcela
             },
             external_reference: order.id,
