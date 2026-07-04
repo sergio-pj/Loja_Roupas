@@ -204,6 +204,26 @@ body {
 
 .empty-state a {
     width: fit-content;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 13px 24px;
+    border-radius: 999px;
+    background: #1a1714;
+    color: #fff;
+    font-weight: 700;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    text-decoration: none;
+    box-shadow: 0 14px 30px rgba(26, 23, 20, 0.18);
+    transition: transform 0.22s ease, box-shadow 0.22s ease, background 0.22s ease;
+}
+
+.empty-state a:hover {
+    background: #3a3430;
+    transform: translateY(-2px);
+    box-shadow: 0 20px 40px rgba(26, 23, 20, 0.22);
 }
 
 .empty-state button {
