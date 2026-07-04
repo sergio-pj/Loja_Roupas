@@ -245,10 +245,17 @@ serve(async request => {
             },
             payment_methods: {
                 excluded_payment_types: [
-                    { id: 'ticket' }, // Exclui boleto
-                    { id: 'atm' }     // Exclui pagamentos em lotéricas/caixas eletrônicos
+                    { id: 'credit_card' },
+                    { id: 'debit_card' },
+                    { id: 'ticket' },        // boleto
+                    { id: 'atm' },           // lotérica / caixa eletrônico
+                    { id: 'digital_wallet' },
+                    { id: 'digital_currency' },
+                    { id: 'voucher_card' },
+                    { id: 'prepaid_card' }
                 ],
-                installments: 12
+                default_payment_method_id: 'pix',
+                installments: 1             // PIX não parcela
             },
             external_reference: order.id,
             notification_url: `${supabaseUrl}/functions/v1/mercadopago-webhook`,
