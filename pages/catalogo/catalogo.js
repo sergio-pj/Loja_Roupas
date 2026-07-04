@@ -9,6 +9,52 @@ let catalogMediaCarouselSyncIntervalId = null;
 let catalogMediaCarouselSyncIndex = 0;
 const catalogMediaCarouselPauseSet = new Set();
 
+function initComingSoonNotice() {
+    const modal = document.getElementById('coming-soon-modal');
+    const closeButton = modal?.querySelector('.coming-soon-close');
+    const sidebar = document.getElementById('sidebar');
+
+    if (!modal || !closeButton) return;
+
+    const closeModal = () => {
+        modal.classList.remove('is-open');
+        modal.setAttribute('aria-hidden', 'true');
+        document.body.classList.remove('no-scroll');
+    };
+
+    const openModal = () => {
+        modal.classList.add('is-open');
+        modal.setAttribute('aria-hidden', 'false');
+        document.body.classList.add('no-scroll');
+    };
+
+    closeButton.addEventListener('click', closeModal);
+    modal.addEventListener('click', (event) => {
+        if (event.target === modal) {
+            closeModal();
+        }
+    });
+
+    document.querySelectorAll('#sidebar .sidebar-categories-list a').forEach((link) => {
+        link.addEventListener('click', (event) => {
+            const label = link.textContent.trim().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+            if (['moletom', 'moletons', 'polo', 'shorts e bermudas', 'kits'].includes(label)) {
+                event.preventDefault();
+                if (sidebar?.classList.contains('open')) {
+                    toggleMenu();
+                }
+                openModal();
+            }
+        });
+    });
+}
+
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initComingSoonNotice);
+} else {
+    initComingSoonNotice();
+}
+
 function resolveProductImages(produto) {
     const sources = Array.isArray(produto.galeria) && produto.galeria.length ? produto.galeria : [produto.imagem];
 

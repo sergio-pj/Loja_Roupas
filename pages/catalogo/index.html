@@ -12,7 +12,15 @@
 </head>
 <body>
     <div id="overlay" onclick="toggleMenu()"></div>
-    
+
+    <div id="coming-soon-modal" class="coming-soon-modal" aria-hidden="true" role="dialog" aria-labelledby="coming-soon-title">
+        <div class="coming-soon-card">
+            <button type="button" class="coming-soon-close" aria-label="Fechar aviso">×</button>
+            <p class="coming-soon-eyebrow">Em breve</p>
+            <h3 id="coming-soon-title">Ainda estamos trabalhando nisso</h3>
+            <p>Essa categoria ainda não está disponível no momento. Em breve teremos novidades para você.</p>
+        </div>
+    </div>
     
     <div id="sidebar" class="sidebar">
             <a href="javascript:void(0)" class="closebtn" onclick="toggleMenu()">×</a>
@@ -21,7 +29,11 @@
                 <i class="fas fa-user-circle"></i>
                 <div class="user-quick-text">
                     <strong class="greeting">Olá, visitante</strong>
-                    <span class="auth-links"><a href="../login/index.html">Entrar</a> ou <a href="../login/index.html">Cadastrar</a></span>
+                    <span class="auth-links">
+                        <a href="../login/index.html">Entrar</a>
+                        <span class="sep">ou</span>
+                        <a href="../login/index.html">Cadastrar</a>
+                    </span>
                 </div>
             </div>
             <script>
@@ -53,11 +65,9 @@
             <div class="sidebar-account">
                 <nav class="sidebar-links sidebar-account-list">
                     <a href="../contato/index.html" class="account-link"><i class="fas fa-headset"></i> Central de Atendimento</a>
-                    <a href="../login/index.html" class="account-link"><i class="fas fa-user-circle"></i> Minha Conta</a>
                     <a href="../minha-conta/index.html" class="account-link"><i class="fas fa-box"></i> Meus Pedidos</a>
                     <a href="../carrinho/index.html" class="account-link"><i class="fas fa-truck"></i> Rastrear Pedidos</a>
-                    <hr>
-                    <a href="../../index.html">Voltar ao Início</a>
+                    <a href="../../index.html" class="inicio-link" onclick="toggleMenu()"><i class="fas fa-home"></i> Início</a>
                 </nav>
             </div>
         </div>
