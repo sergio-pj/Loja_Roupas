@@ -16,23 +16,40 @@
 	<div id="sidebar" class="sidebar">
 		<a href="javascript:void(0)" class="closebtn" onclick="toggleMenu()">×</a>
 		<div class="sidebar-content">
+			<div class="sidebar-user-quick">
+				<i class="fas fa-user-circle"></i>
+				<div class="user-quick-text">
+					<strong class="greeting">Olá, visitante</strong>
+					<span class="auth-links"><a href="../login/index.html">Entrar</a> ou <a href="../login/index.html">Cadastrar</a></span>
+				</div>
+			</div>
+			<script>
+				(function(){
+					const key = 'aranhaUser';
+					const raw = localStorage.getItem(key);
+					const container = document.querySelector('.sidebar-user-quick .user-quick-text');
+					if(!container) return;
+					if(raw) {
+						try{ const user = JSON.parse(raw); const name = user && (user.nome || user.name) ? (user.nome || user.name) : 'cliente'; container.innerHTML = `<strong class="greeting">Olá, ${name}</strong>`; }catch(e){}
+					}
+				})();
+			</script>
+
 			<div class="sidebar-categories">
 				<h3>Categorias</h3>
 				<nav class="sidebar-links sidebar-categories-list">
-					<a href="../catalogo/index.html">Catálogo</a>
-					<a href="#">Todas as Camisas</a>
-					<a href="#">Camisas Claras</a>
+					<a href="../catalogo/index.html">MOLETOM</a>
+					<a href="../catalogo/index.html">CAMISETAS</a>
+					<a href="../catalogo/index.html">POLOS</a>
 				</nav>
 			</div>
 
 			<div class="sidebar-account">
 				<nav class="sidebar-links sidebar-account-list">
-					<a href="../../index.html">Início</a>
-					<a href="../catalogo/index.html">Catálogo</a>
-					<a href="#manifesto">Manifesto</a>
-					<a href="#diferenciais">Diferenciais</a>
-					<a href="../contato/index.html">Contato</a>
-					<a href="../carrinho/index.html">Carrinho</a>
+					<a href="../contato/index.html" class="account-link"><i class="fas fa-headset"></i> Central de Atendimento</a>
+					<a href="../minha-conta/index.html" class="account-link"><i class="fas fa-box"></i> Meus Pedidos</a>
+					<a href="../carrinho/index.html" class="account-link"><i class="fas fa-truck"></i> Rastrear Pedidos</a>
+					<a href="../../index.html" class="inicio-link" onclick="toggleMenu()"><i class="fas fa-home"></i> Início</a>
 				</nav>
 			</div>
 		</div>

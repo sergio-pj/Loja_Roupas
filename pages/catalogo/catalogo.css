@@ -323,13 +323,10 @@ body {
     gap: 8px; /* Espaço entre o círculo e o texto */
 }
 
-/* Garante que o Font Awesome use a fonte correta e apareça */
+/* Mantem a fonte dos icones sem sobrescrever layout global da sidebar */
 .fas, .fa-solid {
     font-family: "Font Awesome 6 Free" !important;
-    font-weight: 950 !important;
-    display: inline-block !important;
-    font-style: normal !important;
-    color: inherit; /* Segue a cor do texto do link */
+    font-weight: 900 !important;
 }
 
 .user-link i {

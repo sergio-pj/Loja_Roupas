@@ -17,8 +17,47 @@ function toggleMenu() {
     }
 }
 
+function normalizeSidebarCategories() {
+    const categoriesList = document.querySelector('#sidebar .sidebar-categories-list');
+    if (!categoriesList || categoriesList.dataset.normalized === 'true') return;
+
+    const catalogHref = window.location.pathname.toLowerCase().includes('/pages/')
+        ? '../catalogo/index.html'
+        : 'pages/catalogo/index.html';
+
+    categoriesList.innerHTML = `
+        <a href="${catalogHref}">MOLETOM</a>
+        <a href="${catalogHref}">CAMISETAS</a>
+        <a href="${catalogHref}">POLOS</a>
+    `;
+    categoriesList.dataset.normalized = 'true';
+}
+
+function ensureComingSoonModal() {
+    let modal = document.getElementById('coming-soon-modal');
+    if (modal) return modal;
+
+    modal = document.createElement('div');
+    modal.id = 'coming-soon-modal';
+    modal.className = 'coming-soon-modal';
+    modal.setAttribute('aria-hidden', 'true');
+    modal.setAttribute('role', 'dialog');
+    modal.setAttribute('aria-labelledby', 'coming-soon-title');
+    modal.innerHTML = `
+        <div class="coming-soon-card">
+            <button type="button" class="coming-soon-close" aria-label="Fechar aviso">×</button>
+            <p class="coming-soon-eyebrow">Em breve</p>
+            <h3 id="coming-soon-title">Ainda estamos trabalhando nisso</h3>
+            <p>Essa categoria ainda nao esta disponivel no momento. Em breve teremos novidades para voce.</p>
+        </div>
+    `;
+    document.body.appendChild(modal);
+    return modal;
+}
+
 function initComingSoonNotice() {
-    const modal = document.getElementById('coming-soon-modal');
+    normalizeSidebarCategories();
+    const modal = ensureComingSoonModal();
     const closeButton = modal?.querySelector('.coming-soon-close');
     const sidebar = document.getElementById('sidebar');
 
@@ -48,7 +87,7 @@ function initComingSoonNotice() {
     document.querySelectorAll('#sidebar .sidebar-categories-list a').forEach((link) => {
         link.addEventListener('click', (event) => {
             const label = link.textContent.trim().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
-            if (['moletom', 'moletons', 'polo'].includes(label)) {
+            if (['moletom', 'moletons', 'polo', 'polos'].includes(label)) {
                 event.preventDefault();
                 if (sidebar?.classList.contains('open')) {
                     toggleMenu();
