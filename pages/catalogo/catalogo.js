@@ -164,12 +164,14 @@ function initializeCatalogMediaCarousels(root) {
 
 function getProdutosFiltrados() {
     return produtosDados.filter(produto => {
-        const nome = produto.nome.toLowerCase();
-        const categoria = produto.categoria.toLowerCase();
-        const cor = produto.cor.toLowerCase();
+        if (!produto || typeof produto !== 'object') return false;
 
-        const passaBusca = !termoBuscaAtual || nome.includes(termoBuscaAtual) || categoria.includes(termoBuscaAtual);
-        const passaFiltro = filtroAtual === 'todos' || produto.categoria === filtroAtual || produto.cor === filtroAtual;
+        const nome = String(produto.nome || '').toLowerCase();
+        const categoria = String(produto.categoria || '').toLowerCase();
+        const cor = String(produto.cor || '').toLowerCase();
+
+        const passaBusca = !termoBuscaAtual || nome.includes(termoBuscaAtual) || categoria.includes(termoBuscaAtual) || cor.includes(termoBuscaAtual);
+        const passaFiltro = filtroAtual === 'todos' || categoria === String(filtroAtual).toLowerCase() || cor === String(filtroAtual).toLowerCase();
 
         return passaBusca && passaFiltro;
     });
@@ -226,23 +228,30 @@ function aplicarFiltroInicial() {
 async function carregarProdutos() {
     // tenta buscar do Supabase se disponível, senão usa o JSON estático
     try {
-        if (window.supabase) {
-            const { data, error } = await window.supabase.from('produtos').select('*').order('id', { ascending: false });
-            if (!error && Array.isArray(data) && data.length) {
-                produtosDados = data.map(p => ({
-                    ...p,
-                    // garante que propriedades estejam definidas como no JSON (galeria optional)
-                    galeria: p.galeria || [],
-                    imagem: p.imagem || ''
-                }));
-                aplicarFiltroInicial();
-                atualizarCatalogo();
-                return;
-            }
+        // busca tanto do Supabase quanto do catálogo estático e mescla (supabase tem prioridade)
+        let staticData = [];
+        try {
+            const resp = await fetch(CATALOG_DATA_URL);
+            staticData = await resp.json();
+        } catch (e) {
+            console.warn('não foi possível carregar catalogo.json', e);
         }
 
-        const response = await fetch(CATALOG_DATA_URL);
-        produtosDados = await response.json();
+        let dbData = [];
+        if (window.supabase) {
+            const { data, error } = await window.supabase.from('produtos').select('*').order('id', { ascending: false });
+            if (!error && Array.isArray(data)) dbData = data.map(p => ({ ...p, galeria: p.galeria || [], imagem: p.imagem || '' }));
+        }
+
+        // mesclar: manter todos do DB e adicionar do static os que não existem por id
+        const merged = dbData.slice();
+        const dbIds = new Set(dbData.map(d => Number(d.id)));
+        staticData.forEach(s => {
+            const sid = Number(s.id);
+            if (!dbIds.has(sid)) merged.push({ ...s, galeria: s.galeria || [], imagem: s.imagem || s.imagem_url || '' });
+        });
+
+        produtosDados = merged;
         aplicarFiltroInicial();
         atualizarCatalogo();
     } catch (error) {

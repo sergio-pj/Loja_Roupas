@@ -305,7 +305,7 @@ body {
     transition: color 0.12s ease, opacity 0.12s ease, text-decoration 0.12s ease;
 }
 .sidebar-user-quick .auth-links a:hover { color: #000; opacity: 0.95; text-decoration: underline; }
-.sidebar-user-quick .greeting { font-size:25px; }
+.sidebar-user-quick .greeting { font: size 45px; }
 
 /* Layout: alinhar e centralizar os links de autenticação */
 .sidebar-user-quick .auth-links {
