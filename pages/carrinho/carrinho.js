@@ -121,6 +121,8 @@ if (document.readyState === 'loading') {
 window.toggleMenu = toggleMenu;
 
 const firstPurchaseCoupon = 'PRIMEIRACOMPRA';
+const firstPurchaseDiscountRate = 0.37;
+const firstPurchaseDiscountPercent = 37;
 const couponKey = 'aranha-cart-coupon';
 const orderDraftKey = 'aranha-order-draft';
 let appliedCoupon = '';
@@ -377,7 +379,7 @@ function syncCouponStateMessage() {
     }
 
     if (appliedCoupon === firstPurchaseCoupon && couponEligibility.canUseFirstPurchase) {
-        couponFeedback.textContent = 'Cupom aplicado: 10% de desconto liberado para a primeira compra aprovada.';
+        couponFeedback.textContent = `Cupom aplicado: ${firstPurchaseDiscountPercent}% de desconto liberado para a primeira compra aprovada.`;
         return;
     }
 
@@ -490,7 +492,7 @@ function formatZipCode(value) {
 
 function getDiscount(subtotal) {
     if (appliedCoupon === firstPurchaseCoupon && couponEligibility.canUseFirstPurchase) {
-        return subtotal * 0.1;
+        return subtotal * firstPurchaseDiscountRate;
     }
 
     return 0;
@@ -504,7 +506,7 @@ function buildCouponSnapshot(discount) {
     return {
         code: appliedCoupon,
         type: 'first_purchase',
-        discount_percentage: appliedCoupon === firstPurchaseCoupon ? 10 : 0,
+        discount_percentage: appliedCoupon === firstPurchaseCoupon ? firstPurchaseDiscountPercent : 0,
         discount_amount: Number(discount.toFixed(2)),
         eligibility: couponEligibility.canUseFirstPurchase ? 'validated' : 'rejected'
     };
