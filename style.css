@@ -16,6 +16,12 @@ html, body {
     overflow-x: hidden;
 }
 
+/* Prevent background scrolling when modal/sidebar is open */
+body.no-scroll {
+    overflow: hidden !important;
+    touch-action: none;
+}
+
 body {
     background-color: #FAF9F6;
     font-family: 'Inter', sans-serif;
@@ -160,68 +166,284 @@ body {
     z-index: 1000;
     top: 0;
     left: 0;
-    background-color: rgba(255, 255, 255, 0.98);
-    backdrop-filter: blur(10px);
+    background: linear-gradient(180deg, rgba(248,244,239,0.98) 0%, rgba(255,255,255,0.98) 100%);
+    backdrop-filter: blur(18px);
     overflow-x: hidden;
-    transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-    box-shadow: 10px 0 30px rgba(0, 0, 0, 0.05);
+    transition: width 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 16px 0 55px rgba(0, 0, 0, 0.14);
 }
+
+/* Sidebar open state (width controlled by breakpoint) */
+.sidebar.open { width: 320px; max-width: 100%; }
 
 .sidebar-content {
-    padding: 80px 30px;
+    padding: 72px 28px 24px;
     display: flex;
     flex-direction: column;
+    gap: 22px;
 }
 
-.sidebar-content h3 {
-    font-size: 12px;
+.sidebar-user-quick {
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+    padding: 22px 18px;
+    border-radius: 26px;
+    background: rgba(255,255,255,0.92);
+    border: 1px solid rgba(26,23,20,0.08);
+    box-shadow: 0 22px 50px rgba(0, 0, 0, 0.06);
+}
+
+.sidebar-user-quick i {
+    font-size: 26px;
+    color: #1a1714;
+    flex: 0 0 auto;
+    width: 38px;
+    height: 38px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid rgba(26,23,20,0.08);
+    border-radius: 50%;
+    background: #fff;
+}
+
+.sidebar-user-quick .user-quick-text {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    min-width: 0;
+    flex: 1;
+    margin-left: 0;
+}
+
+.sidebar-user-quick .greeting {
+    font-weight: 800;
+    font-size: 1.05rem;
+    line-height: 1.15;
+    color: #1a1714;
+    letter-spacing: 0.2px;
+}
+
+.sidebar-user-quick .auth-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    align-items: center;
+    margin-top: 0;
+}
+
+.sidebar-user-quick .auth-links a {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 8px 14px;
+    border-radius: 999px;
+    border: 1px solid rgba(26,23,20,0.08);
+    background: #fff;
+    color: #1a1714;
+    font-weight: 700;
+    font-size: 0.92rem;
     text-transform: uppercase;
-    letter-spacing: 3px;
-    color: #999;
-    margin-bottom: 20px;
+    letter-spacing: 0.8px;
+    transition: background 0.2s ease, transform 0.2s ease, border-color 0.2s ease;
 }
 
-.sidebar a {
-    padding: 12px 20px;
-    text-decoration: none;
-    font-size: 18px;
-    color: #1a1a1a;
+.sidebar-user-quick .auth-links a:hover {
+    background: #f4efe7;
+    border-color: rgba(26,23,20,0.18);
+    transform: translateY(-1px);
+}
+
+.sidebar-user-quick .auth-links .sep {
+    display: inline-flex;
+    align-items: center;
+    color: #7a7267;
+    font-size: 0.82rem;
+    font-weight: 500;
+    text-transform: none;
+    margin: 0;
+}
+
+.sidebar-categories {
+    padding-bottom: 12px;
+    border-bottom: 1px solid rgba(26,23,20,0.06);
+}
+
+.sidebar-categories h3 {
+    font-size: 0.85rem;
+    font-weight: 800;
+    margin: 0 0 16px 0;
+    letter-spacing: 1.8px;
+    text-transform: uppercase;
+    color: #7a7369;
+}
+
+.sidebar-categories-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.sidebar-categories-list a {
     display: block;
-    transition: 0.3s;
-    border-radius: 8px;
+    padding: 12px 16px;
+    border-radius: 18px;
+    background: rgba(235,231,222,0.9);
+    color: #1a1714;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    text-decoration: none;
+    transition: background 0.2s ease, transform 0.2s ease;
 }
 
-.sidebar a:hover {
-    background-color: #f5f5f5;
-    padding-left: 30px;
+.sidebar-categories-list a:hover {
+    background: rgba(224,216,202,0.96);
+    transform: translateY(-1px);
 }
 
-.link-clara { border-left: 4px solid #EBE7DE; }
-.link-escura { border-left: 4px solid #1A1714; }
+.sidebar-account-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-top: 18px;
+}
+
+.sidebar-account-list .account-link {
+    display:flex;
+    align-items:center;
+    gap:12px;
+    padding: 14px 16px;
+    border-radius: 18px;
+    border: 1px solid rgba(26,23,20,0.08);
+    background: rgba(250,248,245,0.95);
+    color: #1a1714;
+    font-weight: 700;
+    text-decoration: none;
+    transition: background 0.2s ease, transform 0.2s ease, border-color 0.2s ease;
+}
+
+.sidebar-account-list .account-link:hover {
+    background: #fff;
+    transform: translateY(-1px);
+    border-color: rgba(26,23,20,0.16);
+}
+
+.sidebar-account-list .account-link i {
+    font-size: 18px;
+    color: #6b6258;
+    width: 34px;
+    height: 34px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 14px;
+    background: rgba(255,255,255,0.92);
+}
 
 .closebtn {
-    position: absolute; top: 20px; right: 25px;
-    font-size: 36px; color: #333; text-decoration: none;
+    position: absolute;
+    top: 18px;
+    right: 18px;
+    width: 40px;
+    height: 40px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.92);
+    color: #1a1714;
+    font-size: 28px;
+    text-decoration: none;
+    box-shadow: 0 12px 28px rgba(0,0,0,0.08);
+    border: 1px solid rgba(26,23,20,0.08);
+    cursor: pointer;
 }
 
 #overlay {
     display: none; position: fixed; top: 0; left: 0;
-    width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 999;
+    width: 100%; height: 100%; background: rgba(0,0,0,0.45); z-index: 999;
+}
+
+.coming-soon-modal {
+    position: fixed;
+    inset: 0;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    background: rgba(10, 8, 6, 0.55);
+    z-index: 1200;
+}
+
+.coming-soon-modal.is-open {
+    display: flex;
+}
+
+.coming-soon-card {
+    position: relative;
+    width: min(100%, 420px);
+    padding: 28px 24px 24px;
+    border-radius: 24px;
+    background: #fffdf9;
+    box-shadow: 0 24px 60px rgba(0,0,0,0.18);
+    text-align: center;
+    border: 1px solid rgba(26,23,20,0.08);
+}
+
+.coming-soon-close {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    width: 36px;
+    height: 36px;
+    border: 0;
+    border-radius: 50%;
+    background: #f4efe7;
+    color: #1a1714;
+    font-size: 22px;
+    cursor: pointer;
+}
+
+.coming-soon-eyebrow {
+    margin: 0 0 8px;
+    font-size: 0.8rem;
+    font-weight: 800;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: #8c7f71;
+}
+
+.coming-soon-card h3 {
+    margin: 0 0 10px;
+    font-size: 1.2rem;
+    color: #1a1714;
+}
+
+.coming-soon-card p {
+    margin: 0;
+    line-height: 1.6;
+    color: #5f584f;
 }
 
 /* Mobile: sidebar top area fixed, categories scrollable */
 @media (max-width: 720px) {
-    .sidebar {
-        width: 100%;
-        left: 0;
-    }
+    /* On small screens the open state should fill the viewport; keep default closed width 0 */
+    .sidebar { left: 0; }
+    .sidebar.open { width: 100%; }
 
     .sidebar-content {
         display: flex;
         flex-direction: column;
         height: 100vh;
         padding: 20px;
+        gap: 18px;
     }
+
+    .sidebar-user-quick { order: 1; }
+    .sidebar-categories { order: 2; }
+    .sidebar-account { order: 3; }
 
     .sidebar-links {
         overflow: auto;
@@ -232,9 +454,6 @@ body {
         padding-right: 8px;
     }
 
-    /* Reorder blocks: categorias em cima, conta/servico abaixo */
-    .sidebar-categories { order: -1; }
-    .sidebar-account { order: 1; }
     .sidebar-account .sidebar-links { margin-top: 12px; }
 
     .sidebar-links hr {
@@ -249,147 +468,10 @@ body {
     padding: 15px 0;
 }
 
-.user-link-sidebar i {
-    font-size: 22px;
-}
-
-/* Sidebar: user quick block, categories and account links styling to match Figma */
-.sidebar-user-quick {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 12px 0 18px 0;
-    border-bottom: 1px solid rgba(0,0,0,0.04);
-}
-.sidebar-user-quick i {
-    font-size: 22px;
-    color: #1a1714;
-    flex: 0 0 auto;
-    width: 32px;
-    height: 32px;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    border: 1px solid rgba(26,23,20,0.06);
-    border-radius: 50%;
-    background: #fff;
-}
-.sidebar-user-quick .user-quick-text { display:flex; flex-direction:column; min-width: 0; flex: 1; margin-left: 8px; }
-.sidebar-user-quick .user-quick-text { display:flex; flex-direction:column; min-width: 0; flex: 1; margin-left: 10px; }
-.sidebar-user-quick .user-quick-text strong { font-weight:800; font-size:20px; line-height:1.05; color:#1a1714; }
-.sidebar-user-quick .user-quick-text span { font-size:13px; color:#6b6258; line-height:1.1; margin-top:3px; margin-left: -10px; }
-
-/* Estilo para links de entrada/cadastro no sidebar */
-.sidebar-user-quick .auth-links a {
-    color: #1a1714;
-    text-decoration: none;
-    font-weight:600;
-    margin-right: 8px;
-    padding: 0;
-    border: none;
-    background: transparent;
-    box-shadow: none;
-    transition: color 0.12s ease, opacity 0.12s ease, text-decoration 0.12s ease;
-}
-.sidebar-user-quick .auth-links a {
-    color: #1a1714;
-    text-decoration: none;
-    font-weight:600;
-    margin-right: 6px;
-    padding: 0;
-    border: none;
-    background: transparent;
-    box-shadow: none;
-    font-size: 15px;
-    line-height: 1.1;
-    transition: color 0.12s ease, opacity 0.12s ease, text-decoration 0.12s ease;
-}
-.sidebar-user-quick .auth-links a:hover { color: #000; opacity: 0.95; text-decoration: underline; }
-.sidebar-user-quick .greeting { font: size 45px; }
-
-/* Layout: alinhar e centralizar os links de autenticação */
-.sidebar-user-quick .auth-links {
-    display: block;
-    gap: 8px;
-    align-items: center;
-    margin-top: 4px;
-}
-.sidebar-user-quick .auth-links { display: inline-flex; gap: 8px; align-items: center; margin-top: 4px; }
-
-/* Pequeno estilo para o 'ou' separador (texto entre os links) */
-.sidebar-user-quick .auth-links { color: #6b6258; font-size: 13px; }
-.sidebar-user-quick .auth-links a + span { display: inline-block; margin: 0 6px; color: #6b6258; font-size: 12px; vertical-align: middle; }
-.sidebar-user-quick .auth-links a { white-space: nowrap; }
-
-/* Ensure buttons don't get cut-off: allow sidebar content to scroll vertically and avoid horizontal clipping */
-.sidebar { overflow-y: auto; }
-
-@media (max-width:720px) {
-    .sidebar-user-quick { align-items: flex-start; }
-    .sidebar-user-quick .auth-links { display: flex; flex-direction: column; width: 100%; }
-    .sidebar-user-quick .auth-links a { width: auto; text-align: left; padding: 6px 0; }
-}
-
-/* estilo do separador 'ou' */
-.sidebar-user-quick .auth-links .sep { color: #6b6258; margin: 0 6px; font-size: 12px; }
-
-/* Mobile: empilhar com bom espaçamento */
-@media (max-width:720px) {
-    .sidebar-user-quick { align-items: flex-start; }
-    .sidebar-user-quick .auth-links { flex-wrap: wrap; }
-}
-
-.sidebar-categories h3 {
-    font-size: 20px;
-    font-weight: 800;
-    margin: 14px 0 8px 0;
-    letter-spacing: 1px;
-    text-transform: none;
-}
-
-.sidebar-categories-list a {
-    display:block;
-    padding: 10px 0;
-    font-weight:600;
-    color: #111;
-    text-transform: uppercase;
-    letter-spacing: 0.8px;
-}
-
-/* Melhorias visuais: remover sublinhado e ajustar espaçamento para replicar o Figma */
-.sidebar-categories-list a { text-decoration: none; }
-.sidebar-categories-list a + a { margin-top: 6px; }
-
-.sidebar-account-list {
-    margin-top: 18px;
-}
-
-.sidebar-account-list .account-link {
-    display:flex;
-    align-items:center;
-    gap:12px;
-    padding: 10px 0;
-    color: #1a1714;
-}
-.sidebar-account-list .account-link i { font-size:22px; }
-
-/* Ícones menos proeminentes para o sidebar, alinhamento consistente */
-.sidebar-account-list .account-link i { color: #5b534b; }
-.sidebar-account-list .account-link { font-weight:600; }
-
-/* Close button visual improvements */
-.closebtn { background: transparent; border: none; cursor: pointer; }
-
-/* Ensure sidebar content has good spacing on mobile */
-@media (max-width:720px) {
-    .sidebar-content { padding: 18px; }
-    .sidebar-categories-list a, .sidebar-account-list .account-link { padding-left: 6px; }
-}
-
 /* 4. BANNER E DESTAQUES */
 .hero-banner {
     width: 100%;
-    height: clamp(500px, 52vw, 680px) !important;
+    height: clamp(340px, 38vw, 680px) !important;
     background-image: url('assets/bannerp.svg');
     background-size: cover;
     background-position: center 18%;
@@ -413,29 +495,28 @@ body {
 .brand-overlap {
     display: flex;
     justify-content: center;
-    margin-top: -100px; /* Isso puxa a caixa para CIMA do banner */
+    margin-top: -90px; /* ajusta a sobreposição sem cobrir demais */
     position: relative;
-    z-index: 10; /* Garante que a caixa fique na frente da imagem */
+    z-index: 10;
 }
 
 .overlap-box {
-    background-color: #fff; /* Cor de fundo base */
-    background-image: url('assets/fundo_fumaça.png'); /* Sua nova arte */
+    background-color: rgba(255,255,255,0.94);
+    background-image: url('assets/fundo_fumaça.png');
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
-    
-    padding: 40px;
-    width: 90%; /* Ajustei de 150% para 90% para evitar erro de layout */
-    max-width: 1000px;
+    border: 1px solid rgba(255,255,255,0.84);
+    backdrop-filter: blur(10px);
+    padding: 34px 32px;
+    width: min(92%, 760px);
+    max-width: 760px;
     text-align: center;
-    
-    /* Melhorei a sombra para combinar com a fumaça */
-    box-shadow: 0 20px 50px rgba(0,0,0,0.1); 
-    
+    border-radius: 28px;
+    box-shadow: 0 34px 80px rgba(0,0,0,0.16);
     position: relative;
     z-index: 10;
-    overflow: hidden; /* Garante que a fumaça não saia da caixa */
+    overflow: hidden;
 }
 
 .mini-logo {
@@ -446,16 +527,19 @@ body {
 
 .overlap-box h2 {
     font-family: 'Playfair Display', serif;
-    font-size: clamp(2rem, 4vw, 3rem);
-    letter-spacing: 3px;
-    margin-bottom: 12px;
+    font-size: clamp(2.2rem, 3vw, 3.2rem);
+    text-transform: uppercase;
+    font-weight: 700;
+    letter-spacing: 2px;
+    margin-bottom: 14px;
     color: #1a1714;
 }
 
 .overlap-box p {
+    font-size: clamp(1rem, 1.05vw, 1.35rem);
     max-width: 620px;
     margin: 0 auto;
-    line-height: 1.7;
+    line-height: 1.65;
     color: #3f3b37;
 }
 
@@ -1003,7 +1087,7 @@ body {
     }
 
     .overlap-box {
-        width: 92%;
+        max-width: 560px;
         padding: 32px 24px;
     }
 
@@ -1011,6 +1095,11 @@ body {
         width: min(100%, calc(100% - 24px));
         margin: 56px auto 40px;
         padding: 24px 18px;
+    }
+
+    /* Make the brand strip visually narrower and stretched but responsive */
+    .brand-overlap .overlap-box {
+        transform: translateY(-8%);
     }
 
     .home-carousel-header {
@@ -1034,13 +1123,14 @@ body {
     .hero-banner {
         height: auto !important;
         min-height: 0;
-        aspect-ratio: 9 / 4;
+        aspect-ratio: 4 / 3;
         padding: 0;
         margin: 0;
         display: flex;
         align-items: center;
         justify-content: center;
         background-position: center top;
+        /* Mostrar a imagem inteira no celular: pode deixar espaços, mas não corta a arte */
         background-size: contain;
         background-repeat: no-repeat;
         background-color: #f3f1ec;
@@ -1050,13 +1140,13 @@ body {
         background: transparent;
     }
 
-    /* Como a imagem já tem texto, vamos esconder o texto do HTML para não encavalar */
     .banner-text {
         display: none; 
     }
 
     .brand-overlap {
-        margin-top: -54px;
+        margin-top: -48px;
+        padding: 0 10px;
         display: flex;
         justify-content: center;
         position: relative;
@@ -1064,46 +1154,55 @@ body {
     }
 
     .overlap-box {
-        width: calc(100% - 38px);
-        max-width: 296px;
-        padding: 12px 12px 14px;
+        width: calc(100% - 30px);
+        max-width: 320px;
+        padding: 18px 14px 16px;
+        box-sizing: border-box;
+        border-radius: 24px;
+        box-shadow: 0 24px 60px rgba(0,0,0,0.12);
     }
     
     .overlap-box img {
-        width: 34px; /* Deixa o logo da caixa menor no celular */
+        width: 34px;
         margin-bottom: 10px;
     }
 
     .main-header { 
-        padding: 15px 10px; 
+        padding: 12px 10px 14px; 
         display: flex;
-        justify-content: space-between; /* Empurra o menu pra esquerda e a busca pro centro/direita */
+        flex-wrap: wrap;
+        justify-content: space-between;
         align-items: center;
-        gap: 10px;
+        gap: 8px;
     }
+
     .menu-icon { 
-        position: static; /* Remove o 'left: 15px' que pode estar quebrando o flex */
-        margin-right: 5px;
+        position: static;
+        margin-right: 4px;
+        order: 1;
     }
 
     .header-actions {
         position: static;
         gap: 6px;
+        order: 3;
     }
     
     .search-bar { 
-        flex: 1; /* Faz a barra ocupar o espaço restante disponível */
-        max-width: 220px; /* Um pouco maior que os 160px para caber o texto 'O que está procurando?' */
-        margin: 0 auto; /* Centraliza a barra de busca */
+        flex: 1 1 0;
+        min-width: 0;
+        max-width: none;
+        order: 2;
+        margin: 0;
     }
 
     .search-bar input {
-        padding: 8px 15px;
-        font-size: 13px; /* Diminui um pouco a letra para caber o placeholder */
+        padding: 8px 12px;
+        font-size: 13px;
     }
 
     .search-bar input::placeholder {
-    font-size: 11px; /* Diminui só o texto de dentro da barra */
+        font-size: 11px;
     }
 
     .nav-menu {
@@ -1116,15 +1215,19 @@ body {
     }
 
     .overlap-box h2 {
-        font-size: 1.28rem;
+        font-size: 1rem;
         margin-bottom: 6px;
-        letter-spacing: 2px;
+        letter-spacing: 1.6px;
     }
 
     .overlap-box p {
-        font-size: 0.82rem;
+        font-size: 0.92rem;
         line-height: 1.45;
-        max-width: 235px;
+        max-width: 280px;
+    }
+
+    .highlights-section {
+        padding: 40px 0 24px;
     }
 
     .home-carousel-section {
@@ -1149,27 +1252,38 @@ body {
         gap: 12px;
     }
 
+    .newsletter-section {
+        padding: 44px 0;
+        margin: 28px 0;
+    }
+
+    .newsletter-container {
+        padding: 0 16px;
+    }
+
     .newsletter-form { flex-direction: column; }
     .newsletter-input, .newsletter-button { max-width: 100%; width: 100%; }
 
-    .footer-container { grid-template-columns: 1fr; text-align: center; }
+    .main-footer {
+        padding: 42px 16px 18px;
+    }
+
+    .footer-container { grid-template-columns: 1fr; text-align: center; gap: 28px; }
 
     .product-grid {
-        grid-template-columns: 1fr 1fr;
+        grid-template-columns: 1fr;
         gap: 15px;
-    }
-    
-    .product-card:last-child:nth-child(odd) {
-        grid-column: 1 / span 2;
-        justify-self: center;
-        width: 100%;
-        max-width: 250px;
+        padding: 8px 14px 0;
     }
 }
 
 @media (max-width: 380px) {
+    .main-header {
+        gap: 8px;
+    }
+
     .search-bar {
-        max-width: 190px;
+        max-width: none;
     }
 
     .product-grid {

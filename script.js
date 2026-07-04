@@ -1,14 +1,64 @@
 function toggleMenu() {
     const sidebar = document.getElementById("sidebar");
     const overlay = document.getElementById("overlay");
-    
-    if (sidebar.style.width === "250px") {
-        sidebar.style.width = "0";
+    // Toggle visual state using CSS class; width handled by CSS per breakpoint
+    const isOpen = sidebar.classList.contains('open');
+    if (isOpen) {
+        sidebar.classList.remove('open');
         overlay.style.display = "none";
+        document.body.classList.remove('no-scroll');
     } else {
-        sidebar.style.width = "250px";
+        sidebar.classList.add('open');
         overlay.style.display = "block";
+        // Prevent background from scrolling when sidebar is open
+        document.body.classList.add('no-scroll');
     }
+}
+
+function initComingSoonNotice() {
+    const modal = document.getElementById('coming-soon-modal');
+    const closeButton = modal?.querySelector('.coming-soon-close');
+    const sidebar = document.getElementById('sidebar');
+
+    if (!modal || !closeButton) return;
+
+    const closeModal = () => {
+        modal.classList.remove('is-open');
+        modal.setAttribute('aria-hidden', 'true');
+        document.body.classList.remove('no-scroll');
+    };
+
+    const openModal = () => {
+        modal.classList.add('is-open');
+        modal.setAttribute('aria-hidden', 'false');
+        document.body.classList.add('no-scroll');
+    };
+
+    closeButton.addEventListener('click', closeModal);
+    modal.addEventListener('click', (event) => {
+        if (event.target === modal) {
+            closeModal();
+        }
+    });
+
+    document.querySelectorAll('#sidebar .sidebar-categories-list a').forEach((link) => {
+        link.addEventListener('click', (event) => {
+            const label = link.textContent.trim().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+            if (['moletom', 'moletons', 'polo'].includes(label)) {
+                event.preventDefault();
+                if (sidebar?.classList.contains('open')) {
+                    toggleMenu();
+                }
+                openModal();
+            }
+        });
+    });
+}
+
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initComingSoonNotice);
+} else {
+    initComingSoonNotice();
 }
 
 const CATALOG_DATA_URL = new URL('pages/catalogo/catalogo.json', window.location.href).href;
