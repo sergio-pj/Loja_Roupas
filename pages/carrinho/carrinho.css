@@ -382,6 +382,125 @@ body {
     font-size: 0.94rem;
 }
 
+.pix-modal {
+    position: fixed;
+    inset: 0;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 18px;
+    background: rgba(12, 10, 8, 0.62);
+    z-index: 1300;
+}
+
+.pix-modal.is-open {
+    display: flex;
+}
+
+.pix-modal-card {
+    position: relative;
+    width: min(100%, 460px);
+    max-height: calc(100vh - 36px);
+    overflow: auto;
+    background: #fffdf9;
+    border-radius: 24px;
+    border: 1px solid rgba(26, 23, 20, 0.1);
+    box-shadow: 0 28px 60px rgba(0, 0, 0, 0.24);
+    padding: 24px;
+}
+
+.pix-close {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    width: 36px;
+    height: 36px;
+    border: 0;
+    border-radius: 50%;
+    cursor: pointer;
+    background: #f2ece3;
+    font-size: 22px;
+    color: #1a1714;
+}
+
+.pix-kicker {
+    margin: 0 0 6px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    font-size: 0.78rem;
+    color: #7d7163;
+    font-weight: 700;
+}
+
+.pix-modal-card h3 {
+    margin: 0;
+    color: #1a1714;
+    font-family: 'Playfair Display', serif;
+    font-size: 1.7rem;
+}
+
+.pix-total {
+    margin: 10px 0 16px;
+    color: #1a1714;
+    font-weight: 700;
+}
+
+.pix-qr-image {
+    width: 100%;
+    max-width: 260px;
+    margin: 0 auto 14px;
+    display: block;
+    border-radius: 14px;
+    border: 1px solid #e7dfd5;
+    background: #fff;
+    padding: 10px;
+}
+
+.pix-copy-label {
+    display: block;
+    font-size: 0.83rem;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    margin-bottom: 8px;
+    color: #4e4842;
+}
+
+.pix-copy-code {
+    width: 100%;
+    min-height: 95px;
+    border: 1px solid #d8cec3;
+    border-radius: 14px;
+    padding: 12px;
+    font: 12px/1.45 'Courier New', monospace;
+    color: #2f2924;
+    background: #fff;
+    resize: vertical;
+}
+
+.pix-actions {
+    margin-top: 14px;
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.pix-actions .secondary-button {
+    border: 1px solid #1a1714;
+    border-radius: 999px;
+    padding: 10px 16px;
+    background: #1a1714;
+    color: #fff;
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    text-decoration: none;
+}
+
+.pix-actions .secondary-button.secondary-button-muted {
+    background: transparent;
+    color: #1a1714;
+}
+
 @media (max-width: 900px) {
     .cart-grid {
         grid-template-columns: 1fr;
@@ -433,5 +552,14 @@ body {
 
     .coupon-actions {
         flex-direction: column;
+    }
+
+    .pix-actions {
+        flex-direction: column;
+    }
+
+    .pix-actions .secondary-button {
+        width: 100%;
+        text-align: center;
     }
 }

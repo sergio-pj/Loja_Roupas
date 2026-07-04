@@ -198,6 +198,23 @@
         </section>
     </main>
 
+    <div id="pix-modal" class="pix-modal" aria-hidden="true" role="dialog" aria-labelledby="pix-modal-title">
+        <div class="pix-modal-card">
+            <button type="button" id="pix-close" class="pix-close" aria-label="Fechar modal">×</button>
+            <p class="pix-kicker">Pagamento via PIX</p>
+            <h3 id="pix-modal-title">Escaneie o QR Code</h3>
+            <p id="pix-total" class="pix-total">Total: R$ 0,00</p>
+            <img id="pix-qr-image" class="pix-qr-image" alt="QR Code PIX" />
+            <label class="pix-copy-label" for="pix-copy-code">Codigo copia e cola</label>
+            <textarea id="pix-copy-code" class="pix-copy-code" readonly></textarea>
+            <div class="pix-actions">
+                <button type="button" id="pix-copy-button" class="secondary-button">Copiar codigo PIX</button>
+                <a id="pix-ticket-link" class="secondary-button secondary-button-muted" target="_blank" rel="noopener" hidden>Abrir no Mercado Pago</a>
+            </div>
+            <p id="pix-feedback" class="auth-feedback">Aguardando geracao do QR Code.</p>
+        </div>
+    </div>
+
     <footer class="main-footer">
         <div class="footer-bottom">
             <p>&copy; 2026 AuryxTech - Transformando ideias em código.</p>

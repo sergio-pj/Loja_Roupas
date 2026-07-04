@@ -149,6 +149,14 @@ const summarySubtotal = document.getElementById('summary-subtotal');
 const summaryDiscount = document.getElementById('summary-discount');
 const summaryShipping = document.getElementById('summary-shipping');
 const summaryTotal = document.getElementById('summary-total');
+const pixModal = document.getElementById('pix-modal');
+const pixClose = document.getElementById('pix-close');
+const pixQrImage = document.getElementById('pix-qr-image');
+const pixCopyCode = document.getElementById('pix-copy-code');
+const pixCopyButton = document.getElementById('pix-copy-button');
+const pixFeedback = document.getElementById('pix-feedback');
+const pixTotal = document.getElementById('pix-total');
+const pixTicketLink = document.getElementById('pix-ticket-link');
 const debugPanel = document.getElementById('cart-debug-panel');
 const debugOutput = document.getElementById('cart-debug-output');
 const debugEnabled = new URLSearchParams(window.location.search).get('debug') === '1';
@@ -631,7 +639,7 @@ async function persistOrderDraft() {
     };
 }
 
-async function createMercadoPagoPreference(orderId) {
+async function createMercadoPagoPix(orderId) {
     const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
 
     if (sessionError || !sessionData.session?.refresh_token) {
@@ -662,16 +670,86 @@ async function createMercadoPagoPreference(orderId) {
         return { ok: false, message: error.message || 'Nao foi possivel iniciar o checkout.' };
     }
 
-    if (!data?.checkoutUrl) {
-        return { ok: false, message: 'A funcao de checkout nao retornou uma URL valida.' };
+    if (!data?.qrCode || !data?.qrCodeBase64) {
+        return { ok: false, message: 'A funcao PIX nao retornou QR Code valido.' };
     }
 
     return {
         ok: true,
-        checkoutUrl: data.checkoutUrl,
-        sandboxCheckoutUrl: data.sandboxCheckoutUrl || '',
-        preferenceId: data.preferenceId || ''
+        paymentId: data.paymentId || '',
+        qrCode: data.qrCode,
+        qrCodeBase64: data.qrCodeBase64,
+        ticketUrl: data.ticketUrl || '',
+        expiresAt: data.expiresAt || '',
+        totalAmount: Number(data.totalAmount || 0)
     };
+}
+
+function openPixModal(pixData, totalLabel) {
+    if (!pixModal || !pixQrImage || !pixCopyCode || !pixFeedback || !pixTotal) {
+        return;
+    }
+
+    pixQrImage.src = `data:image/png;base64,${pixData.qrCodeBase64}`;
+    pixCopyCode.value = pixData.qrCode;
+    pixTotal.textContent = `Total: ${totalLabel}`;
+
+    if (pixTicketLink) {
+        if (pixData.ticketUrl) {
+            pixTicketLink.href = pixData.ticketUrl;
+            pixTicketLink.hidden = false;
+        } else {
+            pixTicketLink.hidden = true;
+            pixTicketLink.removeAttribute('href');
+        }
+    }
+
+    pixFeedback.textContent = 'PIX gerado. Escaneie o QR Code ou copie o codigo.';
+    pixModal.classList.add('is-open');
+    pixModal.setAttribute('aria-hidden', 'false');
+    document.body.classList.add('no-scroll');
+    document.documentElement.classList.add('no-scroll');
+}
+
+function closePixModal() {
+    if (!pixModal) return;
+    pixModal.classList.remove('is-open');
+    pixModal.setAttribute('aria-hidden', 'true');
+    document.body.classList.remove('no-scroll');
+    document.documentElement.classList.remove('no-scroll');
+}
+
+if (pixClose) {
+    pixClose.addEventListener('click', closePixModal);
+}
+
+if (pixModal) {
+    pixModal.addEventListener('click', (event) => {
+        if (event.target === pixModal) {
+            closePixModal();
+        }
+    });
+}
+
+if (pixCopyButton) {
+    pixCopyButton.addEventListener('click', async () => {
+        if (!pixCopyCode || !pixFeedback) return;
+        const code = String(pixCopyCode.value || '').trim();
+
+        if (!code) {
+            pixFeedback.textContent = 'Codigo PIX vazio. Gere novamente o pagamento.';
+            return;
+        }
+
+        try {
+            await navigator.clipboard.writeText(code);
+            pixFeedback.textContent = 'Codigo PIX copiado com sucesso.';
+        } catch {
+            pixCopyCode.select();
+            document.execCommand('copy');
+            pixFeedback.textContent = 'Codigo PIX copiado para a area de transferencia.';
+        }
+    });
 }
 
 function renderSummary(cart) {
@@ -867,17 +945,17 @@ if (checkoutButton) {
             return;
         }
 
-        checkoutFeedback.textContent = 'Conectando checkout Mercado Pago...';
+        checkoutFeedback.textContent = 'Gerando QR Code PIX...';
 
-        const checkoutResult = await createMercadoPagoPreference(result.draftId);
+        const checkoutResult = await createMercadoPagoPix(result.draftId);
 
         if (!checkoutResult.ok) {
-            checkoutFeedback.textContent = `${result.total} preparado no pedido ${result.draftId.slice(0, 8).toUpperCase()}, mas a integracao de pagamento ainda nao respondeu. Verifique as Edge Functions e as variaveis do Mercado Pago.`;
+            checkoutFeedback.textContent = `${result.total} preparado no pedido ${result.draftId.slice(0, 8).toUpperCase()}, mas nao foi possivel gerar o PIX agora. Verifique a Edge Function e as variaveis do Mercado Pago.`;
             return;
         }
 
-        checkoutFeedback.textContent = 'Redirecionando para o Mercado Pago...';
-        window.location.href = checkoutResult.checkoutUrl;
+        checkoutFeedback.textContent = 'PIX gerado com sucesso.';
+        openPixModal(checkoutResult, result.total);
     });
 }
 
