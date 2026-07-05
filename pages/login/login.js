@@ -9,6 +9,40 @@ const registerForm = document.getElementById('register-form');
 const loginFeedback = document.getElementById('login-feedback');
 const registerFeedback = document.getElementById('register-feedback');
 
+function clearAuthInputs() {
+    const selectors = [
+        '#login-form input[name="email"]',
+        '#login-form input[name="password"]',
+        '#register-form input[name="fullName"]',
+        '#register-form input[name="phone"]',
+        '#register-form input[name="email"]',
+        '#register-form input[name="password"]'
+    ];
+
+    selectors.forEach((selector) => {
+        const input = document.querySelector(selector);
+        if (input) {
+            input.value = '';
+        }
+    });
+}
+
+function enforceBlankAuthForms() {
+    if (loginForm) {
+        loginForm.reset();
+    }
+    if (registerForm) {
+        registerForm.reset();
+    }
+
+    clearAuthInputs();
+
+    requestAnimationFrame(() => {
+        clearAuthInputs();
+        setTimeout(clearAuthInputs, 80);
+    });
+}
+
 function getRedirectTarget() {
     const params = new URLSearchParams(window.location.search);
     const redirect = params.get('redirect');
@@ -167,6 +201,16 @@ if (document.readyState === 'loading') {
 } else {
     initComingSoonNotice();
 }
+
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', enforceBlankAuthForms);
+} else {
+    enforceBlankAuthForms();
+}
+
+window.addEventListener('pageshow', () => {
+    enforceBlankAuthForms();
+});
 
 window.toggleMenu = toggleMenu;
 
