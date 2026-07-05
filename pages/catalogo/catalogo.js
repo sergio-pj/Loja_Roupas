@@ -38,7 +38,7 @@ function initComingSoonNotice() {
     document.querySelectorAll('#sidebar .sidebar-categories-list a').forEach((link) => {
         link.addEventListener('click', (event) => {
             const label = link.textContent.trim().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
-            if (['moletom', 'moletons', 'polo', 'shorts e bermudas', 'kits'].includes(label)) {
+            if (['moletom', 'moletons', 'polo', 'polos'].includes(label)) {
                 event.preventDefault();
                 if (sidebar?.classList.contains('open')) {
                     toggleMenu();

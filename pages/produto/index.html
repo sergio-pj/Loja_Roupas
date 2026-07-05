@@ -242,6 +242,10 @@
     </footer>
 
     <script src="../../json/storefront.js"></script>
+    <script type="module">
+        import { supabase } from '../../json/supabase-browser.js';
+        window.supabase = supabase;
+    </script>
     <script src="produto.js"></script>
 </body>
 </html>

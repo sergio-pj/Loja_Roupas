@@ -234,26 +234,17 @@ serve(async request => {
             });
         }
 
-        const totalAmount = Number(order.total_amount || 0);
+        const items = buildMercadoPagoItems(orderItems, Number(order.total_amount || 0), Number(order.shipping_amount || 0));
+        const redirectBaseUrl = getPublicRedirectBaseUrl(publicSiteUrl);
 
-        if (!Number.isFinite(totalAmount) || totalAmount <= 0) {
-            return new Response(JSON.stringify({ error: 'Order total_amount is invalid for PIX checkout.' }), {
-                status: 400,
-                headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-            });
-        }
-
-        const expirationDate = new Date(Date.now() + 30 * 60 * 1000).toISOString();
-        const pixPaymentPayload: Record<string, unknown> = {
-            transaction_amount: Number(totalAmount.toFixed(2)),
-            payment_method_id: 'pix',
-            description: `Pedido Aranha ${String(order.id).slice(0, 8).toUpperCase()}`,
-            date_of_expiration: expirationDate,
-            external_reference: order.id,
-            notification_url: `${supabaseUrl}/functions/v1/mercadopago-webhook`,
+        const preferencePayload: Record<string, unknown> = {
+            items,
             payer: {
                 email: userData.user.email || undefined
             },
+            external_reference: order.id,
+            notification_url: `${supabaseUrl}/functions/v1/mercadopago-webhook`,
+            statement_descriptor: 'ARANHA',
             metadata: {
                 order_id: order.id,
                 user_id: userData.user.id,
@@ -262,41 +253,35 @@ serve(async request => {
             }
         };
 
-        const mercadoPagoResponse = await fetch('https://api.mercadopago.com/v1/payments', {
+        if (redirectBaseUrl) {
+            preferencePayload.back_urls = {
+                success: `${redirectBaseUrl}/pages/minha-conta/index.html?payment=success`,
+                pending: `${redirectBaseUrl}/pages/minha-conta/index.html?payment=pending`,
+                failure: `${redirectBaseUrl}/pages/carrinho/index.html?payment=failure`
+            };
+            preferencePayload.auto_return = 'approved';
+        }
+
+        const mercadoPagoResponse = await fetch('https://api.mercadopago.com/checkout/preferences', {
             method: 'POST',
             headers: {
                 Authorization: `Bearer ${mercadoPagoAccessToken}`,
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify(pixPaymentPayload)
+            body: JSON.stringify(preferencePayload)
         });
 
-        const paymentData = await mercadoPagoResponse.json();
+        const preferenceData = await mercadoPagoResponse.json();
 
         if (!mercadoPagoResponse.ok) {
-            console.error('Mercado Pago retornou erro ao criar pagamento PIX.', {
+            console.error('Mercado Pago retornou erro ao criar preferencia.', {
                 status: mercadoPagoResponse.status,
-                response: paymentData
+                response: preferenceData
             });
 
             return new Response(JSON.stringify({
-                error: paymentData,
+                error: preferenceData,
                 mercadoPagoStatus: mercadoPagoResponse.status
-            }), {
-                status: 502,
-                headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-            });
-        }
-
-        const transactionData = paymentData?.point_of_interaction?.transaction_data || {};
-        const pixQrCode = String(transactionData.qr_code || '').trim();
-        const pixQrCodeBase64 = String(transactionData.qr_code_base64 || '').trim();
-        const pixTicketUrl = String(transactionData.ticket_url || '').trim();
-
-        if (!pixQrCode || !pixQrCodeBase64) {
-            return new Response(JSON.stringify({
-                error: 'Mercado Pago nao retornou dados de QR Code PIX.',
-                response: paymentData
             }), {
                 status: 502,
                 headers: { ...corsHeaders, 'Content-Type': 'application/json' }
@@ -309,9 +294,9 @@ serve(async request => {
                 status: 'awaiting_payment',
                 payment_status: 'pending',
                 payment_provider: 'mercado_pago',
-                provider_order_id: paymentData.order?.id ? String(paymentData.order.id) : null,
-                provider_payment_id: paymentData.id ? String(paymentData.id) : null,
-                notes: 'Pagamento PIX Mercado Pago iniciado.'
+                provider_order_id: preferenceData.id,
+                provider_payment_id: null,
+                notes: 'Checkout Mercado Pago iniciado.'
             })
             .eq('id', order.id)
             .eq('user_id', userData.user.id);
@@ -324,13 +309,9 @@ serve(async request => {
         }
 
         return new Response(JSON.stringify({
-            paymentId: paymentData.id ? String(paymentData.id) : '',
-            orderId: order.id,
-            totalAmount: Number(totalAmount.toFixed(2)),
-            qrCode: pixQrCode,
-            qrCodeBase64: pixQrCodeBase64,
-            ticketUrl: pixTicketUrl || '',
-            expiresAt: String(paymentData.date_of_expiration || expirationDate)
+            checkoutUrl: preferenceData.init_point,
+            sandboxCheckoutUrl: preferenceData.sandbox_init_point,
+            preferenceId: preferenceData.id
         }), {
             status: 200,
             headers: { ...corsHeaders, 'Content-Type': 'application/json' }

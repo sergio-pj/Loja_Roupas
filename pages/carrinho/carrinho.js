@@ -639,7 +639,7 @@ async function persistOrderDraft() {
     };
 }
 
-async function createMercadoPagoPix(orderId) {
+async function createMercadoPagoPreference(orderId) {
     const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
 
     if (sessionError || !sessionData.session?.refresh_token) {
@@ -670,18 +670,15 @@ async function createMercadoPagoPix(orderId) {
         return { ok: false, message: error.message || 'Nao foi possivel iniciar o checkout.' };
     }
 
-    if (!data?.qrCode || !data?.qrCodeBase64) {
-        return { ok: false, message: 'A funcao PIX nao retornou QR Code valido.' };
+    if (!data?.checkoutUrl) {
+        return { ok: false, message: 'A funcao de checkout nao retornou uma URL valida.' };
     }
 
     return {
         ok: true,
-        paymentId: data.paymentId || '',
-        qrCode: data.qrCode,
-        qrCodeBase64: data.qrCodeBase64,
-        ticketUrl: data.ticketUrl || '',
-        expiresAt: data.expiresAt || '',
-        totalAmount: Number(data.totalAmount || 0)
+        checkoutUrl: data.checkoutUrl,
+        sandboxCheckoutUrl: data.sandboxCheckoutUrl || '',
+        preferenceId: data.preferenceId || ''
     };
 }
 
@@ -945,17 +942,17 @@ if (checkoutButton) {
             return;
         }
 
-        checkoutFeedback.textContent = 'Gerando QR Code PIX...';
+        checkoutFeedback.textContent = 'Conectando checkout Mercado Pago...';
 
-        const checkoutResult = await createMercadoPagoPix(result.draftId);
+        const checkoutResult = await createMercadoPagoPreference(result.draftId);
 
         if (!checkoutResult.ok) {
-            checkoutFeedback.textContent = `${result.total} preparado no pedido ${result.draftId.slice(0, 8).toUpperCase()}, mas nao foi possivel gerar o PIX agora. Verifique a Edge Function e as variaveis do Mercado Pago.`;
+            checkoutFeedback.textContent = `${result.total} preparado no pedido ${result.draftId.slice(0, 8).toUpperCase()}, mas a integracao de pagamento ainda nao respondeu. Verifique as Edge Functions e as variaveis do Mercado Pago.`;
             return;
         }
 
-        checkoutFeedback.textContent = 'PIX gerado com sucesso.';
-        openPixModal(checkoutResult, result.total);
+        checkoutFeedback.textContent = 'Redirecionando para o Mercado Pago...';
+        window.location.href = checkoutResult.checkoutUrl;
     });
 }
 

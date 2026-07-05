@@ -435,8 +435,49 @@ async function loadProduct() {
     }
 
     try {
-        const response = await fetch(CATALOG_DATA_URL);
-        allProducts = await response.json();
+        let staticData = [];
+        try {
+            const response = await fetch(CATALOG_DATA_URL);
+            staticData = await response.json();
+        } catch (error) {
+            console.warn('Nao foi possivel carregar catalogo.json na pagina de produto.', error);
+        }
+
+        let dbData = [];
+        if (window.supabase) {
+            try {
+                const { data, error } = await window.supabase
+                    .from('produtos')
+                    .select('*')
+                    .order('id', { ascending: false });
+
+                if (!error && Array.isArray(data)) {
+                    dbData = data.map(item => ({
+                        ...item,
+                        galeria: item.galeria || [],
+                        imagem: item.imagem || item.imagem_url || ''
+                    }));
+                }
+            } catch (error) {
+                console.warn('Nao foi possivel carregar produtos do Supabase na pagina de produto.', error);
+            }
+        }
+
+        const merged = dbData.slice();
+        const dbIds = new Set(dbData.map(item => Number(item.id)));
+
+        staticData.forEach(item => {
+            const itemId = Number(item.id);
+            if (!dbIds.has(itemId)) {
+                merged.push({
+                    ...item,
+                    galeria: item.galeria || [],
+                    imagem: item.imagem || item.imagem_url || ''
+                });
+            }
+        });
+
+        allProducts = merged;
         const product = allProducts.find(item => Number(item.id) === productId);
 
         if (!product) {

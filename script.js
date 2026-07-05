@@ -423,9 +423,49 @@ async function carregarProdutos() {
         return;
     }
 
-    const response = await fetch(CATALOG_DATA_URL);
-    const produtos = await response.json();
-    const destaques = produtos.slice(0, 3);
+    let staticData = [];
+    try {
+        const response = await fetch(CATALOG_DATA_URL);
+        staticData = await response.json();
+    } catch (error) {
+        console.warn('Nao foi possivel carregar catalogo.json na home.', error);
+    }
+
+    let dbData = [];
+    if (window.supabase) {
+        try {
+            const { data, error } = await window.supabase
+                .from('produtos')
+                .select('*')
+                .order('id', { ascending: false });
+
+            if (!error && Array.isArray(data)) {
+                dbData = data.map(item => ({
+                    ...item,
+                    galeria: item.galeria || [],
+                    imagem: item.imagem || item.imagem_url || ''
+                }));
+            }
+        } catch (error) {
+            console.warn('Nao foi possivel carregar produtos do Supabase na home.', error);
+        }
+    }
+
+    const merged = dbData.slice();
+    const dbIds = new Set(dbData.map(item => Number(item.id)));
+
+    staticData.forEach(item => {
+        const itemId = Number(item.id);
+        if (!dbIds.has(itemId)) {
+            merged.push({
+                ...item,
+                galeria: item.galeria || [],
+                imagem: item.imagem || item.imagem_url || ''
+            });
+        }
+    });
+
+    const destaques = merged.slice(0, 3);
 
     container.innerHTML = destaques.map(prod => `
         <article class="product-card">

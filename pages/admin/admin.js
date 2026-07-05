@@ -1,9 +1,11 @@
 import { supabase } from '../../json/supabase-browser.js'
 
-// Emails autorizados para acessar o admin (padrão: dono e conta local)
-const ADMIN_EMAILS = ['sergiopaulo.almeida04@gmail.com', 'aranha.admin@gmail.com']
-// email primário (usado para mensagens/checagens simples)
-const ADMIN_EMAIL = ADMIN_EMAILS[0]
+// Unico email autorizado para acessar o admin
+const ADMIN_EMAIL = 'aranha.admin@gmail.com'
+
+function isAdminEmail(email){
+  return String(email || '').trim().toLowerCase() === ADMIN_EMAIL.toLowerCase()
+}
 // bucket de storage usado no projeto (ajuste se seu bucket tiver outro nome)
 const STORAGE_BUCKET = 'getPublicUrl'
 
@@ -33,7 +35,7 @@ async function init(){
   const { data: { session } } = await supabase.auth.getSession()
   // permitir sessão local via storefront (admin local)
   const local = window.storefront && window.storefront.getAuth ? window.storefront.getAuth() : null
-  if (!session && local && ADMIN_EMAILS.includes(String(local.email || '').toLowerCase())) {
+  if (!session && local && isAdminEmail(local.email)) {
     handleSession({ user: { email: local.email } })
   } else {
     handleSession(session)
@@ -46,7 +48,7 @@ async function init(){
 function handleSession(session){
   if(session?.user){
     // se estiver logado, garantir que seja o email do admin
-    if(ADMIN_EMAIL && String(session.user.email || '').toLowerCase() !== ADMIN_EMAIL.toLowerCase()){
+    if(!isAdminEmail(session.user.email)){
       supabase.auth.signOut()
       alert('Email não autorizado para acessar o painel de administração.')
       return
@@ -69,8 +71,8 @@ async function signIn(){
   const email = els.email.value.trim()
   if(!email) return alert('Informe um email válido')
   // impedir envios para emails não autorizados (padrão simples)
-  if(ADMIN_EMAIL && email.toLowerCase() !== ADMIN_EMAIL.toLowerCase()){
-    return alert(`Acesso restrito: use o email ${ADMIN_EMAIL} ou altere ADMIN_EMAIL em pages/admin/admin.js`)
+  if(!isAdminEmail(email)){
+    return alert(`Acesso restrito: use o email ${ADMIN_EMAIL}.`)
   }
 
   const { error } = await supabase.auth.signInWithOtp({ email })

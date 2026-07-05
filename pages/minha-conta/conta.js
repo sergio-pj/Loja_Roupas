@@ -1,7 +1,11 @@
 import { supabase } from '../../json/supabase-browser.js';
 
-// Emails autorizados que verão a aba/ação extra na conta
-const ADMIN_EMAILS = ['sergiopaulo.almeida04@gmail.com', 'aranha.admin@gmail.com']
+// Unico email autorizado a acessar funcionalidades administrativas
+const ADMIN_EMAIL = 'aranha.admin@gmail.com';
+
+function isAdminEmail(email) {
+    return String(email || '').trim().toLowerCase() === ADMIN_EMAIL;
+}
 
 function toggleMenu() {
     const sidebar = document.getElementById('sidebar');
@@ -406,10 +410,10 @@ async function loadAccount() {
 
     let user = data?.user || null;
 
-    // fallback: aceitar sessão local definida por storefront (admin local)
+    // fallback: aceitar sessão local definida por storefront somente para o admin oficial
     if (!user && window.storefront) {
         const local = window.storefront.getAuth && window.storefront.getAuth();
-        if (local && ADMIN_EMAILS.includes(String(local.email || '').toLowerCase())) {
+        if (local && isAdminEmail(local.email)) {
             user = { id: local.userId || 'admin-local', email: local.email, user_metadata: {} };
         }
     }
@@ -460,7 +464,7 @@ async function loadAccount() {
 
     // se for o admin, adiciona botão de gerenciamento simples na UI da conta
     try {
-        const isAdmin = ADMIN_EMAILS.includes(String(user.email || '').toLowerCase());
+        const isAdmin = isAdminEmail(user.email);
         if (isAdmin) {
             const container = document.querySelector('#profile-card .profile-actions');
             if (container && !document.getElementById('manage-site-btn')) {

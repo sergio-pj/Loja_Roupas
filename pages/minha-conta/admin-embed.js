@@ -1,7 +1,22 @@
 import { supabase } from '../../json/supabase-browser.js'
 
+const ADMIN_EMAIL = 'aranha.admin@gmail.com';
+
+function isAdminEmail(email){
+  return String(email || '').trim().toLowerCase() === ADMIN_EMAIL;
+}
+
 export async function initAdminPanel(container) {
   if (!container) return;
+
+  const { data: { user } } = await supabase.auth.getUser();
+  const localAuth = window.storefront && window.storefront.getAuth ? window.storefront.getAuth() : null;
+  const resolvedEmail = String(user?.email || localAuth?.email || '').trim().toLowerCase();
+
+  if (!isAdminEmail(resolvedEmail)) {
+    alert('Acesso administrativo restrito ao email aranha.admin@gmail.com.');
+    return;
+  }
 
   // inject CSS for the embedded admin panel (once)
   if (!document.getElementById('admin-embed-css')) {
