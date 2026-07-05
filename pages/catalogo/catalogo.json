@@ -73,5 +73,29 @@
       "Secar em local ventilado."
     ],
     "tamanhos": ["P", "M", "G", "GG"]
+  },
+  {
+    "id": 4,
+    "nome": "Camisa Royal Aranha",
+    "preco": 89.90,
+    "categoria": "camisetas",
+    "cor": "escura",
+    "imagem": "../../assets/modelofrente_azulcnome.jpg",
+    "galeria": [
+      "../../assets/modelofrente_azulcnome.jpg",
+      "../../assets/modelocosta_azulcnome.jpg",
+      "../../assets/modelocosta_azulclogo.jpg"
+    ],
+    "subtitulo": "Camisa azul royal com visual limpo, assinatura discreta frontal e detalhe nas costas.",
+    "descricao": "A Camisa Royal Aranha foi criada para quem busca uma peça versátil e elegante no dia a dia. O tom azul royal entrega presença sem exagero, enquanto a assinatura minimalista da marca reforça a identidade premium da coleção.",
+    "destaque": "Modelagem confortável, acabamento refinado e galeria com frente, costas e detalhe da gola.",
+    "composicao": "100% algodão premium com toque macio e boa respirabilidade para uso prolongado.",
+    "cuidados": [
+      "Lavar do avesso com água fria.",
+      "Não usar alvejante.",
+      "Secar à sombra para preservar a cor.",
+      "Passar em temperatura baixa."
+    ],
+    "tamanhos": ["P", "M", "G", "GG"]
   }
 ]

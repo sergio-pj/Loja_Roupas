@@ -12,6 +12,8 @@ const supabaseAnonKey = Deno.env.get('APP_SUPABASE_ANON_KEY') || '';
 const supabaseServiceRoleKey = Deno.env.get('APP_SUPABASE_SERVICE_ROLE_KEY') || '';
 const mercadoPagoAccessToken = Deno.env.get('MERCADO_PAGO_ACCESS_TOKEN') || '';
 const publicSiteUrl = (Deno.env.get('PUBLIC_SITE_URL') || '').replace(/\/$/, '');
+const mercadoPagoPreferPix = String(Deno.env.get('MERCADO_PAGO_PREFER_PIX') || 'true').toLowerCase() === 'true';
+const mercadoPagoPixOnly = String(Deno.env.get('MERCADO_PAGO_PIX_ONLY') || 'false').toLowerCase() === 'true';
 
 function getMercadoPagoPictureUrl(imagePath: string | null | undefined) {
     if (!imagePath) {

@@ -639,47 +639,56 @@ async function persistOrderDraft() {
     };
 }
 
-async function createMercadoPagoPreference(orderId) {
-    const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
+function formatWhatsAppMessage(cart, total, orderId, discount, coupon) {
+    const lines = [
+        '========================================',
+        'Ola! Gostaria de finalizar meu pedido',
+        '========================================',
+        ''
+    ];
 
-    if (sessionError || !sessionData.session?.refresh_token) {
-        return { ok: false, message: 'Sua sessao expirou. Entre novamente para iniciar o pagamento.' };
-    }
+    lines.push('PRODUTOS SELECIONADOS:');
+    lines.push('');
 
-    const { data: refreshedSession, error: refreshError } = await supabase.auth.refreshSession({
-        refresh_token: sessionData.session.refresh_token
+    cart.forEach(item => {
+        const itemTotal = (item.preco * item.quantity).toFixed(2);
+        lines.push(`• ${item.nome}${item.tamanho ? ` (Tam ${item.tamanho})` : ''}`);
+        lines.push(`  Quantidade: ${item.quantity} | Valor: R$ ${itemTotal.replace('.', ',')}`);
     });
 
-    const accessToken = refreshedSession.session?.access_token || sessionData.session.access_token || '';
-
-    if (refreshError || !accessToken) {
-        return { ok: false, message: 'Nao foi possivel renovar sua sessao. Entre novamente para iniciar o pagamento.' };
-    }
-
-    const { data, error } = await supabase.functions.invoke('create-mercadopago-preference', {
-        headers: {
-            Authorization: `Bearer ${accessToken}`
-        },
-        body: {
-            orderId,
-            accessToken
+    lines.push('');
+    lines.push('------------------------');
+    lines.push(`Subtotal: R$ ${(parseFloat(total) + parseFloat(discount)).toFixed(2).replace('.', ',')}`);
+    
+    if (parseFloat(discount) > 0) {
+        lines.push(`DESCONTO: -R$ ${parseFloat(discount).toFixed(2).replace('.', ',')}`);
+        if (coupon) {
+            lines.push(`Cupom: ${coupon}`);
         }
-    });
-
-    if (error) {
-        return { ok: false, message: error.message || 'Nao foi possivel iniciar o checkout.' };
     }
 
-    if (!data?.checkoutUrl) {
-        return { ok: false, message: 'A funcao de checkout nao retornou uma URL valida.' };
-    }
+    lines.push(`TOTAL: R$ ${total.replace('.', ',')}`);
+    lines.push('------------------------');
+    lines.push('');
+    lines.push(`Pedido #${orderId.slice(0, 8).toUpperCase()}`);
+    lines.push('');
+    lines.push('Estou pronto para pagar via PIX!');
+    lines.push('Aguardo o QR Code para confirmar.');
+    lines.push('');
+    lines.push('Obrigado! :)');
 
-    return {
-        ok: true,
-        checkoutUrl: data.checkoutUrl,
-        sandboxCheckoutUrl: data.sandboxCheckoutUrl || '',
-        preferenceId: data.preferenceId || ''
-    };
+    return lines.join('\n');
+}
+
+function openWhatsAppCheckout(cart, total, orderId, discount, coupon) {
+    const phoneNumber = '5511910257470';
+    const message = formatWhatsAppMessage(cart, total, orderId, discount, coupon);
+    const encodedMessage = encodeURIComponent(message);
+    const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodedMessage}`;
+    
+    window.open(whatsappUrl, '_blank');
+    
+    return { ok: true };
 }
 
 function openPixModal(pixData, totalLabel) {
@@ -942,17 +951,16 @@ if (checkoutButton) {
             return;
         }
 
-        checkoutFeedback.textContent = 'Conectando checkout Mercado Pago...';
+        const cart = window.storefront.getCart();
+        const discount = (cart.reduce((total, item) => total + item.preco * item.quantity, 0) - parseFloat(result.total)).toFixed(2);
+        const whatsappResult = openWhatsAppCheckout(cart, result.total, result.draftId, discount, appliedCoupon);
 
-        const checkoutResult = await createMercadoPagoPreference(result.draftId);
-
-        if (!checkoutResult.ok) {
-            checkoutFeedback.textContent = `${result.total} preparado no pedido ${result.draftId.slice(0, 8).toUpperCase()}, mas a integracao de pagamento ainda nao respondeu. Verifique as Edge Functions e as variaveis do Mercado Pago.`;
+        if (!whatsappResult.ok) {
+            checkoutFeedback.textContent = `Pedido ${result.draftId.slice(0, 8).toUpperCase()} criado, mas houve erro ao abrir WhatsApp. Tente novamente.`;
             return;
         }
 
-        checkoutFeedback.textContent = 'Redirecionando para o Mercado Pago...';
-        window.location.href = checkoutResult.checkoutUrl;
+        checkoutFeedback.textContent = `✓ Pedido #${result.draftId.slice(0, 8).toUpperCase()} criado! WhatsApp será aberto agora com os detalhes.`;
     });
 }
 

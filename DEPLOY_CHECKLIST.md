@@ -20,11 +20,12 @@
    - `supabase/002_addresses.sql`
    - `supabase/003_orders_coupons.sql`
    - `supabase/004_payment_workflow.sql`
+   - `supabase/007_ton_manual_confirmation.sql`
 2. Verifique se RLS esta ativa nas tabelas `profiles` e `addresses`
 3. Confirme que nenhuma chave administrativa foi colocada no frontend
 4. Confirme que dados de cliente nao existem em arquivos locais do projeto
-5. Configure as variaveis das Edge Functions para Supabase e Mercado Pago
-6. Publique as funcoes `create-mercadopago-preference` e `mercadopago-webhook`
+5. Configure as variaveis das Edge Functions para Supabase e Ton
+6. Publique a funcao `create-ton-checkout`
 
 ## Arquitetura correta
 
