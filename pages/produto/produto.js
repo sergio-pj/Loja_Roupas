@@ -35,7 +35,7 @@ let selectedSize = '';
 let productRelatedStartIndex = 0;
 let productMediaCarouselCleanups = [];
 
-async function waitForSupabaseBrowserClient(maxWaitMs = 1800) {
+async function waitForSupabaseBrowserClient(maxWaitMs = 450) {
     if (window.supabase) {
         return true;
     }

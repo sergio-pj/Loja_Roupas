@@ -11,7 +11,7 @@ let catalogMediaCarouselSyncIntervalId = null;
 let catalogMediaCarouselSyncIndex = 0;
 const catalogMediaCarouselPauseSet = new Set();
 
-async function waitForSupabaseBrowserClient(maxWaitMs = 1800) {
+async function waitForSupabaseBrowserClient(maxWaitMs = 450) {
     if (window.supabase) {
         return true;
     }

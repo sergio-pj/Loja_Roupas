@@ -226,7 +226,7 @@ function loadAppliedCoupon() {
     }
 }
 
-async function getSessionSnapshot(timeoutMs = 1800) {
+async function getSessionSnapshot(timeoutMs = 900) {
     let timeoutId = null;
 
     try {
@@ -349,7 +349,7 @@ async function updateDebugPanel() {
     let sessionTimedOut = false;
 
     try {
-        const { data, error, timedOut } = await getSessionSnapshot(1200);
+        const { data, error, timedOut } = await getSessionSnapshot(700);
         sessionUserId = String(data?.session?.user?.id || '').trim();
         sessionEmail = String(data?.session?.user?.email || '').trim();
         sessionErrorMessage = String(error?.message || '').trim();
@@ -423,7 +423,7 @@ async function loadCouponEligibility() {
 
     const [paidOrdersResult, couponUseResult] = await withTimeout(
         Promise.all([paidOrdersRequest, couponUseRequest]),
-        1800,
+        1000,
         () => ([
             { count: 0, error: { message: 'coupon eligibility timeout' } },
             { count: 0, error: { message: 'coupon eligibility timeout' } }
@@ -1009,27 +1009,32 @@ supabase.auth.onAuthStateChange(async (eventType, session) => {
     }
 });
 
-document.addEventListener('DOMContentLoaded', async () => {
+document.addEventListener('DOMContentLoaded', () => {
     appendDebugLine('DOMContentLoaded: inicio');
-    await syncAuthState();
-    appendDebugLine('DOMContentLoaded: apos syncAuthState');
-    loadAppliedCoupon();
-    appendDebugLine(`DOMContentLoaded: apos loadAppliedCoupon; appliedCoupon=${appliedCoupon || '(vazio)'}`);
     renderCart();
-    appendDebugLine('DOMContentLoaded: apos renderCart');
-    await updateDebugPanel();
+    appendDebugLine('DOMContentLoaded: primeira render sem bloquear auth');
+    void updateDebugPanel();
 
-    loadCouponEligibility().then(() => {
-        appendDebugLine('DOMContentLoaded: apos loadCouponEligibility');
-
-        if (couponFeedback) {
-            syncCouponStateMessage();
-            appendDebugLine('DOMContentLoaded: apos syncCouponStateMessage');
-        }
-
+    void (async () => {
+        await syncAuthState();
+        appendDebugLine('DOMContentLoaded: apos syncAuthState');
+        loadAppliedCoupon();
+        appendDebugLine(`DOMContentLoaded: apos loadAppliedCoupon; appliedCoupon=${appliedCoupon || '(vazio)'}`);
         renderCart();
         void updateDebugPanel();
-    });
+
+        loadCouponEligibility().then(() => {
+            appendDebugLine('DOMContentLoaded: apos loadCouponEligibility');
+
+            if (couponFeedback) {
+                syncCouponStateMessage();
+                appendDebugLine('DOMContentLoaded: apos syncCouponStateMessage');
+            }
+
+            renderCart();
+            void updateDebugPanel();
+        });
+    })();
 
     appendDebugLine('DOMContentLoaded: fim');
 });
