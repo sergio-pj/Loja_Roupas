@@ -464,38 +464,54 @@ async function loadAccount() {
 
     // se for o admin, adiciona botão de gerenciamento simples na UI da conta
     try {
-        const isAdmin = isAdminEmail(user.email);
-        if (isAdmin) {
-            const container = document.querySelector('#profile-card .profile-actions');
-            if (container && !document.getElementById('manage-site-btn')) {
-                const btn = document.createElement('a');
-                btn.id = 'manage-site-btn';
-                btn.className = 'secondary-button';
-                btn.href = '#';
-                btn.textContent = 'Gerenciar site';
-                btn.addEventListener('click', async (ev) => {
-                    ev.preventDefault();
-                    // load embedded admin panel
-                    if (document.getElementById('account-admin-panel')) {
-                        // toggle visibility
-                        const panel = document.getElementById('account-admin-panel');
-                        panel.hidden = !panel.hidden;
-                        return;
-                    }
-                    try {
-                        const mod = await import('./admin-embed.js');
-                        await mod.initAdminPanel(container.parentElement);
-                    } catch (e) {
-                        console.error('Erro ao carregar admin:', e);
-                        alert('Erro ao abrir painel administrativo. Veja console.');
-                    }
-                });
-                container.insertBefore(btn, container.firstChild);
-            }
+    const isAdmin = isAdminEmail(user.email);
+    if (isAdmin) {
+        const container = document.querySelector('#profile-card .profile-actions');
+        if (container && !document.getElementById('manage-site-btn')) {
+            const btn = document.createElement('a');
+            btn.id = 'manage-site-btn';
+            btn.className = 'secondary-button';
+            btn.href = '#';
+            btn.textContent = 'Gerenciar site';
+            
+            btn.addEventListener('click', async (ev) => {
+                ev.preventDefault();
+                
+                // Se o painel já existe, apenas alterna a visibilidade
+                if (document.getElementById('account-admin-panel')) {
+                    const panel = document.getElementById('account-admin-panel');
+                    panel.hidden = !panel.hidden;
+                    return;
+                }
+
+                // 👇 BLOQUEIO ADICIONADO AQUI 👇
+                // Desativa o botão temporariamente para evitar cliques rápidos/duplos
+                btn.style.pointerEvents = 'none';
+                const textoOriginal = btn.textContent;
+                btn.textContent = 'Carregando...';
+                // 👆 ======================= 👆
+
+                try {
+                    const mod = await import('./admin-embed.js');
+                    await mod.initAdminPanel(container.parentElement);
+                } catch (e) {
+                    console.error('Erro ao carregar admin:', e);
+                    alert('Erro ao abrir painel administrativo. Veja console.');
+                } finally {
+                    // 👇 DESBLOQUEIO ADICIONADO AQUI 👇
+                    // Restaura o botão de volta ao normal após o painel carregar na tela
+                    btn.style.pointerEvents = 'auto';
+                    btn.textContent = textoOriginal;
+                    // 👆 ========================== 👆
+                }
+            });
+            
+            container.insertBefore(btn, container.firstChild);
         }
-    } catch (e) {
-        // ignore
     }
+} catch (e) {
+    // ignore
+}
 
     const { data: addresses, error: addressesError } = await supabase
         .from('addresses')
