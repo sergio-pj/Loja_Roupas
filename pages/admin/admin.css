@@ -14,3 +14,9 @@ input,textarea{width:100%;padding:8px;margin-top:6px;border:1px solid #ddd;borde
 form .actions button{background:#0b7cff}
 .small{background:#eee;color:#333;padding:6px;border-radius:6px}
 .muted{color:#666;font-size:13px}
+
+.id-guide-table-wrap{overflow:auto;background:#fff;border:1px solid #e6e6e6;border-radius:8px}
+.id-guide-table{width:100%;border-collapse:collapse;font-size:14px}
+.id-guide-table th,.id-guide-table td{padding:10px 12px;border-bottom:1px solid #f0f0f0;text-align:left}
+.id-guide-table thead th{background:#fafafa;text-transform:uppercase;letter-spacing:.06em;font-size:12px;color:#444}
+.id-guide-table tbody tr:hover{background:#fcfcfd}

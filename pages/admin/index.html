@@ -35,8 +35,29 @@
       </form>
     </section>
 
+    <section id="id-guide" hidden>
+      <h2>Referência de IDs e cores</h2>
+      <p class="muted">Use esta tabela para manter cadastro organizado por peça e cor.</p>
+      <p class="muted"><strong>Próximo ID sugerido:</strong> <span id="next-product-id">-</span></p>
+      <div class="id-guide-table-wrap">
+        <table class="id-guide-table">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Produto</th>
+              <th>Cor</th>
+            </tr>
+          </thead>
+          <tbody id="id-guide-body"></tbody>
+        </table>
+      </div>
+    </section>
+
     <section id="list">
       <h2>Produtos</h2>
+      <div class="actions" style="margin-bottom: 10px;">
+        <button id="btn-remove-franja" type="button">Remover Camisa franja (teste)</button>
+      </div>
       <div id="products"></div>
     </section>
   </main>

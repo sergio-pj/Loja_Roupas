@@ -13,8 +13,12 @@ const els = {
   email: document.getElementById('email'),
   btnSignin: document.getElementById('btn-signin'),
   btnSignout: document.getElementById('btn-signout'),
+  btnRemoveFranja: document.getElementById('btn-remove-franja'),
   userInfo: document.getElementById('user-info'),
   editor: document.getElementById('editor'),
+  idGuide: document.getElementById('id-guide'),
+  idGuideBody: document.getElementById('id-guide-body'),
+  nextProductId: document.getElementById('next-product-id'),
   form: document.getElementById('product-form'),
   products: document.getElementById('products'),
   btnCancel: document.getElementById('btn-cancel'),
@@ -31,6 +35,9 @@ async function init(){
   els.form.addEventListener('submit', onSave)
   els.fileInput.addEventListener('change', onFilesSelected)
   els.btnCancel.addEventListener('click', resetForm)
+  if (els.btnRemoveFranja) {
+    els.btnRemoveFranja.addEventListener('click', removeCamisaFranja)
+  }
 
   const { data: { session } } = await supabase.auth.getSession()
   // permitir sessão local via storefront (admin local)
@@ -59,12 +66,67 @@ function handleSession(session){
     els.userInfo.hidden = false
     els.userInfo.textContent = `Logado: ${session.user.email}`
     els.editor.hidden = false
+    if (els.idGuide) {
+      els.idGuide.hidden = false
+    }
+    if (els.btnRemoveFranja) {
+      els.btnRemoveFranja.hidden = false
+    }
   } else {
     els.btnSignin.hidden = false
     els.btnSignout.hidden = true
     els.userInfo.hidden = true
     els.editor.hidden = true
+    if (els.idGuide) {
+      els.idGuide.hidden = true
+    }
+    if (els.btnRemoveFranja) {
+      els.btnRemoveFranja.hidden = true
+    }
   }
+}
+
+function normalizeText(value){
+  return String(value || '')
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .trim()
+}
+
+function inferCorFromProduct(produto){
+  const corDireta = String(produto?.cor || '').trim()
+  if (corDireta) return corDireta
+
+  const base = normalizeText(produto?.nome)
+  if (base.includes('azul')) return 'azul'
+  if (base.includes('preto') || base.includes('black')) return 'escura'
+  if (base.includes('off white') || base.includes('white') || base.includes('branca') || base.includes('bege')) return 'clara'
+  if (base.includes('rosa')) return 'rosa'
+  return 'não informada'
+}
+
+function renderIdGuide(products){
+  if (!els.idGuideBody || !els.nextProductId) {
+    return
+  }
+
+  const ordered = (Array.isArray(products) ? products.slice() : [])
+    .sort((a, b) => Number(a.id || 0) - Number(b.id || 0))
+
+  const maxId = ordered.reduce((acc, item) => Math.max(acc, Number(item?.id || 0)), 0)
+  els.nextProductId.textContent = String(maxId + 1)
+
+  if (!ordered.length) {
+    els.idGuideBody.innerHTML = '<tr><td colspan="3" class="muted">Nenhum produto cadastrado.</td></tr>'
+    return
+  }
+
+  els.idGuideBody.innerHTML = ordered.map((p) => {
+    const cor = inferCorFromProduct(p)
+    const nome = String(p?.nome || 'Sem nome')
+    return `<tr><td>${p.id}</td><td>${nome}</td><td>${cor}</td></tr>`
+  }).join('')
 }
 
 async function signIn(){
@@ -89,6 +151,8 @@ async function loadProducts(){
   const { data, error } = await supabase.from('produtos').select('*').order('id', {ascending:true})
   if(error){ els.products.innerHTML = `<div class="muted">Erro: ${error.message}</div>`; return }
 
+  renderIdGuide(data || [])
+
   if(!data || !data.length){ els.products.innerHTML = '<div class="muted">Nenhum produto cadastrado</div>'; return }
 
   els.products.innerHTML = ''
@@ -97,12 +161,13 @@ async function loadProducts(){
     const img = document.createElement('img'); img.src = p.imagem || '/assets/modelofrente_begesnome.png'
     const h = document.createElement('div'); h.innerHTML = `<strong>${p.nome}</strong>`
     const d = document.createElement('div'); d.className='muted'; d.textContent = p.descricao || ''
+    const meta = document.createElement('div'); meta.className='muted'; meta.textContent = `ID ${p.id} | Cor: ${inferCorFromProduct(p)}`
     const a = document.createElement('div'); a.className='actions'
     const edit = document.createElement('button'); edit.textContent='Editar'; edit.addEventListener('click', ()=> fillForm(p))
     const del = document.createElement('button'); del.textContent='Excluir'; del.style.background='#c0392b'
     del.addEventListener('click', ()=> delProduct(p.id))
     a.appendChild(edit); a.appendChild(del)
-    div.appendChild(img); div.appendChild(h); div.appendChild(d); div.appendChild(a)
+    div.appendChild(img); div.appendChild(h); div.appendChild(meta); div.appendChild(d); div.appendChild(a)
     els.products.appendChild(div)
   })
 }
@@ -162,8 +227,6 @@ async function onSave(e){
   const nome = document.getElementById('nome').value.trim()
   const preco = Number(document.getElementById('preco').value || 0)
   const descricao = document.getElementById('descricao').value.trim()
-  const files = Array.from(document.getElementById('imagem').files || [])
-
     // handle multiple files: upload newFiles and collect URLs (or dataURL fallback)
     let galeria = currentGallery.slice()
     for (const file of newFiles) {
@@ -187,14 +250,18 @@ async function onSave(e){
 
     if(id){
       const updates = { nome, preco, descricao }
-      if(galeria && galeria.length) updates.galeria = galeria
-      else if (galeria && galeria.length === 1) updates.imagem = galeria[0]
+      if(galeria && galeria.length) {
+        updates.galeria = galeria
+        updates.imagem = galeria[0]
+      }
       const { error } = await supabase.from('produtos').update(updates).eq('id', id)
     if(error) return alert('Erro ao atualizar: '+error.message)
   } else {
       const payload = { nome, preco, descricao }
-      if(galeria && galeria.length) payload.galeria = galeria
-      else if (galeria && galeria.length === 1) payload.imagem = galeria[0]
+      if(galeria && galeria.length) {
+        payload.galeria = galeria
+        payload.imagem = galeria[0]
+      }
       const { error } = await supabase.from('produtos').insert([payload])
     if(error) return alert('Erro ao inserir: '+error.message)
   }
@@ -209,6 +276,23 @@ async function delProduct(id){
   const { error } = await supabase.from('produtos').delete().eq('id', id)
   if(error) return alert('Erro ao excluir: '+error.message)
   await loadProducts();
+}
+
+async function removeCamisaFranja(){
+  if(!confirm('Remover todos os produtos com nome "Camisa franja"?')) return
+
+  const { error } = await supabase
+    .from('produtos')
+    .delete()
+    .ilike('nome', '%camisa franja%')
+
+  if(error) {
+    alert('Não foi possível remover automaticamente. Verifique as policies de DELETE no Supabase.\n\nErro: ' + error.message)
+    return
+  }
+
+  await loadProducts()
+  alert('Produto de teste removido com sucesso.')
 }
 
 init()
