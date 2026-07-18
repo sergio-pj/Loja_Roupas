@@ -1,6 +1,7 @@
 const params = new URLSearchParams(window.location.search);
 const productId = Number(params.get('id'));
 const CATALOG_DATA_URL = new URL('../catalogo/catalogo.json', window.location.href).href;
+const hiddenProductNames = new Set(['camisa franja']);
 
 const stateElement = document.getElementById('product-state');
 const layoutElement = document.getElementById('product-layout');
@@ -33,6 +34,19 @@ let allProducts = [];
 let selectedSize = '';
 let productRelatedStartIndex = 0;
 let productMediaCarouselCleanups = [];
+
+function normalizeText(value) {
+    return String(value || '')
+        .toLowerCase()
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .trim();
+}
+
+function shouldHideProduct(produto) {
+    const nomeNormalizado = normalizeText(produto?.nome);
+    return hiddenProductNames.has(nomeNormalizado);
+}
 
 function resolveProductImages(product) {
     const sources = Array.isArray(product.galeria) && product.galeria.length ? product.galeria : [product.imagem];
@@ -435,21 +449,17 @@ async function loadProduct() {
     }
 
     try {
-        let staticData = [];
-        try {
-            const response = await fetch(CATALOG_DATA_URL);
-            staticData = await response.json();
-        } catch (error) {
-            console.warn('Nao foi possivel carregar catalogo.json na pagina de produto.', error);
-        }
-
         let dbData = [];
+        let dbError = null;
+
         if (window.supabase) {
             try {
                 const { data, error } = await window.supabase
                     .from('produtos')
                     .select('*')
                     .order('id', { ascending: false });
+
+                dbError = error || null;
 
                 if (!error && Array.isArray(data)) {
                     dbData = data.map(item => ({
@@ -459,25 +469,36 @@ async function loadProduct() {
                     }));
                 }
             } catch (error) {
+                dbError = error;
                 console.warn('Nao foi possivel carregar produtos do Supabase na pagina de produto.', error);
             }
         }
 
-        const merged = dbData.slice();
-        const dbIds = new Set(dbData.map(item => Number(item.id)));
+        if (window.supabase) {
+            if (dbError) {
+                setState('Nao foi possivel carregar os produtos agora. Tente novamente em instantes.', true);
+                return;
+            }
 
-        staticData.forEach(item => {
-            const itemId = Number(item.id);
-            if (!dbIds.has(itemId)) {
-                merged.push({
+            allProducts = dbData.filter(item => !shouldHideProduct(item));
+        } else {
+            let staticData = [];
+            try {
+                const response = await fetch(CATALOG_DATA_URL);
+                staticData = await response.json();
+            } catch (error) {
+                console.warn('Nao foi possivel carregar catalogo.json na pagina de produto.', error);
+            }
+
+            allProducts = staticData
+                .map(item => ({
                     ...item,
                     galeria: item.galeria || [],
                     imagem: item.imagem || item.imagem_url || ''
-                });
-            }
-        });
+                }))
+                .filter(item => !shouldHideProduct(item));
+        }
 
-        allProducts = merged;
         const product = allProducts.find(item => Number(item.id) === productId);
 
         if (!product) {

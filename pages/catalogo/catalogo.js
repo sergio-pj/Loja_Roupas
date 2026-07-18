@@ -4,55 +4,72 @@ let termoBuscaAtual = '';
 let paginaAtual = 1;
 const itensPorPagina = 6;
 const CATALOG_DATA_URL = new URL('catalogo.json', window.location.href).href;
+const ADMIN_EMAIL = 'aranha.admin@gmail.com';
+const hiddenProductNames = new Set(['camisa franja']);
 let catalogMediaCarouselCleanups = [];
 let catalogMediaCarouselSyncIntervalId = null;
 let catalogMediaCarouselSyncIndex = 0;
 const catalogMediaCarouselPauseSet = new Set();
 
-function initComingSoonNotice() {
-    const modal = document.getElementById('coming-soon-modal');
-    const closeButton = modal?.querySelector('.coming-soon-close');
-    const sidebar = document.getElementById('sidebar');
-
-    if (!modal || !closeButton) return;
-
-    const closeModal = () => {
-        modal.classList.remove('is-open');
-        modal.setAttribute('aria-hidden', 'true');
-        document.body.classList.remove('no-scroll');
-    };
-
-    const openModal = () => {
-        modal.classList.add('is-open');
-        modal.setAttribute('aria-hidden', 'false');
-        document.body.classList.add('no-scroll');
-    };
-
-    closeButton.addEventListener('click', closeModal);
-    modal.addEventListener('click', (event) => {
-        if (event.target === modal) {
-            closeModal();
-        }
-    });
-
-    document.querySelectorAll('#sidebar .sidebar-categories-list a').forEach((link) => {
-        link.addEventListener('click', (event) => {
-            const label = link.textContent.trim().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
-            if (['moletom', 'moletons', 'polo', 'polos'].includes(label)) {
-                event.preventDefault();
-                if (sidebar?.classList.contains('open')) {
-                    toggleMenu();
-                }
-                openModal();
-            }
-        });
-    });
+function normalizeText(value) {
+    return String(value || '')
+        .toLowerCase()
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .trim();
 }
 
-if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initComingSoonNotice);
-} else {
-    initComingSoonNotice();
+function shouldHideProduct(produto) {
+    const nomeNormalizado = normalizeText(produto?.nome);
+    return hiddenProductNames.has(nomeNormalizado);
+}
+
+async function isCatalogAdmin() {
+    const localAuth = window.storefront?.getAuth?.() || null;
+    const localEmail = String(localAuth?.email || '').trim().toLowerCase();
+
+    if (localEmail && localEmail === ADMIN_EMAIL) {
+        return true;
+    }
+
+    if (!window.supabase?.auth?.getSession) {
+        return false;
+    }
+
+    const { data, error } = await window.supabase.auth.getSession();
+
+    if (error) {
+        return false;
+    }
+
+    const sessionEmail = String(data?.session?.user?.email || '').trim().toLowerCase();
+    return sessionEmail === ADMIN_EMAIL;
+}
+
+async function setupCatalogAdminActions() {
+    const actions = document.getElementById('catalog-actions');
+    const btn = document.getElementById('reload-catalog');
+
+    if (!actions || !btn) {
+        return;
+    }
+
+    const isAdmin = await isCatalogAdmin();
+    actions.hidden = !isAdmin;
+
+    if (!isAdmin || btn.dataset.bound === 'true') {
+        return;
+    }
+
+    btn.addEventListener('click', async () => {
+        btn.disabled = true;
+        btn.textContent = 'Recarregando...';
+        await carregarProdutos();
+        btn.disabled = false;
+        btn.textContent = 'Recarregar catálogo';
+    });
+
+    btn.dataset.bound = 'true';
 }
 
 function resolveProductImages(produto) {
@@ -270,34 +287,44 @@ function aplicarFiltroInicial() {
     }
 }
 
-// Busca os dados do JSON
+// Busca os produtos priorizando Supabase para manter a vitrine sincronizada
 async function carregarProdutos() {
-    // tenta buscar do Supabase se disponível, senão usa o JSON estático
     try {
-        // busca tanto do Supabase quanto do catálogo estático e mescla (supabase tem prioridade)
+        let dbData = [];
+        let dbError = null;
+
+        if (window.supabase) {
+            const { data, error } = await window.supabase.from('produtos').select('*').order('id', { ascending: false });
+            dbError = error || null;
+            if (!error && Array.isArray(data)) {
+                dbData = data.map(p => ({ ...p, galeria: p.galeria || [], imagem: p.imagem || '' }));
+            }
+        }
+
+        // Se o Supabase está disponível no frontend, ele sempre é a fonte de verdade.
+        // Isso evita mostrar catálogo antigo para visitante/cliente quando houver erro de policy.
+        if (window.supabase) {
+            if (dbError) {
+                console.error('Erro ao carregar produtos do Supabase:', dbError);
+                produtosDados = [];
+            } else {
+                produtosDados = dbData.filter(produto => !shouldHideProduct(produto));
+            }
+
+            aplicarFiltroInicial();
+            atualizarCatalogo();
+            return;
+        }
+
         let staticData = [];
         try {
             const resp = await fetch(CATALOG_DATA_URL);
             staticData = await resp.json();
-        } catch (e) {
-            console.warn('não foi possível carregar catalogo.json', e);
+        } catch (staticError) {
+            console.warn('Nao foi possivel carregar catalogo.json', staticError);
         }
 
-        let dbData = [];
-        if (window.supabase) {
-            const { data, error } = await window.supabase.from('produtos').select('*').order('id', { ascending: false });
-            if (!error && Array.isArray(data)) dbData = data.map(p => ({ ...p, galeria: p.galeria || [], imagem: p.imagem || '' }));
-        }
-
-        // mesclar: manter todos do DB e adicionar do static os que não existem por id
-        const merged = dbData.slice();
-        const dbIds = new Set(dbData.map(d => Number(d.id)));
-        staticData.forEach(s => {
-            const sid = Number(s.id);
-            if (!dbIds.has(sid)) merged.push({ ...s, galeria: s.galeria || [], imagem: s.imagem || s.imagem_url || '' });
-        });
-
-        produtosDados = merged;
+        produtosDados = staticData.filter(produto => !shouldHideProduct(produto));
         aplicarFiltroInicial();
         atualizarCatalogo();
     } catch (error) {
@@ -309,6 +336,11 @@ async function carregarProdutos() {
 function exibirProdutos(lista) {
     const container = document.getElementById('lista-produtos');
     container.innerHTML = ""; 
+
+    if (!Array.isArray(lista) || !lista.length) {
+        container.innerHTML = '<p class="muted">Nenhum produto disponível no momento.</p>';
+        return;
+    }
 
     lista.forEach(produto => {
         const card = `
@@ -521,16 +553,12 @@ if (filtrosToggle && filtrosBody) {
     }
 }
 
-// botão de recarregar catálogo (útil em desenvolvimento)
 document.addEventListener('DOMContentLoaded', () => {
-    const btn = document.getElementById('reload-catalog');
-    if (btn) {
-        btn.addEventListener('click', async () => {
-            btn.disabled = true;
-            btn.textContent = 'Recarregando...';
-            await carregarProdutos();
-            btn.disabled = false;
-            btn.textContent = 'Recarregar catálogo';
+    setupCatalogAdminActions();
+
+    if (window.supabase?.auth?.onAuthStateChange) {
+        window.supabase.auth.onAuthStateChange(() => {
+            setupCatalogAdminActions();
         });
     }
 });
