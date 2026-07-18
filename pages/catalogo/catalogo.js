@@ -11,50 +11,79 @@ let catalogMediaCarouselSyncIntervalId = null;
 let catalogMediaCarouselSyncIndex = 0;
 const catalogMediaCarouselPauseSet = new Set();
 
-function initComingSoonNotice() {
-    const modal = document.getElementById('coming-soon-modal');
-    const closeButton = modal?.querySelector('.coming-soon-close');
-    const sidebar = document.getElementById('sidebar');
+async function waitForSupabaseBrowserClient(maxWaitMs = 1800) {
+    if (window.supabase) {
+        return true;
+    }
 
-    if (!modal || !closeButton) return;
+    const start = Date.now();
 
-    const closeModal = () => {
-        modal.classList.remove('is-open');
-        modal.setAttribute('aria-hidden', 'true');
-        document.body.classList.remove('no-scroll');
-    };
+    while (!window.supabase && Date.now() - start < maxWaitMs) {
+        await new Promise(resolve => window.setTimeout(resolve, 60));
+    }
 
-    const openModal = () => {
-        modal.classList.add('is-open');
-        modal.setAttribute('aria-hidden', 'false');
-        document.body.classList.add('no-scroll');
-    };
-
-    closeButton.addEventListener('click', closeModal);
-    modal.addEventListener('click', (event) => {
-        if (event.target === modal) {
-            closeModal();
-        }
-    });
-
-    document.querySelectorAll('#sidebar .sidebar-categories-list a').forEach((link) => {
-        link.addEventListener('click', (event) => {
-            const label = link.textContent.trim().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
-            if (['moletom', 'moletons', 'polo', 'polos'].includes(label)) {
-                event.preventDefault();
-                if (sidebar?.classList.contains('open')) {
-                    toggleMenu();
-                }
-                openModal();
-            }
-        });
-    });
+    return Boolean(window.supabase);
 }
 
-if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initComingSoonNotice);
-} else {
-    initComingSoonNotice();
+function normalizeText(value) {
+    return String(value || '')
+        .toLowerCase()
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .trim();
+}
+
+function shouldHideProduct(produto) {
+    const nomeNormalizado = normalizeText(produto?.nome);
+    return hiddenProductNames.has(nomeNormalizado);
+}
+
+async function isCatalogAdmin() {
+    const localAuth = window.storefront?.getAuth?.() || null;
+    const localEmail = String(localAuth?.email || '').trim().toLowerCase();
+
+    if (localEmail && localEmail === ADMIN_EMAIL) {
+        return true;
+    }
+
+    if (!window.supabase?.auth?.getSession) {
+        return false;
+    }
+
+    const { data, error } = await window.supabase.auth.getSession();
+
+    if (error) {
+        return false;
+    }
+
+    const sessionEmail = String(data?.session?.user?.email || '').trim().toLowerCase();
+    return sessionEmail === ADMIN_EMAIL;
+}
+
+async function setupCatalogAdminActions() {
+    const actions = document.getElementById('catalog-actions');
+    const btn = document.getElementById('reload-catalog');
+
+    if (!actions || !btn) {
+        return;
+    }
+
+    const isAdmin = await isCatalogAdmin();
+    actions.hidden = !isAdmin;
+
+    if (!isAdmin || btn.dataset.bound === 'true') {
+        return;
+    }
+
+    btn.addEventListener('click', async () => {
+        btn.disabled = true;
+        btn.textContent = 'Recarregando...';
+        await carregarProdutos();
+        btn.disabled = false;
+        btn.textContent = 'Recarregar catálogo';
+    });
+
+    btn.dataset.bound = 'true';
 }
 
 function resolveProductImages(produto) {

@@ -35,6 +35,33 @@ let selectedSize = '';
 let productRelatedStartIndex = 0;
 let productMediaCarouselCleanups = [];
 
+async function waitForSupabaseBrowserClient(maxWaitMs = 1400) {
+    if (window.supabase) {
+        return true;
+    }
+
+    const start = Date.now();
+
+    while (!window.supabase && Date.now() - start < maxWaitMs) {
+        await new Promise(resolve => window.setTimeout(resolve, 60));
+    }
+
+    return Boolean(window.supabase);
+}
+
+function normalizeText(value) {
+    return String(value || '')
+        .toLowerCase()
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .trim();
+}
+
+function shouldHideProduct(produto) {
+    const nomeNormalizado = normalizeText(produto?.nome);
+    return hiddenProductNames.has(nomeNormalizado);
+}
+
 function resolveProductImages(product) {
     const sources = Array.isArray(product.galeria) && product.galeria.length ? product.galeria : [product.imagem];
 
