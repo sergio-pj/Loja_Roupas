@@ -11,6 +11,20 @@ let catalogMediaCarouselSyncIntervalId = null;
 let catalogMediaCarouselSyncIndex = 0;
 const catalogMediaCarouselPauseSet = new Set();
 
+async function waitForSupabaseBrowserClient(maxWaitMs = 1800) {
+    if (window.supabase) {
+        return true;
+    }
+
+    const start = Date.now();
+
+    while (!window.supabase && Date.now() - start < maxWaitMs) {
+        await new Promise(resolve => window.setTimeout(resolve, 60));
+    }
+
+    return Boolean(window.supabase);
+}
+
 function normalizeText(value) {
     return String(value || '')
         .toLowerCase()
@@ -290,6 +304,8 @@ function aplicarFiltroInicial() {
 // Busca os produtos priorizando Supabase para manter a vitrine sincronizada
 async function carregarProdutos() {
     try {
+        await waitForSupabaseBrowserClient();
+
         let dbData = [];
         let dbError = null;
 

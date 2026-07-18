@@ -35,6 +35,20 @@ let selectedSize = '';
 let productRelatedStartIndex = 0;
 let productMediaCarouselCleanups = [];
 
+async function waitForSupabaseBrowserClient(maxWaitMs = 1800) {
+    if (window.supabase) {
+        return true;
+    }
+
+    const start = Date.now();
+
+    while (!window.supabase && Date.now() - start < maxWaitMs) {
+        await new Promise(resolve => window.setTimeout(resolve, 60));
+    }
+
+    return Boolean(window.supabase);
+}
+
 function normalizeText(value) {
     return String(value || '')
         .toLowerCase()
@@ -449,6 +463,8 @@ async function loadProduct() {
     }
 
     try {
+        await waitForSupabaseBrowserClient();
+
         let dbData = [];
         let dbError = null;
 
