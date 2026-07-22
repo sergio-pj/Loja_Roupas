@@ -1,0 +1,35 @@
+{
+  "schema_version": 1,
+  "updated_at": "2026-07-18T16:53:08.262977600+00:00",
+  "entries": [
+    {
+      "id": "buddy-buddy_pr_issue_matchmaker-e9f72bb0-ab60-4600-bab9-1d015d382e85",
+      "file_name": "buddy-buddy_pr_issue_matchmaker-e9f72bb0-ab60-4600-bab9-1d015d382e85.json",
+      "source": {
+        "kind": "buddy"
+      },
+      "created_at": "2026-07-18T16:53:08.229786700+00:00",
+      "updated_at": "2026-07-18T16:53:08.237627100+00:00",
+      "title": "PR/Issue Matchmaker",
+      "model": "google_gemini/gemini-flash-lite-latest",
+      "mode": "buddy",
+      "message_count": 12,
+      "root_chat_id": "buddy-buddy_pr_issue_matchmaker-e9f72bb0-ab60-4600-bab9-1d015d382e85",
+      "is_title_generated": false,
+      "total_lines_added": 0,
+      "total_lines_removed": 0,
+      "tasks_total": 0,
+      "tasks_done": 0,
+      "tasks_failed": 0,
+      "total_prompt_tokens": 8417,
+      "total_completion_tokens": 613,
+      "total_tokens": 9030,
+      "total_cache_read_tokens": 0,
+      "total_cache_creation_tokens": 0,
+      "displayable_chat": false,
+      "waiting_for_card_ids": [],
+      "file_len": 9245,
+      "file_modified_unix_ms": 1784393588238
+    }
+  ]
+}

@@ -19,30 +19,27 @@ html {
 
 html.no-scroll {
     overflow: hidden !important;
-    height: 100vh !important;
+    height: 100% !important;
     width: 100% !important;
 }
 
 body {
     width: 100%;
     overflow-x: hidden;
-}
-
-/* Prevent background scrolling when modal/sidebar is open */
-body.no-scroll {
-    overflow: hidden !important;
-    height: 100vh !important;
-    width: 100% !important;
-    touch-action: none;
-}
-
-body {
     background-color: #FAF9F6;
     font-family: 'Inter', sans-serif;
     color: #333;
     min-height: 100vh;
     display: flex;
     flex-direction: column;
+}
+
+/* Prevent background scrolling when modal/sidebar is open */
+body.no-scroll {
+    overflow: hidden !important;
+    height: 100% !important;
+    width: 100% !important;
+    touch-action: none;
 }
 
 /* 2. HEADER E BARRA DE BUSCA */
@@ -52,13 +49,9 @@ body {
     align-items: center;
     padding: 20px 40px;
     position: relative;
-    
-    /* O Fundo: Primeiro a imagem de fumaça, depois a cor sólida de backup */
-    background-image: url('assets/Fundo_Cabeçalho.png'); /* Nome da sua nova arte */
-    background-color: #FAF9F6; /* Cor original de fundo */
-    
-    /* Ajustes da Imagem: Para ela cobrir sem repetir */
-    background-size: cover; 
+    background-image: url('assets/Fundo_Cabeçalho.png');
+    background-color: #FAF9F6;
+    background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
 }
@@ -188,7 +181,6 @@ body {
     box-shadow: 16px 0 55px rgba(0, 0, 0, 0.14);
 }
 
-/* Sidebar open state (width controlled by breakpoint) */
 .sidebar.open { width: 320px; max-width: 100%; }
 
 .sidebar-content {
@@ -484,47 +476,6 @@ body {
     color: #5f584f;
 }
 
-/* Mobile: sidebar top area fixed, categories scrollable */
-@media (max-width: 720px) {
-    /* On small screens the open state should fill the viewport; keep default closed width 0 */
-    .sidebar { left: 0; }
-    .sidebar.open { width: 100%; }
-
-    .sidebar-content {
-        display: flex;
-        flex-direction: column;
-        padding: 72px 20px 32px;
-        gap: 18px;
-        min-height: calc(100vh - 72px);
-    }
-
-    .sidebar-user-quick { order: 1; }
-    .sidebar-categories { order: 2; }
-    .sidebar-account { order: 3; }
-
-    .sidebar-links {
-        overflow: auto;
-        flex: 1 1 auto;
-        display: flex;
-        flex-direction: column;
-        gap: 6px;
-        padding-right: 8px;
-    }
-
-    .sidebar-account .sidebar-links { margin-top: 12px; }
-
-    .sidebar-links hr {
-        margin-top: 8px;
-    }
-}
-
-.user-link-sidebar {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 15px 0;
-}
-
 /* 4. BANNER E DESTAQUES */
 .hero-banner {
     width: 100%;
@@ -542,8 +493,8 @@ body {
 
 .banner-overlay {
     width: 100%;
-    height: 100%; /* Mude de 150% para 100% para encaixar no banner */
-    background: rgba(0, 0, 0, 0.05); /* Escurece levemente para dar leitura ao texto */
+    height: 100%;
+    background: rgba(0, 0, 0, 0.05);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -552,7 +503,7 @@ body {
 .brand-overlap {
     display: flex;
     justify-content: center;
-    margin-top: -90px; /* ajusta a sobreposição sem cobrir demais */
+    margin-top: -90px;
     position: relative;
     z-index: 10;
 }
@@ -939,7 +890,6 @@ body {
         opacity: 0;
         transform: translate3d(0, 14px, 0) scale(0.99);
     }
-
     to {
         opacity: 1;
         transform: translate3d(0, 0, 0) scale(1);
@@ -947,18 +897,15 @@ body {
 }
 
 /* 5.6 NEWSLETTER */
-
-/* A faixa cinza que ocupa a largura toda da tela */
 .newsletter-section {
-    background-color: #f4f4f4; /* Cinza claro suave */
+    background-color: #f4f4f4;
     width: 100%;
-    padding: 60px 0; /* Aumenta o respiro em cima e embaixo */
+    padding: 60px 0;
     margin: 40px 0;
 }
 
-/* O conteúdo centralizado */
 .newsletter-container {
-    max-width: 800px; /* Aumentei um pouco para não ficar apertado */
+    max-width: 800px;
     margin: 0 auto; 
     text-align: center;
     padding: 0 20px;
@@ -974,9 +921,9 @@ body {
 .newsletter-input {
     flex: 1; 
     max-width: 350px; 
-    padding: 14px 20px; /* Input um pouco mais alto para parecer premium */
+    padding: 14px 20px; 
     border: 1px solid #ddd; 
-    border-radius: 4px; /* Arredondado mais sutil combina com a Aranha */
+    border-radius: 4px; 
     outline: none;
     font-size: 16px;
 }
@@ -988,14 +935,14 @@ body {
     border: none; 
     border-radius: 4px;
     font-weight: 700; 
-    letter-spacing: 1px; /* Espaçamento nas letras para elegância */
+    letter-spacing: 1px; 
     text-transform: uppercase; 
     cursor: pointer;
     transition: background 0.3s;
 }
 
 .newsletter-button:hover {
-    background-color: #201d1d; /* Efeito ao passar o mouse */
+    background-color: #201d1d; 
 }
 
 .newsletter-text {
@@ -1004,26 +951,11 @@ body {
     margin: 0;
 }
 
-/* Ajuste para Celular */
-@media (max-width: 600px) {
-    .newsletter-form {
-        flex-direction: column; /* No celular, um fica embaixo do outro */
-        align-items: center;
-    }
-    .newsletter-input {
-        width: 100%;
-        max-width: none;
-    }
-    .newsletter-button {
-        width: 100%;
-    }
-}
-
 /* 6. RODAPÉ */
 .main-footer {
     background-color: #1a1714; color: #fff;
     padding: 60px 20px 20px; font-family: 'Inter', sans-serif;
-    position: relative; /* Importante para as teias */
+    position: relative;
 }
 
 .footer-container {
@@ -1127,9 +1059,8 @@ body {
     .footer-container { grid-template-columns: 1fr 1fr; }
     .product-grid { grid-template-columns: 1fr 1fr; }
 
-    /* Estas regras devem estar AQUI DENTRO */
     .hero-banner {
-        height: 480px; /* Ajuste fino para o SVG no tablet */
+        height: 480px;
         background-size: cover;
         background-position: 56% 20%;
     }
@@ -1140,7 +1071,7 @@ body {
     }
 
     .brand-overlap {
-        margin-top: -60px; /* Sobe menos a caixa para não tapar o cupom na arte */
+        margin-top: -60px;
     }
 
     .overlap-box {
@@ -1154,7 +1085,6 @@ body {
         padding: 24px 18px;
     }
 
-    /* Make the brand strip visually narrower and stretched but responsive */
     .brand-overlap .overlap-box {
         transform: translateY(-8%);
     }
@@ -1187,7 +1117,6 @@ body {
         align-items: center;
         justify-content: center;
         background-position: center top;
-        /* Mostrar a imagem inteira no celular: pode deixar espaços, mas não corta a arte */
         background-size: contain;
         background-repeat: no-repeat;
         background-color: #f3f1ec;
@@ -1246,11 +1175,11 @@ body {
     }
     
     .search-bar { 
-        flex: 1 1 0;
+        flex: 1 1 100%;
         min-width: 0;
         max-width: none;
         order: 2;
-        margin: 0;
+        margin: 4px 0 0 0;
     }
 
     .search-bar input {
