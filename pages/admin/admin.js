@@ -7,7 +7,7 @@ function isAdminEmail(email){
   return String(email || '').trim().toLowerCase() === ADMIN_EMAIL.toLowerCase()
 }
 // bucket de storage usado no projeto (ajuste se seu bucket tiver outro nome)
-const STORAGE_BUCKET = 'getPublicUrl'
+const STORAGE_BUCKET = 'product-images'
 
 const els = {
   email: document.getElementById('email'),
@@ -34,7 +34,7 @@ async function init(){
   els.btnSignout.addEventListener('click', signOut)
   els.form.addEventListener('submit', onSave)
   els.fileInput.addEventListener('change', onFilesSelected)
-  els.btnCancel.addEventListener('click', resetForm)
+  els.btnCancel.addEventListener('click', clearForm)
   if (els.btnRemoveFranja) {
     els.btnRemoveFranja.addEventListener('click', removeCamisaFranja)
   }
@@ -186,7 +186,7 @@ function fillForm(p){
   renderPreviewGallery()
 }
 
-function resetForm(){ els.form.reset(); document.getElementById('prod-id').value=''; els.editor.hidden = false }
+function clearForm(){ els.form.reset(); document.getElementById('prod-id').value=''; }
 
 function onFilesSelected(e){
   const files = Array.from(e.target.files || [])
@@ -227,48 +227,48 @@ async function onSave(e){
   const nome = document.getElementById('nome').value.trim()
   const preco = Number(document.getElementById('preco').value || 0)
   const descricao = document.getElementById('descricao').value.trim()
-    // handle multiple files: upload newFiles and collect URLs (or dataURL fallback)
-    let galeria = currentGallery.slice()
-    for (const file of newFiles) {
-      const filePath = `produtos/${Date.now()}_${file.name}`
-      try {
-        const { error: upErr } = await supabase.storage.from(STORAGE_BUCKET).upload(filePath, file)
-        if (upErr) throw upErr
-        const { data } = supabase.storage.from(STORAGE_BUCKET).getPublicUrl(filePath)
-        if (data && data.publicUrl) galeria.push(data.publicUrl)
-      } catch (uploadErr) {
-        console.error('storage upload failed for', file.name, uploadErr)
-        const dataUrl = await new Promise((res) => {
-          const r = new FileReader()
-          r.onload = () => res(r.result)
-          r.onerror = () => res('')
-          r.readAsDataURL(file)
-        })
-        if (dataUrl) galeria.push(dataUrl)
-      }
+  // handle multiple files: upload newFiles and collect URLs (or dataURL fallback)
+  let galeria = currentGallery.slice()
+  for (const file of newFiles) {
+    const filePath = `produtos/${Date.now()}_${file.name}`
+    try {
+      const { error: upErr } = await supabase.storage.from(STORAGE_BUCKET).upload(filePath, file)
+      if (upErr) throw upErr
+      const { data } = supabase.storage.from(STORAGE_BUCKET).getPublicUrl(filePath)
+      if (data && data.publicUrl) galeria.push(data.publicUrl)
+    } catch (uploadErr) {
+      console.error('storage upload failed for', file.name, uploadErr)
+      const dataUrl = await new Promise((res) => {
+        const r = new FileReader()
+        r.onload = () => res(r.result)
+        r.onerror = () => res('')
+        r.readAsDataURL(file)
+      })
+      if (dataUrl) galeria.push(dataUrl)
     }
+  }
 
-    if(id){
-      const updates = { nome, preco, descricao }
-      if(galeria && galeria.length) {
-        updates.galeria = galeria
-        updates.imagem = galeria[0]
-      }
-      const { error } = await supabase.from('produtos').update(updates).eq('id', id)
+  if(id){
+    const updates = { nome, preco, descricao }
+    if(galeria && galeria.length) {
+      updates.galeria = galeria
+      updates.imagem = galeria[0]
+    }
+    const { error } = await supabase.from('produtos').update(updates).eq('id', id)
     if(error) return alert('Erro ao atualizar: '+error.message)
   } else {
-      const payload = { nome, preco, descricao }
-      if(galeria && galeria.length) {
-        payload.galeria = galeria
-        payload.imagem = galeria[0]
-      }
-      const { error } = await supabase.from('produtos').insert([payload])
+    const payload = { nome, preco, descricao }
+    if(galeria && galeria.length) {
+      payload.galeria = galeria
+      payload.imagem = galeria[0]
+    }
+    const { error } = await supabase.from('produtos').insert([payload])
     if(error) return alert('Erro ao inserir: '+error.message)
   }
-    // reset state and UI
-    currentGallery = []
-    newFiles = []
-    resetForm(); await loadProducts(); alert('Salvo com sucesso')
+  // reset state and UI
+  currentGallery = []
+  newFiles = []
+  clearForm(); await loadProducts(); alert('Salvo com sucesso')
 }
 
 async function delProduct(id){

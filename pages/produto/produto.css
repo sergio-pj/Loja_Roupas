@@ -85,6 +85,8 @@
 }
 
 .product-gallery-surface .media-carousel-slide {
+    position: absolute;
+    inset: 0;
     width: 100%;
     height: 100%;
     max-width: none;
@@ -92,6 +94,20 @@
     padding: 28px;
     object-fit: contain;
     object-position: center;
+    opacity: 0;
+    transform: scale(0.985);
+    transition: opacity 0.35s ease, transform 0.45s ease;
+}
+
+.product-gallery-surface .media-carousel-slide.is-active {
+    opacity: 1;
+    transform: scale(1);
+}
+
+.product-gallery-surface .media-carousel-slide:first-child:last-child {
+    position: relative;
+    opacity: 1;
+    transform: none;
 }
 
 .product-gallery-thumbs {
@@ -181,6 +197,7 @@
     font-size: clamp(2rem, 3vw, 3.2rem);
     line-height: 1.05;
     color: #1a1714;
+    word-break: break-word;
 }
 
 .product-subtitle {
@@ -415,6 +432,7 @@
 .product-measures-section,
 .related-products-section {
     padding: 30px;
+    overflow: hidden;
 }
 
 .product-table-wrapper {

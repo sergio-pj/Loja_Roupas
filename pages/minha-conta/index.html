@@ -24,15 +24,38 @@
                 </div>
             </div>
             <script>
-                (function(){
-                    const key = 'aranhaUser';
-                    const raw = localStorage.getItem(key);
-                    const container = document.querySelector('.sidebar-user-quick .user-quick-text');
-                    if(!container) return;
-                    if(raw) {
-                        try{ const user = JSON.parse(raw); const name = user && (user.nome || user.name) ? (user.nome || user.name) : 'cliente'; container.innerHTML = `<strong class="greeting">Olá, ${name}</strong>`; }catch(e){}
+            (async () => {
+                const getLoginPath = () => window.location.pathname.includes('/pages/') ? '../login/index.html' : 'pages/login/index.html';
+
+                // Wait for supabase client
+                while(!window.supabase) {
+                    await new Promise(resolve => setTimeout(resolve, 50));
+                }
+
+                const container = document.querySelector('.sidebar-user-quick .user-quick-text');
+                if (!container) return;
+
+                try {
+                    const { data: { session } } = await window.supabase.auth.getSession();
+
+                    if (session && session.user) {
+                        const user = session.user;
+                        if (user.email.toLowerCase() === 'aranha.admin@gmail.com') {
+                            container.innerHTML = `<strong class="greeting">Seja Bem-Vindo Adm Aranha</strong>`;
+                        } else {
+                            const name = user.user_metadata?.full_name || 'cliente';
+                            container.innerHTML = `<strong class="greeting">Seja bem-vindo, ${name}</strong>`;
+                        }
+                    } else {
+                         const loginPath = getLoginPath();
+                         container.innerHTML = `
+                            <strong class="greeting">Olá, visitante</strong>
+                            <span class="auth-links"><a href="${loginPath}">Entrar</a> ou <a href="${loginPath}">Cadastrar</a></span>`;
                     }
-                })();
+                } catch(e) {
+                    console.error('Error updating greeting', e);
+                }
+            })();
             </script>
 
             <div class="sidebar-categories">
@@ -79,13 +102,6 @@
                 <i class="fas fa-bag-shopping"></i>
                 <span class="cart-badge" data-cart-count hidden>0</span>
             </a>
-            </div>
-            <div class="header-actions">
-                <a href="../carrinho/index.html" class="header-icon-link" aria-label="Abrir carrinho">
-                    <i class="fas fa-bag-shopping"></i>
-                    <span class="cart-badge" data-cart-count hidden>0</span>
-                </a>
-            </div>
         </div>
     </header>
 
@@ -249,6 +265,7 @@
         </div>
     </footer>
 
+    <script src="../shared.js"></script>
     <script src="../../json/storefront.js"></script>
     <script type="module" src="conta.js"></script>
 </body>

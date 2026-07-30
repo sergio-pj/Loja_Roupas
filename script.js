@@ -423,49 +423,25 @@ async function carregarProdutos() {
         return;
     }
 
-    let staticData = [];
+    let products = [];
     try {
         const response = await fetch(CATALOG_DATA_URL);
-        staticData = await response.json();
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        products = await response.json();
     } catch (error) {
         console.warn('Nao foi possivel carregar catalogo.json na home.', error);
+        container.innerHTML = '<p>Não foi possível carregar os destaques. Tente novamente mais tarde.</p>';
+        return;
     }
 
-    let dbData = [];
-    if (window.supabase) {
-        try {
-            const { data, error } = await window.supabase
-                .from('produtos')
-                .select('*')
-                .order('id', { ascending: false });
+    // Filter for active products: has a category and at least one size
+    const activeProducts = products.filter(prod =>
+        prod.categoria && prod.tamanhos && prod.tamanhos.length > 0
+    );
 
-            if (!error && Array.isArray(data)) {
-                dbData = data.map(item => ({
-                    ...item,
-                    galeria: item.galeria || [],
-                    imagem: item.imagem || item.imagem_url || ''
-                }));
-            }
-        } catch (error) {
-            console.warn('Nao foi possivel carregar produtos do Supabase na home.', error);
-        }
-    }
-
-    const merged = dbData.slice();
-    const dbIds = new Set(dbData.map(item => Number(item.id)));
-
-    staticData.forEach(item => {
-        const itemId = Number(item.id);
-        if (!dbIds.has(itemId)) {
-            merged.push({
-                ...item,
-                galeria: item.galeria || [],
-                imagem: item.imagem || item.imagem_url || ''
-            });
-        }
-    });
-
-    const destaques = merged.slice(0, 3);
+    const destaques = activeProducts.slice(0, 3);
 
     container.innerHTML = destaques.map(prod => `
         <article class="product-card">

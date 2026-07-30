@@ -13,9 +13,6 @@ body {
     color: #1a1714;
 }
 
-/* Sidebar styles removed - using global styles from ../../style.css */
-
-
 /* Sidebar elegante */
 .filtros-sidebar {
     width: 250px;
@@ -24,6 +21,8 @@ body {
     padding: 25px;
     border-radius: 2px;
     border-left: 4px solid #1a1714;
+    position: sticky; /* Faz o filtro acompanhar a rolagem */
+    top: 100px;
 }
 
 .filtros-header {
@@ -271,11 +270,6 @@ body {
     cursor: wait;
 }
 
-.filtros-sidebar {
-    width: 250px;
-    position: sticky; /* Faz o filtro acompanhar a rolagem */
-    top: 100px;
-}   
 
 .search-bar input:focus {
     outline: none;

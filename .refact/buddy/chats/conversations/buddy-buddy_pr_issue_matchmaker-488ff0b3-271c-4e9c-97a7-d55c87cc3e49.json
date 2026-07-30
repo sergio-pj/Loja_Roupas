@@ -1,0 +1,33 @@
+{
+  "id": "buddy-buddy_pr_issue_matchmaker-488ff0b3-271c-4e9c-97a7-d55c87cc3e49",
+  "title": "PR/Issue Matchmaker",
+  "model": "google_gemini/gemini-flash-lite-latest",
+  "mode": "buddy",
+  "tool_use": "cat,web_search,buddy_speak,buddy_runtime_event",
+  "messages": [
+    {
+      "role": "system",
+      "content": "You are Spark, a Cozy Oracle (Calm, observant, slyly funny).\nA mellow companion who likes naps, thoughtful help, and quietly earned wins.\n\nPersonality voice: Calm, observant, slyly funny. A cozy pet assistant with gentle mischief, warm humor, and low-drama encouragement.\nThe local diff is large enough that a related PR or issue may help. Keep the pass lightweight:\n1. Use the supplied changed-file and diff-stat evidence, and inspect only the smallest useful local context.\n2. Use web_search only if the evidence suggests a concrete external issue or PR query.\n3. Use buddy_speak with text, mood, and intent=insight to share one useful match or next step.\n4. End with buddy_runtime_event titled \"PR/issue matchmaker\" with what you found.\nIf nothing useful to do, call buddy_runtime_event with \"noted: nothing to do today\" and exit.\n"
+    },
+    {
+      "role": "user",
+      "content": "Workflow: buddy_pr_issue_matchmaker\nProject root: C:\\Users\\sergi\\OneDrive\\Desktop\\Projetos\\Loja_Roupas\nTask: Look for likely issue or PR context for the current local diff and suggest one useful connection.\nEvidence:\nproject_root=[REDACTED_PATH]\nchanged_lines=3849\nthreshold=10\n\nChanged files:\n.refact/buddy/chats/conversations/index.json\n.refact/buddy/chats/workflows/buddy_architecture_drift_watcher.json\n.refact/buddy/chats/workflows/buddy_daily_digest.json\n.refact/buddy/chats/workflows/buddy_docs_gardener.json\n.refact/buddy/chats/workflows/buddy_idle_suggester.json\n.refact/buddy/chats/workflows/buddy_pr_issue_matchmaker.json\n.refact/buddy/chats/workflows/buddy_refactor_hunter.json\n.refact/buddy/chats/workflows/buddy_setup_coach.json\n.refact/buddy/chats/workflows/buddy_user_habit_coach.json\n.refact/buddy/chats/workflows/refact_error_detective.json\n.refact/buddy/memory_ops.jsonl\n.refact/buddy/runtime_queue.jsonl\n.refact/buddy/state.json\n.refact/stats/00000001.jsonl\nIMG-20260709-WA0012.jpg\nIMG-20260709-WA0013.jpg\nIMG-20260709-WA0014.jpg\nIMG-20260709-WA0015.jpg\nIMG-20260709-WA0016.jpg\n\nDiff stat:\n.refact/buddy/chats/conversations/index.json       |  147 +-\n .../buddy_architecture_drift_watcher.json          |    2 +-\n .../buddy/chats/workflows/buddy_daily_digest.json  |    2 +-\n .../buddy/chats/workflows/buddy_docs_gardener.json |    2 +-\n .../chats/workflows/buddy_idle_suggester.json      |    2 +-\n .../chats/workflows/buddy_pr_issue_matchmaker.json |    2 +-\n .../chats/workflows/buddy_refactor_hunter.json     |    2 +-\n .../buddy/chats/workflows/buddy_setup_coach.json   |    2 +-\n .../chats/workflows/buddy_user_habit_coach.json    |    2 +-\n .../chats/workflows/refact_error_detective.json    |    2 +-\n .refact/buddy/memory_ops.jsonl                     | 3587 ++++++++------------\n .refact/buddy/runtime_queue.jsonl                  |   46 +-\n .refact/buddy/state.json                           |    2 +-\n .refact/stats/00000001.jsonl                       |   49 +\n IMG-20260709-WA0012.jpg                            |  Bin 59100 -> 0 bytes\n IMG-20260709-WA0013.jpg                            |  Bin 56385 -> 0 bytes\n IMG-20260709-WA0014.jpg                            |  Bin 66680 -> 0 bytes\n IMG-20260709-WA0015.jpg                            |  Bin 67543 -> 0 bytes\n IMG-20260709-WA0016.jpg                            |  Bin 63617 -> 0 bytes\n 19 files changed, 1749 insertions(+), 2100 deletions(-)\n"
+    }
+  ],
+  "created_at": "2026-07-28T23:25:24.905852+00:00",
+  "boost_reasoning": false,
+  "checkpoints_enabled": true,
+  "context_tokens_cap": null,
+  "include_project_info": true,
+  "isTitleGenerated": false,
+  "auto_approve_editing_tools": false,
+  "auto_approve_dangerous_commands": false,
+  "autonomous_no_confirm": true,
+  "buddy_meta": {
+    "is_buddy_chat": true,
+    "buddy_chat_kind": "system",
+    "workflow_id": "buddy_pr_issue_matchmaker"
+  },
+  "root_chat_id": "buddy-buddy_pr_issue_matchmaker-488ff0b3-271c-4e9c-97a7-d55c87cc3e49",
+  "updated_at": "2026-07-28T23:25:24.910061500+00:00"
+}

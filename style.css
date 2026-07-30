@@ -1154,32 +1154,30 @@ body.no-scroll {
     }
 
     .main-header { 
-        padding: 12px 10px 14px; 
+        padding: 12px 10px;
         display: flex;
-        flex-wrap: wrap;
         justify-content: space-between;
         align-items: center;
-        gap: 8px;
+        gap: 10px;
     }
 
     .menu-icon { 
         position: static;
-        margin-right: 4px;
         order: 1;
+        flex-shrink: 0;
     }
 
     .header-actions {
         position: static;
-        gap: 6px;
         order: 3;
+        flex-shrink: 0;
     }
     
     .search-bar { 
-        flex: 1 1 100%;
-        min-width: 0;
-        max-width: none;
         order: 2;
-        margin: 4px 0 0 0;
+        flex-grow: 1;
+        min-width: 0;
+        margin: 0;
     }
 
     .search-bar input {
@@ -1257,9 +1255,16 @@ body.no-scroll {
     .footer-container { grid-template-columns: 1fr; text-align: center; gap: 28px; }
 
     .product-grid {
-        grid-template-columns: 1fr;
+        grid-template-columns: repeat(2, 1fr); /* Two columns for mobile */
         gap: 15px;
         padding: 8px 14px 0;
+    }
+
+    /* Style for the third product card to span two columns, creating the inverted triangle layout */
+    .product-grid .product-card:nth-child(3):last-child {
+        grid-column: span 2;
+        max-width: calc(50% - 7.5px); /* Adjust max-width to center it under two columns with gap */
+        justify-self: center; /* Center the single item */
     }
 }
 

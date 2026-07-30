@@ -3,7 +3,7 @@ import { supabase } from '../../json/supabase-browser.js'
 const ADMIN_EMAIL = 'aranha.admin@gmail.com';
 
 function isAdminEmail(email){
-  return String(email || '').trim().toLowerCase() === ADMIN_EMAIL;
+  return String(email || '').trim().toLowerCase() === ADMIN_EMAIL.toLowerCase();
 }
 
 export async function initAdminPanel(container) {
@@ -128,7 +128,7 @@ export async function initAdminPanel(container) {
     let galeria = panelGallery.slice();
     // upload any new files selected via file input
     if (panelNewFiles.length) {
-      const STORAGE_BUCKET = 'getPublicUrl';
+      const STORAGE_BUCKET = 'product-images';
       for (const f of panelNewFiles) {
         const filePath = `produtos/${Date.now()}_${f.name}`;
         try {
@@ -151,14 +151,18 @@ export async function initAdminPanel(container) {
 
     if (id) {
       const updates = { nome, preco, descricao };
-      if (galeria && galeria.length) updates.galeria = galeria;
-      else if (galeria && galeria.length === 1) updates.imagem = galeria[0];
+      if (galeria && galeria.length) {
+        updates.galeria = galeria;
+        updates.imagem = galeria[0];
+      }
       const { error } = await supabase.from('produtos').update(updates).eq('id', id);
       if (error) return alert('Erro ao atualizar: '+error.message);
     } else {
       const payload = { nome, preco, descricao };
-      if (galeria && galeria.length) payload.galeria = galeria;
-      else if (galeria && galeria.length === 1) payload.imagem = galeria[0];
+      if (galeria && galeria.length) {
+        payload.galeria = galeria;
+        payload.imagem = galeria[0];
+      }
       const { error } = await supabase.from('produtos').insert([payload]);
       if (error) return alert('Erro ao inserir: '+error.message);
     }
