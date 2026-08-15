@@ -459,10 +459,7 @@ function filtrar(criterio) {
 
 async function carregarProdutos() {
     const container = document.getElementById('home-highlights-grid');
-
-    if (!container) {
-        return;
-    }
+    if (!container) return;
 
     let products = [];
     try {
@@ -477,19 +474,22 @@ async function carregarProdutos() {
         return;
     }
 
-    // Filter for active products: has a category and at least one size
-    const activeProducts = products.filter(prod =>
-        prod.categoria && prod.tamanhos && prod.tamanhos.length > 0
-    );
+    // Seleciona os produtos desejados pelo ID
+    const idsDestaque = [8, 3, 7]; // 8: Branca, 3: Bege, 7: Preta
+    const destaques = idsDestaque
+        .map(id => products.find(p => p.id === id))
+        .filter(Boolean); // Garante que apenas produtos encontrados sejam usados
 
-    const destaques = activeProducts.slice(0, 3);
+    if (destaques.length < 3) {
+        console.warn('Não foi possível encontrar todos os produtos de destaque (IDs: 8, 3, 7).');
+    }
 
     container.innerHTML = destaques.map(prod => `
         <article class="product-card">
             <a class="product-card-link" href="pages/produto/index.html?id=${prod.id}">
                 ${buildMediaCarouselMarkup(resolveProductImages(prod), prod.nome, 'home-product-carousel')}
                 <h3>${prod.nome}</h3>
-                <p class="price">R$ ${prod.preco.toFixed(2).replace('.', ',')}</p>
+                <p class="price">R$ ${Number(prod.preco).toFixed(2).replace('.', ',')}</p>
             </a>
         </article>
     `).join('');
