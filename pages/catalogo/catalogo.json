@@ -122,10 +122,60 @@
     "cor": "escura",
     "imagem": "../../assets/verdemilitar_etiqueta_frente.jpeg",
     "galeria": [
-      "../../assets/verdemilitar_etiqueta_frente.jpeg"
+      "../../assets/verdemilitar_frente.jpeg",
+      "../../assets/verdemilitar_etiqueta_frente.jpeg",
+      "../../assets/verdemilitar_costa.jpeg"
     ],
     "subtitulo": "Linha Field",
     "descricao": "Camiseta verde militar com proposta utilitaria premium.",
+    "destaque": "Visual robusto com identidade da marca.",
+    "composicao": "100% algodao",
+    "cuidados": [
+      "Lavar com cores escuras",
+      "Secagem natural",
+      "Nao usar alvejante"
+    ],
+    "tamanhos": ["P", "M", "G", "GG"]
+  },
+  {
+    "id": 7,
+    "nome": "Camiseta Aranha Preta",
+    "preco": 129.9,
+    "categoria": "camisetas",
+    "cor": "escura",
+    "imagem": "../../assets/preta_etiqueta_frente.jpeg",
+    "galeria": [
+      "../../assets/preta_frente.jpeg",
+      "../../assets/preta_etiqueta_frente.jpeg",
+      "../../assets/preta_costa.jpeg"
+      
+    ],
+    "subtitulo": "Linha Field",
+    "descricao": "Camiseta preta com proposta utilitaria premium.",
+    "destaque": "Visual robusto com identidade da marca.",
+    "composicao": "100% algodao",
+    "cuidados": [
+      "Lavar com cores escuras",
+      "Secagem natural",
+      "Nao usar alvejante"
+    ],
+    "tamanhos": ["P", "M", "G", "GG"]
+  },
+  {
+    "id": 8,
+    "nome": "Camiseta Aranha Branca",
+    "preco": 129.9,
+    "categoria": "camisetas",
+    "cor": "clara",
+    "imagem": "../../assets/branca_etiqueta_frente.jpeg",
+    "galeria": [
+      "../../assets/branca_frente.jpeg",
+      "../../assets/branca_etiqueta_frente.jpeg",
+      "../../assets/branca_costa.jpeg"
+      
+    ],
+    "subtitulo": "Linha Field",
+    "descricao": "Camiseta branca com proposta utilitaria premium.",
     "destaque": "Visual robusto com identidade da marca.",
     "composicao": "100% algodao",
     "cuidados": [
