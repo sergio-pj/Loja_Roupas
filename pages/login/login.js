@@ -117,20 +117,24 @@ if (phoneInput) {
 }
 
 async function redirectIfLoggedIn() {
-    let data;
+    let user;
 
     try {
-        const sessionResult = await supabase.auth.getSession();
-        data = sessionResult.data;
+        const { data } = await supabase.auth.getUser();
+        user = data.user;
     } catch (_) {
+        // If there's a network error or Supabase is down, better to just stay here.
         return;
     }
 
-    if (data.session) {
+    if (user) {
+        // We have a valid user, let's sync storefront and redirect.
         if (window.storefront) {
             window.storefront.setAuth({
-                userId: data.session.user.id,
-                email: data.session.user.email || ''
+                userId: user.id,
+                email: user.email || '',
+                full_name: user.user_metadata?.full_name || '',
+                name: user.user_metadata?.full_name || ''
             });
         }
         window.location.href = getRedirectTarget();
@@ -152,7 +156,12 @@ if (loginForm) {
                 const { data: adminData, error: adminErr } = await supabase.auth.signInWithPassword({ email: ADMIN_EMAIL, password: ADMIN_PASSWORD });
                 if (!adminErr && adminData && adminData.user) {
                     if (window.storefront) {
-                        window.storefront.setAuth({ userId: adminData.user.id, email: adminData.user.email || '' });
+                        window.storefront.setAuth({
+                            userId: adminData.user.id,
+                            email: adminData.user.email || '',
+                            full_name: adminData.user.user_metadata?.full_name || 'Administrador',
+                            name: adminData.user.user_metadata?.full_name || 'Administrador'
+                        });
                     }
                     loginFeedback.textContent = 'Login de administrador realizado. Redirecionando...';
                     window.location.href = getRedirectTarget();
@@ -164,7 +173,12 @@ if (loginForm) {
 
             // fallback local se nao conseguir autenticar no Supabase
             if (window.storefront) {
-                window.storefront.setAuth({ userId: 'admin-local', email: ADMIN_EMAIL });
+                window.storefront.setAuth({
+                    userId: 'admin-local',
+                    email: ADMIN_EMAIL,
+                    full_name: 'Administrador',
+                    name: 'Administrador'
+                });
             }
             loginFeedback.textContent = 'Login de administrador (local) realizado.';
             window.location.href = getRedirectTarget();
@@ -192,7 +206,9 @@ if (loginForm) {
             if (window.storefront) {
                 window.storefront.setAuth({
                     userId: data.user.id,
-                    email: data.user.email || ''
+                    email: data.user.email || '',
+                    full_name: data.user.user_metadata?.full_name || '',
+                    name: data.user.user_metadata?.full_name || ''
                 });
             }
 
@@ -265,7 +281,9 @@ if (registerForm) {
             if (window.storefront) {
                 window.storefront.setAuth({
                     userId: data.user.id,
-                    email: data.user.email || ''
+                    email: data.user.email || '',
+                    full_name: fullName,
+                    name: fullName
                 });
             }
             registerFeedback.textContent = 'Cadastro criado com sucesso.';

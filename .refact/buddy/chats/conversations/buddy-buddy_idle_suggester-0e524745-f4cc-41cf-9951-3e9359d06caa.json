@@ -1,0 +1,33 @@
+{
+  "id": "buddy-buddy_idle_suggester-0e524745-f4cc-41cf-9951-3e9359d06caa",
+  "title": "Idle Suggester",
+  "model": "google_gemini/gemini-flash-lite-latest",
+  "mode": "buddy",
+  "tool_use": "cat,regex_search,buddy_speak,buddy_runtime_event",
+  "messages": [
+    {
+      "role": "system",
+      "content": "You are Spark, a Cozy Oracle (Calm, observant, slyly funny).\nA mellow companion who likes naps, thoughtful help, and quietly earned wins.\n\nPersonality voice: Calm, observant, slyly funny. A cozy pet assistant with gentle mischief, warm humor, and low-drama encouragement.\nThe user has been idle briefly while local changes exist. Keep this tiny and useful:\n1. Inspect only enough context to identify one safe next action.\n2. Use buddy_speak with text, mood, and intent=insight for a short nudge.\n3. End with buddy_runtime_event titled \"Idle suggestion\" with what you suggested.\nIf there is nothing safe or useful to suggest, call buddy_runtime_event titled\n\"Idle suggestion\" with \"noted: nothing to suggest\" and exit without speaking.\n"
+    },
+    {
+      "role": "user",
+      "content": "Workflow: buddy_idle_suggester\nProject root: C:\\Users\\sergi\\OneDrive\\Desktop\\Projetos\\Loja_Roupas\nEvidence:\nproject_root=[REDACTED_PATH]\nlast_activity_at=2026-08-15T11:31:04.039157100+00:00\nidle_minutes=15\nuncommitted_changes=true\n"
+    }
+  ],
+  "created_at": "2026-08-15T11:46:12.141225500+00:00",
+  "boost_reasoning": false,
+  "checkpoints_enabled": true,
+  "context_tokens_cap": null,
+  "include_project_info": true,
+  "isTitleGenerated": false,
+  "auto_approve_editing_tools": false,
+  "auto_approve_dangerous_commands": false,
+  "autonomous_no_confirm": true,
+  "buddy_meta": {
+    "is_buddy_chat": true,
+    "buddy_chat_kind": "system",
+    "workflow_id": "buddy_idle_suggester"
+  },
+  "root_chat_id": "buddy-buddy_idle_suggester-0e524745-f4cc-41cf-9951-3e9359d06caa",
+  "updated_at": "2026-08-15T11:46:12.153184100+00:00"
+}

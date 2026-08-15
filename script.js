@@ -29,8 +29,6 @@ function normalizeSidebarCategories() {
         <a href="${catalogHref}">MOLETOM</a>
         <a href="${catalogHref}">CAMISETAS</a>
         <a href="${catalogHref}">POLOS</a>
-        <a href="${catalogHref}">SHORTS E BERMUDAS</a>
-        <a href="${catalogHref}">KIT'S</a>
     `;
     categoriesList.dataset.normalized = 'true';
 }
@@ -502,45 +500,168 @@ async function carregarProdutos() {
 carregarProdutos();
 setupHomeCarousel();
 
-// Gerencia exibição do bloco de autenticação no sidebar:
-// - se `localStorage.aranhaUser` existir mostra `Olá, <nome>` e esconde os links;
-// - caso contrário exibe os links `Entrar / Cadastrar`.
-(function sidebarAuthToggle(){
-    const KEY = 'aranhaUser';
+function resolveLoginPath() {
+    return window.location.pathname.toLowerCase().includes('/pages/')
+        ? '../login/index.html'
+        : 'pages/login/index.html';
+}
 
-    function getContainer(){
-        return document.querySelector('.sidebar-user-quick .user-quick-text');
-    }
+function resolveDisplayName(user) {
+    const metadata = user?.user_metadata || {};
+    const candidates = [
+        metadata.full_name,
+        metadata.name,
+        metadata.nome,
+        metadata.first_name
+    ];
 
-    function update() {
-        const raw = localStorage.getItem(KEY);
-        const container = getContainer();
-        if (!container) return;
-
-        const authBlock = container.querySelector('.auth-links');
-        const greeting = container.querySelector('.greeting');
-
-        if (raw) {
-            try {
-                const user = JSON.parse(raw);
-                const name = user && (user.nome || user.name || user.username) ? (user.nome || user.name || user.username) : 'cliente';
-                if (greeting) greeting.textContent = `Olá, ${name}`;
-                if (authBlock) authBlock.style.display = 'none';
-            } catch (e) {
-                // se JSON inválido, remove a chave por segurança
-                try { localStorage.removeItem(KEY); } catch(_){}
-                if (greeting) greeting.textContent = 'Olá, visitante';
-                if (authBlock) authBlock.style.display = '';
-            }
-        } else {
-            if (greeting) greeting.textContent = 'Olá, visitante';
-            if (authBlock) authBlock.style.display = '';
+    for (const candidate of candidates) {
+        if (candidate && String(candidate).trim()) {
+            return String(candidate).trim();
         }
     }
 
-    // Atualiza imediatamente e ao mudar storage (sincroniza entre abas)
-    try { update(); } catch (e) {}
-    window.addEventListener('storage', e => { if (e.key === KEY) update(); });
-    // Também atualiza depois do carregamento completo caso scripts inline tenham modificado o DOM
-    window.addEventListener('load', update);
-})();
+    if (user?.email && String(user.email).includes('@')) {
+        return String(user.email).split('@')[0];
+    }
+
+    return 'cliente';
+}
+
+function updateSidebarLoginShortcut(isLoggedIn) {
+    const accountList = document.querySelector('#sidebar .sidebar-account-list');
+    if (!accountList) return;
+
+    const dynamicShortcut = accountList.querySelector('.login-shortcut-dynamic');
+    if (dynamicShortcut) {
+        dynamicShortcut.remove();
+    }
+
+    if (!isLoggedIn) {
+        return;
+    }
+
+    const loginHref = resolveLoginPath();
+    const loginShortcut = document.createElement('a');
+    loginShortcut.href = loginHref;
+    loginShortcut.className = 'account-link login-shortcut-dynamic';
+    loginShortcut.innerHTML = '<i class="fas fa-user-circle"></i> Meu login';
+
+    const inicioLink = accountList.querySelector('.inicio-link');
+    if (inicioLink) {
+        accountList.insertBefore(loginShortcut, inicioLink);
+        return;
+    }
+
+    accountList.appendChild(loginShortcut);
+}
+
+function setSidebarGuestState(container) {
+    const greeting = container.querySelector('.greeting');
+    const authLinks = container.querySelector('.auth-links');
+    const loginHref = resolveLoginPath();
+
+    if (!greeting || !authLinks) {
+        container.innerHTML = `
+            <strong class="greeting">Olá, visitante</strong>
+            <span class="auth-links">
+                <a href="${loginHref}">Entrar</a>
+                <span class="sep">ou</span>
+                <a href="${loginHref}">Cadastrar</a>
+            </span>
+        `;
+        updateSidebarLoginShortcut(false);
+        return;
+    }
+
+    if (greeting) {
+        greeting.textContent = 'Olá, visitante';
+    }
+
+    if (authLinks) {
+        const links = authLinks.querySelectorAll('a');
+        if (links[0]) links[0].setAttribute('href', loginHref);
+        if (links[1]) links[1].setAttribute('href', loginHref);
+        authLinks.style.display = '';
+    }
+
+    updateSidebarLoginShortcut(false);
+}
+
+function setSidebarLoggedState(container, name) {
+    const greeting = container.querySelector('.greeting');
+    const authLinks = container.querySelector('.auth-links');
+
+    if (greeting) {
+        greeting.textContent = `Seja bem-vindo, ${name}`;
+    }
+
+    if (authLinks) {
+        authLinks.style.display = 'none';
+    }
+
+    updateSidebarLoginShortcut(true);
+}
+
+async function waitForSupabaseClient(maxAttempts = 120) {
+    for (let index = 0; index < maxAttempts; index += 1) {
+        if (window.supabase?.auth?.getSession) {
+            return window.supabase;
+        }
+        await new Promise((resolve) => setTimeout(resolve, 50));
+    }
+
+    return null;
+}
+
+async function updateSidebarAuthState() {
+    const container = document.querySelector('.sidebar-user-quick .user-quick-text');
+    if (!container) return;
+
+    const supabaseClient = await waitForSupabaseClient();
+    if (!supabaseClient) {
+        setSidebarGuestState(container);
+        return;
+    }
+
+    try {
+        const { data: { session } } = await supabaseClient.auth.getSession();
+
+        if (session?.user) {
+            const name = resolveDisplayName(session.user);
+            setSidebarLoggedState(container, name);
+            return;
+        }
+
+        setSidebarGuestState(container);
+    } catch (error) {
+        console.error('Error updating sidebar auth state', error);
+        setSidebarGuestState(container);
+    }
+}
+
+function initSidebarAuthState() {
+    if (window.__sidebarAuthInitialized) {
+        return;
+    }
+
+    window.__sidebarAuthInitialized = true;
+    updateSidebarAuthState();
+
+    window.addEventListener('load', () => {
+        updateSidebarAuthState();
+    });
+
+    waitForSupabaseClient().then((supabaseClient) => {
+        if (!supabaseClient?.auth?.onAuthStateChange) return;
+        supabaseClient.auth.onAuthStateChange(() => {
+            updateSidebarAuthState();
+        });
+    });
+}
+
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initSidebarAuthState);
+} else {
+    initSidebarAuthState();
+}

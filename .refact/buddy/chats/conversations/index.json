@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-08-15T02:50:34.521772100+00:00",
+  "updated_at": "2026-08-15T11:46:12.200175900+00:00",
   "entries": [
     {
       "id": "buddy-buddy_pr_issue_matchmaker-e9f72bb0-ab60-4600-bab9-1d015d382e85",
@@ -465,6 +465,35 @@
       "waiting_for_card_ids": [],
       "file_len": 2920,
       "file_modified_unix_ms": 1786762234514
+    },
+    {
+      "id": "buddy-buddy_idle_suggester-0e524745-f4cc-41cf-9951-3e9359d06caa",
+      "file_name": "buddy-buddy_idle_suggester-0e524745-f4cc-41cf-9951-3e9359d06caa.json",
+      "source": {
+        "kind": "buddy"
+      },
+      "created_at": "2026-08-15T11:46:12.141225500+00:00",
+      "updated_at": "2026-08-15T11:46:12.153184100+00:00",
+      "title": "Idle Suggester",
+      "model": "google_gemini/gemini-flash-lite-latest",
+      "mode": "buddy",
+      "message_count": 2,
+      "root_chat_id": "buddy-buddy_idle_suggester-0e524745-f4cc-41cf-9951-3e9359d06caa",
+      "is_title_generated": false,
+      "total_lines_added": 0,
+      "total_lines_removed": 0,
+      "tasks_total": 0,
+      "tasks_done": 0,
+      "tasks_failed": 0,
+      "total_prompt_tokens": 0,
+      "total_completion_tokens": 0,
+      "total_tokens": 0,
+      "total_cache_read_tokens": 0,
+      "total_cache_creation_tokens": 0,
+      "displayable_chat": false,
+      "waiting_for_card_ids": [],
+      "file_len": 1957,
+      "file_modified_unix_ms": 1786794372155
     }
   ]
 }
