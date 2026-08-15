@@ -507,54 +507,73 @@ async function persistOrderDraft() {
     return {
         ok: true,
         draftId,
-        total: formatPrice(total)
+        subtotal: Number(subtotal.toFixed(2)),
+        discount: Number(discount.toFixed(2)),
+        total: Number(total.toFixed(2)),
+        totalLabel: formatPrice(total),
+        couponCode: appliedCoupon || ''
     };
 }
 
-function formatWhatsAppMessage(cart, total, orderId, discount, coupon) {
+function formatCurrencyForMessage(value) {
+    return `R$ ${Number(value || 0).toFixed(2).replace('.', ',')}`;
+}
+
+function formatWhatsAppMessage({ cart, total, orderId, discount, coupon, subtotal, zipCode }) {
     const lines = [
-        '========================================',
-        'Ola! Gostaria de finalizar meu pedido',
-        '========================================',
+        'Olá, equipe Aranha! Quero finalizar meu pedido.',
         ''
     ];
 
-    lines.push('PRODUTOS SELECIONADOS:');
+    lines.push('Resumo do pedido:');
+    lines.push(`Pedido: #${orderId.slice(0, 8).toUpperCase()}`);
+
+    if (zipCode) {
+        lines.push(`CEP informado: ${zipCode}`);
+    }
+
     lines.push('');
+    lines.push('Itens:');
 
     cart.forEach(item => {
-        const itemTotal = (item.preco * item.quantity).toFixed(2);
-        lines.push(`• ${item.nome}${item.tamanho ? ` (Tam ${item.tamanho})` : ''}`);
-        lines.push(`  Quantidade: ${item.quantity} | Valor: R$ ${itemTotal.replace('.', ',')}`);
+        const itemTotal = item.preco * item.quantity;
+        const sizeLabel = item.tamanho ? ` | Tam ${item.tamanho}` : '';
+        lines.push(`- ${item.nome}${sizeLabel}`);
+        lines.push(`  Qtd: ${item.quantity} | Unitario: ${formatCurrencyForMessage(item.preco)} | Total item: ${formatCurrencyForMessage(itemTotal)}`);
     });
 
     lines.push('');
-    lines.push('------------------------');
-    lines.push(`Subtotal: R$ ${(parseFloat(total) + parseFloat(discount)).toFixed(2).replace('.', ',')}`);
-    
-    if (parseFloat(discount) > 0) {
-        lines.push(`DESCONTO: -R$ ${parseFloat(discount).toFixed(2).replace('.', ',')}`);
+    lines.push('Totais:');
+    lines.push(`Subtotal: ${formatCurrencyForMessage(subtotal)}`);
+
+    if (Number(discount) > 0) {
+        lines.push(`Desconto: -${formatCurrencyForMessage(discount)}`);
         if (coupon) {
-            lines.push(`Cupom: ${coupon}`);
+            lines.push(`Cupom aplicado: ${coupon}`);
         }
     }
 
-    lines.push(`TOTAL: R$ ${total.replace('.', ',')}`);
-    lines.push('------------------------');
+    lines.push(`Total final: ${formatCurrencyForMessage(total)}`);
     lines.push('');
-    lines.push(`Pedido #${orderId.slice(0, 8).toUpperCase()}`);
+    lines.push('Pagamento: PIX');
+    lines.push('Pode me enviar o QR Code ou o copia e cola para eu concluir agora.');
     lines.push('');
-    lines.push('Estou pronto para pagar via PIX!');
-    lines.push('Aguardo o QR Code para confirmar.');
-    lines.push('');
-    lines.push('Obrigado! :)');
+    lines.push('Obrigado!');
 
     return lines.join('\n');
 }
 
-function openWhatsAppCheckout(cart, total, orderId, discount, coupon) {
+function openWhatsAppCheckout({ cart, total, orderId, discount, coupon, subtotal, zipCode }) {
     const phoneNumber = '5511910257470';
-    const message = formatWhatsAppMessage(cart, total, orderId, discount, coupon);
+    const message = formatWhatsAppMessage({
+        cart,
+        total,
+        orderId,
+        discount,
+        coupon,
+        subtotal,
+        zipCode
+    });
     const encodedMessage = encodeURIComponent(message);
     const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodedMessage}`;
     
@@ -821,8 +840,15 @@ if (checkoutButton) {
         }
 
         const cart = window.storefront.getCart();
-        const discount = (cart.reduce((total, item) => total + item.preco * item.quantity, 0) - parseFloat(result.total)).toFixed(2);
-        const whatsappResult = openWhatsAppCheckout(cart, result.total, result.draftId, discount, appliedCoupon);
+        const whatsappResult = openWhatsAppCheckout({
+            cart,
+            total: result.total,
+            orderId: result.draftId,
+            discount: result.discount,
+            coupon: result.couponCode,
+            subtotal: result.subtotal,
+            zipCode: shippingZip?.value.trim() || ''
+        });
 
         if (!whatsappResult.ok) {
             checkoutFeedback.textContent = `Pedido ${result.draftId.slice(0, 8).toUpperCase()} criado, mas houve erro ao abrir WhatsApp. Tente novamente.`;

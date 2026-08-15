@@ -29,8 +29,24 @@ function normalizeSidebarCategories() {
         <a href="${catalogHref}">MOLETOM</a>
         <a href="${catalogHref}">CAMISETAS</a>
         <a href="${catalogHref}">POLOS</a>
+        <a href="${catalogHref}">SHORTS E BERMUDAS</a>
+        <a href="${catalogHref}">KIT'S</a>
     `;
     categoriesList.dataset.normalized = 'true';
+}
+
+function syncHeroBannerByViewport() {
+    const heroBanner = document.querySelector('.hero-banner');
+    if (!heroBanner) return;
+
+    const isMobileViewport = window.matchMedia('(max-width: 768px)').matches;
+    const mobileImage = "url('assets/banner-mobile.jpeg?v=20260814')";
+    const desktopImage = "url('assets/bannerp.svg')";
+
+    heroBanner.style.backgroundImage = isMobileViewport ? mobileImage : desktopImage;
+    heroBanner.style.backgroundPosition = isMobileViewport ? 'center top' : 'center 18%';
+    heroBanner.style.backgroundSize = isMobileViewport ? 'contain' : 'cover';
+    heroBanner.style.backgroundRepeat = 'no-repeat';
 }
 
 function ensureComingSoonModal() {
@@ -84,10 +100,29 @@ function initComingSoonNotice() {
         }
     });
 
+    const blockedCategories = new Set([
+        'moletom',
+        'moletons',
+        'polo',
+        'polos',
+        'shorts e bermudas',
+        'shorts',
+        'bermudas',
+        'kits',
+        'kit'
+    ]);
+
     document.querySelectorAll('#sidebar .sidebar-categories-list a').forEach((link) => {
         link.addEventListener('click', (event) => {
-            const label = link.textContent.trim().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
-            if (['moletom', 'moletons', 'polo', 'polos'].includes(label)) {
+            const label = link.textContent
+                .trim()
+                .toLowerCase()
+                .normalize('NFD')
+                .replace(/[\u0300-\u036f]/g, '')
+                .replace(/[’'´`]/g, '')
+                .replace(/\s+/g, ' ');
+
+            if (blockedCategories.has(label)) {
                 event.preventDefault();
                 if (sidebar?.classList.contains('open')) {
                     toggleMenu();
@@ -103,6 +138,14 @@ if (document.readyState === 'loading') {
 } else {
     initComingSoonNotice();
 }
+
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', syncHeroBannerByViewport);
+} else {
+    syncHeroBannerByViewport();
+}
+
+window.addEventListener('resize', syncHeroBannerByViewport);
 
 const CATALOG_DATA_URL = new URL('pages/catalogo/catalogo.json', window.location.href).href;
 let homeMediaCarouselCleanups = [];

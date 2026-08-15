@@ -102,11 +102,30 @@ function initComingSoonNotice() {
         modal.dataset.bound = 'true';
     }
 
+    const blockedCategories = new Set([
+        'moletom',
+        'moletons',
+        'polo',
+        'polos',
+        'shorts e bermudas',
+        'shorts',
+        'bermudas',
+        'kits',
+        'kit'
+    ]);
+
     document.querySelectorAll('#sidebar .sidebar-categories-list a').forEach((link) => {
         if (link.dataset.comingSoonBound === 'true') return;
         link.addEventListener('click', (event) => {
-            const label = link.textContent.trim().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
-            if (['moletom', 'moletons', 'polo', 'polos'].includes(label)) {
+            const label = link.textContent
+                .trim()
+                .toLowerCase()
+                .normalize('NFD')
+                .replace(/[\u0300-\u036f]/g, '')
+                .replace(/[’'´`]/g, '')
+                .replace(/\s+/g, ' ');
+
+            if (blockedCategories.has(label)) {
                 event.preventDefault();
                 if (sidebar?.classList.contains('open')) {
                     toggleMenu();

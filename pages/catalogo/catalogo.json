@@ -1,100 +1,137 @@
-[
+[ 
   {
     "id": 1,
-    "nome": "Camiseta All Black",
-    "preco": 79.90,
+    "nome": "Camiseta Aranha Azul Bebe",
+    "preco": 129.9,
     "categoria": "camisetas",
-    "cor": "escura",
-    "imagem": "../../assets/modelofrente_pretasnome.svg",
+    "cor": "clara",
+    "imagem": "../../assets/azulbebe_frente.jpeg",
     "galeria": [
-      "../../assets/modelofrente_pretasnome.svg",
-      "../../assets/modelocosta_pretasnome.svg",
-      "../../assets/modelofrente_pretacnome.svg",
-      "../../assets/modelocosta_pretacnome.svg"
+      "../../assets/azulbebe_frente.jpeg",
+      "../../assets/azulbebe_etiqueta_frente.jpeg",
+      "../../assets/azulbebe_costa.jpeg"
     ],
-    "subtitulo": "Essencial escura com quatro visuais para destacar frente e costas da peça.",
-    "descricao": "A All Black foi pensada para compor um visual urbano direto, com leitura minimalista e galeria completa para mostrar as quatro versões da camiseta preta.",
-    "destaque": "Modelagem reta, toque macio e carrossel com os quatro modelos da preta.",
-    "composicao": "Malha premium de algodão com toque suave e estrutura leve.",
+    "subtitulo": "Linha Essential",
+    "descricao": "Camiseta azul bebe com visual limpo e caimento premium.",
+    "destaque": "Modelagem confortavel para uso diario.",
+    "composicao": "100% algodao",
     "cuidados": [
-      "Lavar do avesso com cores similares.",
-      "Não usar alvejante.",
-      "Passar em temperatura baixa.",
-      "Secar à sombra para preservar a cor."
+      "Lavar do avesso",
+      "Nao usar alvejante",
+      "Secar a sombra"
     ],
     "tamanhos": ["P", "M", "G", "GG"]
   },
   {
     "id": 2,
-    "nome": "Oversized Smoke",
-    "preco": 79.90,
-    "categoria": "oversized",
-    "cor": "clara",
-    "imagem": "../../assets/modelofrente_begesnome.svg",
+    "nome": "Camiseta Aranha Azul",
+    "preco": 129.9,
+    "categoria": "camisetas",
+    "cor": "escura",
+    "imagem": "../../assets/azul_frente.jpeg",
     "galeria": [
-      "../../assets/modelofrente_begesnome.svg",
-      "../../assets/modelocosta_begesnome.svg",
-      "../../assets/modelofrente_begecnome.svg",
-      "../../assets/modelocosta_begecnome.svg"
+      "../../assets/azul_frente.jpeg",
+      "../../assets/azul_etiqueta_frente.jpeg",
+      "../../assets/azul_costa.jpeg"
     ],
-    "subtitulo": "Silhueta ampla em tom bege com galeria completa da peça.",
-    "descricao": "A Oversized Smoke trabalha volume e leveza em uma peça pensada para layering, agora com as quatro variações visuais da camiseta bege para mostrar melhor frente e costas.",
-    "destaque": "Caimento solto, ombro deslocado e carrossel com os quatro modelos da bege.",
-    "composicao": "Algodão encorpado com respirabilidade equilibrada para o dia a dia.",
+    "subtitulo": "Linha Signature",
+    "descricao": "Camiseta azul com identidade visual marcante da Aranha.",
+    "destaque": "Acabamento premium e tecido macio.",
+    "composicao": "100% algodao",
     "cuidados": [
-      "Lavar com água fria.",
-      "Evitar máquina em ciclos agressivos.",
-      "Não secar em tambor.",
-      "Armazenar dobrada para manter o shape."
+      "Lavar com cores semelhantes",
+      "Nao usar secadora",
+      "Passar em temperatura baixa"
     ],
     "tamanhos": ["P", "M", "G", "GG"]
   },
   {
     "id": 3,
-    "nome": "Camiseta Off White",
-    "preco": 79.90,
+    "nome": "Camiseta Aranha Bege",
+    "preco": 129.9,
     "categoria": "camisetas",
     "cor": "clara",
-    "imagem": "../../assets/modelofrente_brancasnome.svg",
+    "imagem": "../../assets/bege_frente.jpeg",
     "galeria": [
-      "../../assets/modelofrente_brancasnome.svg",
-      "../../assets/modelocosta_brancasnome.svg",
-      "../../assets/modelofrente_brancacnome.svg",
-      "../../assets/modelocosta_brancacnome.svg"
+      "../../assets/bege_frente.jpeg",
+      "../../assets/bege_etiqueta_frente.jpeg",
+      "../../assets/bege_costa.jpeg"
     ],
-    "subtitulo": "Base off white com leitura limpa e 4 variações visuais da peça.",
-    "descricao": "A Off White entra como peça clara principal da Aranha, com presença minimalista, visual refinado e galeria completa para mostrar frente e costas em quatro composições.",
-    "destaque": "Tom claro versátil, visual premium e carrossel com as quatro artes da branca.",
-    "composicao": "Malha premium com toque macio, estrutura leve e acabamento pensado para uso diário.",
+    "subtitulo": "Linha Neutral",
+    "descricao": "Camiseta bege versatil com caimento elegante.",
+    "destaque": "Visual minimalista e atemporal.",
+    "composicao": "100% algodao",
     "cuidados": [
-      "Lavar separadamente na primeira lavagem.",
-      "Usar sabão neutro.",
-      "Não deixar de molho por longos períodos.",
-      "Secar em local ventilado."
+      "Lavar em ciclo delicado",
+      "Nao torcer",
+      "Secagem natural"
     ],
     "tamanhos": ["P", "M", "G", "GG"]
   },
   {
     "id": 4,
-    "nome": "Camisa Royal Aranha",
-    "preco": 89.90,
+    "nome": "Camiseta Aranha Azul Escuro",
+    "preco": 129.9,
     "categoria": "camisetas",
     "cor": "escura",
-    "imagem": "../../assets/modelofrente_azulcnome.jpg",
+    "imagem": "../../assets/azulescuro_frente.jpeg",
     "galeria": [
-      "../../assets/modelofrente_azulcnome.jpg",
-      "../../assets/modelocosta_azulcnome.jpg",
-      "../../assets/modelocosta_azulclogo.jpg"
+      "../../assets/azulescuro_frente.jpeg",
+      "../../assets/azulescuro_etiqueta_frente.jpeg",
+      "../../assets/azulescuro_costa.jpeg"
     ],
-    "subtitulo": "Camisa azul royal com visual limpo, assinatura discreta frontal e detalhe nas costas.",
-    "descricao": "A Camisa Royal Aranha foi criada para quem busca uma peça versátil e elegante no dia a dia. O tom azul royal entrega presença sem exagero, enquanto a assinatura minimalista da marca reforça a identidade premium da coleção.",
-    "destaque": "Modelagem confortável, acabamento refinado e galeria com frente, costas e detalhe da gola.",
-    "composicao": "100% algodão premium com toque macio e boa respirabilidade para uso prolongado.",
+    "subtitulo": "Linha Urban",
+    "descricao": "Camiseta azul escuro com visual sofisticado e moderno.",
+    "destaque": "Excelente para combinacoes casuais e noturnas.",
+    "composicao": "100% algodao",
     "cuidados": [
-      "Lavar do avesso com água fria.",
-      "Não usar alvejante.",
-      "Secar à sombra para preservar a cor.",
-      "Passar em temperatura baixa."
+      "Lavar do avesso",
+      "Secar a sombra",
+      "Nao usar alvejante"
+    ],
+    "tamanhos": ["P", "M", "G", "GG"]
+  },
+  {
+    "id": 5,
+    "nome": "Camiseta Aranha Rosa",
+    "preco": 129.9,
+    "categoria": "camisetas",
+    "cor": "clara",
+    "imagem": "../../assets/rosa_frente.jpeg",
+    "galeria": [
+      "../../assets/rosa_frente.jpeg",
+      "../../assets/rosa_etiqueta_frente.jpeg",
+      "../../assets/rosa_costa.jpeg"
+    ],
+    "subtitulo": "Linha Soft",
+    "descricao": "Camiseta rosa com toque suave e proposta contemporanea.",
+    "destaque": "Cor diferenciada para compor looks exclusivos.",
+    "composicao": "100% algodao",
+    "cuidados": [
+      "Lavar em agua fria",
+      "Nao usar secadora",
+      "Passar do avesso"
+    ],
+    "tamanhos": ["P", "M", "G", "GG"]
+  },
+  {
+    "id": 6,
+    "nome": "Camiseta Aranha Verde Militar",
+    "preco": 129.9,
+    "categoria": "camisetas",
+    "cor": "escura",
+    "imagem": "../../assets/verdemilitar_etiqueta_frente.jpeg",
+    "galeria": [
+      "../../assets/verdemilitar_etiqueta_frente.jpeg"
+    ],
+    "subtitulo": "Linha Field",
+    "descricao": "Camiseta verde militar com proposta utilitaria premium.",
+    "destaque": "Visual robusto com identidade da marca.",
+    "composicao": "100% algodao",
+    "cuidados": [
+      "Lavar com cores escuras",
+      "Secagem natural",
+      "Nao usar alvejante"
     ],
     "tamanhos": ["P", "M", "G", "GG"]
   }

@@ -337,57 +337,24 @@ async function loadProduct() {
     }
 
     try {
-        await waitForSupabaseBrowserClient();
-
-        let dbData = [];
-        let dbError = null;
-
-        if (window.supabase) {
-            try {
-                const { data, error } = await window.supabase
-                    .from('produtos')
-                    .select('*')
-                    .order('id', { ascending: false });
-
-                dbError = error || null;
-
-                if (!error && Array.isArray(data)) {
-                    dbData = data.map(item => ({
-                        ...item,
-                        galeria: item.galeria || [],
-                        imagem: item.imagem || item.imagem_url || ''
-                    }));
-                }
-            } catch (error) {
-                dbError = error;
-                console.warn('Nao foi possivel carregar produtos do Supabase na pagina de produto.', error);
+        let staticData = [];
+        try {
+            const response = await fetch(CATALOG_DATA_URL);
+            if (!response.ok) {
+                throw new Error(`HTTP ${response.status}`);
             }
+            staticData = await response.json();
+        } catch (error) {
+            console.warn('Nao foi possivel carregar catalogo.json na pagina de produto.', error);
         }
 
-        if (window.supabase) {
-            if (dbError) {
-                setState('Nao foi possivel carregar os produtos agora. Tente novamente em instantes.', true);
-                return;
-            }
-
-            allProducts = dbData.filter(item => !shouldHideProduct(item));
-        } else {
-            let staticData = [];
-            try {
-                const response = await fetch(CATALOG_DATA_URL);
-                staticData = await response.json();
-            } catch (error) {
-                console.warn('Nao foi possivel carregar catalogo.json na pagina de produto.', error);
-            }
-
-            allProducts = staticData
-                .map(item => ({
-                    ...item,
-                    galeria: item.galeria || [],
-                    imagem: item.imagem || item.imagem_url || ''
-                }))
-                .filter(item => !shouldHideProduct(item));
-        }
+        allProducts = staticData
+            .map(item => ({
+                ...item,
+                galeria: item.galeria || [],
+                imagem: item.imagem || item.imagem_url || ''
+            }))
+            .filter(item => !shouldHideProduct(item));
 
         const product = allProducts.find(item => Number(item.id) === productId);
 

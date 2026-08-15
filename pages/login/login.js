@@ -57,6 +57,10 @@ function getRedirectTarget() {
 function toFriendlyAuthMessage(message) {
     const normalized = String(message || '').toLowerCase();
 
+    if (normalized.includes('failed to fetch') || normalized.includes('network') || normalized.includes('fetch failed')) {
+        return 'Servico de autenticacao temporariamente indisponivel. Se o banco estiver em restauracao, aguarde alguns minutos e tente novamente.';
+    }
+
     if (normalized.includes('email not confirmed')) {
         return 'Seu cadastro foi criado, mas o e-mail ainda nao foi confirmado. Abra sua caixa de entrada e clique no link de confirmacao.';
     }
@@ -70,6 +74,11 @@ function toFriendlyAuthMessage(message) {
     }
 
     return message;
+}
+
+function getFriendlyError(error) {
+    const rawMessage = String(error?.message || error || '');
+    return toFriendlyAuthMessage(rawMessage || 'Nao foi possivel concluir a autenticacao agora.');
 }
 
 async function syncProfile(user, profile) {
@@ -108,7 +117,14 @@ if (phoneInput) {
 }
 
 async function redirectIfLoggedIn() {
-    const { data } = await supabase.auth.getSession();
+    let data;
+
+    try {
+        const sessionResult = await supabase.auth.getSession();
+        data = sessionResult.data;
+    } catch (_) {
+        return;
+    }
 
     if (data.session) {
         if (window.storefront) {
@@ -155,10 +171,20 @@ if (loginForm) {
             return;
         }
 
-        const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+        let data;
+        let error;
+
+        try {
+            const loginResult = await supabase.auth.signInWithPassword({ email, password });
+            data = loginResult.data;
+            error = loginResult.error;
+        } catch (unexpectedError) {
+            loginFeedback.textContent = getFriendlyError(unexpectedError);
+            return;
+        }
 
         if (error) {
-            loginFeedback.textContent = toFriendlyAuthMessage(error.message);
+            loginFeedback.textContent = getFriendlyError(error);
             return;
         }
 
@@ -197,19 +223,30 @@ if (registerForm) {
         const email = String(formData.get('email') || '').trim();
         const password = String(formData.get('password') || '');
 
-        const { data, error } = await supabase.auth.signUp({
-            email,
-            password,
-            options: {
-                data: {
-                    full_name: fullName,
-                    phone
+        let data;
+        let error;
+
+        try {
+            const signUpResult = await supabase.auth.signUp({
+                email,
+                password,
+                options: {
+                    data: {
+                        full_name: fullName,
+                        phone
+                    }
                 }
-            }
-        });
+            });
+
+            data = signUpResult.data;
+            error = signUpResult.error;
+        } catch (unexpectedError) {
+            registerFeedback.textContent = getFriendlyError(unexpectedError);
+            return;
+        }
 
         if (error) {
-            registerFeedback.textContent = toFriendlyAuthMessage(error.message);
+            registerFeedback.textContent = getFriendlyError(error);
             return;
         }
 

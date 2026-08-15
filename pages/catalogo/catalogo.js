@@ -301,45 +301,27 @@ function aplicarFiltroInicial() {
     }
 }
 
-// Busca os produtos priorizando Supabase para manter a vitrine sincronizada
+// Busca os produtos apenas do arquivo local para permitir gestao manual do catalogo
 async function carregarProdutos() {
     try {
-        await waitForSupabaseBrowserClient();
-
-        let dbData = [];
-        let dbError = null;
-
-        if (window.supabase) {
-            const { data, error } = await window.supabase.from('produtos').select('*').order('id', { ascending: false });
-            dbError = error || null;
-            if (!error && Array.isArray(data)) {
-                dbData = data.map(p => ({ ...p, galeria: p.galeria || [], imagem: p.imagem || '' }));
-            }
-        }
-
-        // Se o Supabase está disponível no frontend, ele sempre é a fonte de verdade.
-        if (window.supabase) {
-            if (dbError) {
-                console.error('Erro ao carregar produtos do Supabase:', dbError);
-                produtosDados = [];
-            } else {
-                produtosDados = dbData.filter(produto => !shouldHideProduct(produto));
-            }
-
-            aplicarFiltroInicial();
-            atualizarCatalogo();
-            return;
-        }
-
         let staticData = [];
         try {
             const resp = await fetch(CATALOG_DATA_URL);
+            if (!resp.ok) {
+                throw new Error(`HTTP ${resp.status}`);
+            }
             staticData = await resp.json();
         } catch (staticError) {
             console.warn('Nao foi possivel carregar catalogo.json', staticError);
         }
 
-        produtosDados = staticData.filter(produto => !shouldHideProduct(produto));
+        produtosDados = staticData
+            .map(item => ({
+                ...item,
+                galeria: Array.isArray(item.galeria) ? item.galeria : (item.imagem ? [item.imagem] : []),
+                imagem: item.imagem || item.imagem_url || ''
+            }))
+            .filter(produto => !shouldHideProduct(produto));
         aplicarFiltroInicial();
         atualizarCatalogo();
     } catch (error) {

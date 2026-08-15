@@ -1060,9 +1060,12 @@ body.no-scroll {
     .product-grid { grid-template-columns: 1fr 1fr; }
 
     .hero-banner {
-        height: 480px;
-        background-size: cover;
-        background-position: 56% 20%;
+        background-image: url('assets/banner-mobile.jpeg') !important;
+        height: clamp(220px, 46vw, 340px);
+        background-size: contain;
+        background-position: center top;
+        background-repeat: no-repeat;
+        background-color: #d8d5cf;
     }
     
     .banner-text h1 {
@@ -1108,15 +1111,16 @@ body.no-scroll {
 
 @media (max-width: 480px) {
     .hero-banner {
-        height: 38vw !important;
-        min-height: 0;
+        height: clamp(170px, 52vw, 250px) !important;
+        min-height: 170px;
+        background-image: url('assets/banner-mobile.jpeg') !important;
         padding: 0;
         margin: 0;
         display: flex;
         align-items: center;
         justify-content: center;
         background-position: center top;
-        background-size: 100% auto;
+        background-size: contain;
         background-repeat: no-repeat;
         background-color: #f3f1ec;
     }
@@ -1130,12 +1134,12 @@ body.no-scroll {
     }
 
     .brand-overlap {
-        margin-top: -16px;
+        margin-top: -52px;
         padding: 0 10px;
         display: flex;
         justify-content: center;
         position: relative;
-        z-index: 2;
+        z-index: 12;
     }
 
     .overlap-box {
