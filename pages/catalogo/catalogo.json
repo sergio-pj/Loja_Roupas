@@ -24,7 +24,7 @@
   },
   {
     "id": 2,
-    "nome": "Camiseta Aranha Azul",
+    "nome": "Camiseta Aranha Azul Marinho",
     "preco": 129.9,
     "categoria": "camisetas",
     "cor": "escura",
@@ -70,7 +70,7 @@
   },
   {
     "id": 4,
-    "nome": "Camiseta Aranha Azul Escuro",
+    "nome": "Camiseta Aranha Azul Royal",
     "preco": 129.9,
     "categoria": "camisetas",
     "cor": "escura",
